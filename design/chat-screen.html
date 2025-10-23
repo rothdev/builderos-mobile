@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuilderOS Mobile - Chat/Terminal Screen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: #f0f0f0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .phone-frame {
+            width: 393px;
+            height: 852px;
+            background: #1d1d1f;
+            border-radius: 50px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            position: relative;
+        }
+
+        .notch {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 30px;
+            background: #1d1d1f;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            border-radius: 42px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 54px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 24px 8px 24px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .time {
+            color: #1d1d1f;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            color: #1d1d1f;
+        }
+
+        /* Chat Header */
+        .chat-header {
+            background: white;
+            padding: 12px 20px;
+            border-bottom: 0.5px solid #e5e5e7;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .title-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .connection-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #34C759;
+        }
+
+        .title-text {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: #6e6e73;
+            margin-left: 20px;
+            margin-top: 2px;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            background: white;
+            padding: 12px 16px;
+            border-bottom: 0.5px solid #e5e5e7;
+            overflow-x: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .quick-actions::-webkit-scrollbar {
+            display: none;
+        }
+
+        .quick-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #f5f5f7;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #007AFF;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-action-btn:active {
+            transform: scale(0.95);
+            background: #e5e5e7;
+        }
+
+        /* Messages Container */
+        .messages-container {
+            height: calc(100% - 54px - 47px - 49px - 100px - 83px);
+            overflow-y: auto;
+            padding: 16px;
+            background: #f5f5f7;
+        }
+
+        .messages-container::-webkit-scrollbar {
+            width: 0;
+        }
+
+        /* Message Bubbles */
+        .message {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.user {
+            align-items: flex-end;
+        }
+
+        .message.system {
+            align-items: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .message.user .message-bubble {
+            background: #007AFF;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.system .message-bubble {
+            background: white;
+            color: #1d1d1f;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .message-text {
+            font-size: 15px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message-timestamp {
+            font-size: 11px;
+            color: #6e6e73;
+            margin-top: 4px;
+            padding: 0 4px;
+        }
+
+        /* Code Block in Messages */
+        .code-block {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .message.user .code-block {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .message.system .code-block {
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        /* Status Message (system info) */
+        .status-message {
+            text-align: center;
+            padding: 8px 16px;
+            margin: 16px auto;
+            background: rgba(0, 122, 255, 0.1);
+            border-radius: 12px;
+            font-size: 13px;
+            color: #007AFF;
+            max-width: 80%;
+        }
+
+        /* Input Container */
+        .input-container {
+            position: absolute;
+            bottom: 83px;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 0.5px solid #e5e5e7;
+            padding: 12px 16px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .voice-button {
+            width: 44px;
+            height: 44px;
+            background: #007AFF;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .voice-button:active {
+            transform: scale(0.95);
+            background: #0051D5;
+        }
+
+        .voice-button.recording {
+            background: #FF3B30;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .text-input {
+            flex: 1;
+            background: #f5f5f7;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 16px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            max-height: 100px;
+            outline: none;
+        }
+
+        .text-input:focus {
+            background: #e5e5e7;
+        }
+
+        .send-button {
+            width: 44px;
+            height: 44px;
+            background: #007AFF;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .send-button:active {
+            transform: scale(0.95);
+            background: #0051D5;
+        }
+
+        .send-button.disabled {
+            background: #e5e5e7;
+            cursor: not-allowed;
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 83px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 0.5px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding: 8px 16px 0 16px;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .tab-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .tab-item.active {
+            color: #007AFF;
+        }
+
+        .tab-item:not(.active) {
+            color: #8e8e93;
+        }
+
+        /* Voice Recording Indicator */
+        .voice-recording-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 24px 32px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 100;
+            display: none;
+        }
+
+        .voice-recording-indicator.active {
+            display: block;
+        }
+
+        .waveform {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .waveform-bar {
+            width: 4px;
+            background: #FF3B30;
+            border-radius: 2px;
+            animation: wave 1s infinite ease-in-out;
+        }
+
+        .waveform-bar:nth-child(1) { height: 20px; animation-delay: 0s; }
+        .waveform-bar:nth-child(2) { height: 30px; animation-delay: 0.1s; }
+        .waveform-bar:nth-child(3) { height: 40px; animation-delay: 0.2s; }
+        .waveform-bar:nth-child(4) { height: 30px; animation-delay: 0.3s; }
+        .waveform-bar:nth-child(5) { height: 20px; animation-delay: 0.4s; }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.5); }
+        }
+
+        .recording-text {
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .recording-time {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="notch"></div>
+        <div class="screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="time">9:41</div>
+                <div class="status-icons">
+                    <span>📶</span>
+                    <span>📡</span>
+                    <span>🔋</span>
+                </div>
+            </div>
+
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="header-title">
+                    <div class="title-left">
+                        <div class="connection-status"></div>
+                        <div class="title-text">BuilderOS Terminal</div>
+                    </div>
+                </div>
+                <div class="header-subtitle">Connected to roth-macbook-pro</div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="quick-action-btn">⚡ Status</div>
+                <div class="quick-action-btn">📋 Logs</div>
+                <div class="quick-action-btn">🔄 Refresh</div>
+                <div class="quick-action-btn">📊 Metrics</div>
+                <div class="quick-action-btn">🔍 Search</div>
+            </div>
+
+            <!-- Messages Container -->
+            <div class="messages-container">
+                <div class="status-message">
+                    Session started — SSH connected
+                </div>
+
+                <div class="message system">
+                    <div class="message-bubble">
+                        <div class="message-text">Welcome to BuilderOS! I'm Jarvis, your Number-2. How can I help you today?</div>
+                    </div>
+                    <div class="message-timestamp">9:35 AM</div>
+                </div>
+
+                <div class="message user">
+                    <div class="message-bubble">
+                        <div class="message-text">Show me system status</div>
+                    </div>
+                    <div class="message-timestamp">9:36 AM</div>
+                </div>
+
+                <div class="message system">
+                    <div class="message-bubble">
+                        <div class="message-text">Here's your system status:</div>
+                        <div class="code-block">24 capsules (7 active, 18 testing)
+API latency: 32ms
+Uptime: 2h 34m
+Memory: 8.2GB / 16GB</div>
+                    </div>
+                    <div class="message-timestamp">9:36 AM</div>
+                </div>
+
+                <div class="message user">
+                    <div class="message-bubble">
+                        <div class="message-text">What's the status of jellyfin-server-ops?</div>
+                    </div>
+                    <div class="message-timestamp">9:37 AM</div>
+                </div>
+
+                <div class="message system">
+                    <div class="message-bubble">
+                        <div class="message-text">Jellyfin Server Ops is <strong>active</strong>:</div>
+                        <div class="code-block">Status: Active
+Last updated: 1 day ago
+Tags: media, server, automation
+Health: ✓ All checks passing</div>
+                    </div>
+                    <div class="message-timestamp">9:37 AM</div>
+                </div>
+
+                <div class="status-message">
+                    ✓ Command executed successfully
+                </div>
+
+                <div class="message user">
+                    <div class="message-bubble">
+                        <div class="message-text">Thanks! Run daily audit</div>
+                    </div>
+                    <div class="message-timestamp">9:38 AM</div>
+                </div>
+
+                <div class="message system">
+                    <div class="message-bubble">
+                        <div class="message-text">Running daily audit...</div>
+                        <div class="code-block">⏳ Starting audit...
+✓ Checking capsule health
+✓ Validating registry
+✓ Performance baseline
+Completed in 2.3s</div>
+                    </div>
+                    <div class="message-timestamp">9:38 AM</div>
+                </div>
+            </div>
+
+            <!-- Input Container -->
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <div class="voice-button">
+                        🎤
+                    </div>
+                    <textarea class="text-input" placeholder="Message Jarvis or type command..." rows="1"></textarea>
+                    <div class="send-button">
+                        ↑
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voice Recording Indicator (Hidden by default) -->
+            <div class="voice-recording-indicator">
+                <div class="waveform">
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                </div>
+                <div class="recording-text">Listening...</div>
+                <div class="recording-time">0:03</div>
+            </div>
+
+            <!-- Tab Bar -->
+            <div class="tab-bar">
+                <div class="tab-item">
+                    <div class="tab-icon">📊</div>
+                    <div class="tab-label">Dashboard</div>
+                </div>
+                <div class="tab-item active">
+                    <div class="tab-icon">💬</div>
+                    <div class="tab-label">Chat</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">🔍</div>
+                    <div class="tab-label">Preview</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">⚙️</div>
+                    <div class="tab-label">Settings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple demo interaction
+        const voiceBtn = document.querySelector('.voice-button');
+        const recordingIndicator = document.querySelector('.voice-recording-indicator');
+
+        voiceBtn.addEventListener('click', () => {
+            voiceBtn.classList.toggle('recording');
+            recordingIndicator.classList.toggle('active');
+
+            if (voiceBtn.classList.contains('recording')) {
+                let seconds = 0;
+                const timer = setInterval(() => {
+                    seconds++;
+                    document.querySelector('.recording-time').textContent = `0:${seconds.toString().padStart(2, '0')}`;
+
+                    if (!voiceBtn.classList.contains('recording')) {
+                        clearInterval(timer);
+                    }
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

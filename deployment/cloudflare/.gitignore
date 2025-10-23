@@ -1,0 +1,13 @@
+# Cloudflare Tunnel - Generated Files
+# Do NOT commit these files as they contain sensitive tunnel credentials
+
+# Generated during setup
+.tunnel-info
+
+# Log files
+cloudflared.log
+cloudflared.error.log
+*.log
+
+# Backup files
+*.bak

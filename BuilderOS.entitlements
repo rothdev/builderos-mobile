@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Keychain Sharing -->
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.builderos.ios</string>
+	</array>
+
+	<!-- Network Extensions (for VPN) -->
+	<key>com.apple.developer.networking.networkextension</key>
+	<array>
+		<string>packet-tunnel-provider</string>
+		<string>app-proxy-provider</string>
+	</array>
+
+	<!-- Personal VPN (required for Tailscale) -->
+	<key>com.apple.developer.networking.vpn.api</key>
+	<array>
+		<string>allow-vpn</string>
+	</array>
+
+	<!-- App Groups (for sharing data between app and network extension) -->
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.builderos.ios</string>
+	</array>
+
+	<!-- Background Modes -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:builderos.app</string>
+	</array>
+</dict>
+</plist>

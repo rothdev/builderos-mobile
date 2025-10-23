@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Service identifier -->
+    <key>Label</key>
+    <string>com.builderos.cloudflared</string>
+
+    <!-- Program to run -->
+    <key>Program</key>
+    <string>/opt/homebrew/bin/cloudflared</string>
+
+    <!-- Command arguments -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/cloudflared</string>
+        <string>tunnel</string>
+        <string>--config</string>
+        <string>/Users/Ty/BuilderOS/capsules/builder-system-mobile/deployment/cloudflare/tunnel-config.yml</string>
+        <string>run</string>
+        <string>builderos-mobile</string>
+    </array>
+
+    <!-- Run on load (system startup) -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Keep service running (restart if it crashes) -->
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+        <key>Crashed</key>
+        <true/>
+    </dict>
+
+    <!-- Logging -->
+    <key>StandardOutPath</key>
+    <string>/Users/Ty/BuilderOS/capsules/builder-system-mobile/deployment/cloudflare/cloudflared.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/Ty/BuilderOS/capsules/builder-system-mobile/deployment/cloudflare/cloudflared.error.log</string>
+
+    <!-- Environment variables -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <!-- Process type -->
+    <key>ProcessType</key>
+    <string>Interactive</string>
+
+    <!-- Restart throttle (wait 10 seconds before restarting) -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <!-- Working directory -->
+    <key>WorkingDirectory</key>
+    <string>/Users/Ty/BuilderOS/capsules/builder-system-mobile/deployment/cloudflare</string>
+</dict>
+</plist>

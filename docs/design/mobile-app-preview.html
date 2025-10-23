@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuilderOS Mobile - Design Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+            background: #f5f5f7;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .controls h2 {
+            font-size: 20px;
+            font-weight: 600;
+            flex: 1 0 100%;
+            margin-bottom: 8px;
+        }
+
+        .theme-toggle {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.96);
+        }
+
+        .screen-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .screen-btn {
+            background: #f5f5f7;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .screen-btn.active {
+            background: #007AFF;
+            color: white;
+        }
+
+        .screen-btn:hover {
+            background: #e5e5e7;
+        }
+
+        .screen-btn.active:hover {
+            background: #0051D5;
+        }
+
+        .device-frame {
+            width: 393px;
+            height: 852px;
+            background: #1c1c1e;
+            border-radius: 50px;
+            padding: 14px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .device-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #1c1c1e;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .screen-content {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 40px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Dark mode */
+        .dark .screen-content {
+            background: #000000;
+            color: white;
+        }
+
+        /* Terminal Dark mode for Empty State */
+        .dark .screen-content.terminal-mode {
+            background: #0a0e1a;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 54px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 24px 8px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .dark .status-bar {
+            color: white;
+        }
+
+        /* Terminal Status Bar */
+        .terminal-mode .status-bar {
+            font-family: 'JetBrains Mono', monospace;
+            color: #60efff;
+            font-size: 13px;
+        }
+
+        /* Header */
+        .header {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dark .header {
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+
+        /* Terminal Header */
+        .terminal-mode .header {
+            background: rgba(10, 14, 26, 0.8);
+            border-bottom: 2px solid #1a2332;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        /* Terminal Header Title */
+        .terminal-mode .header-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 700;
+            color: #60efff;
+            letter-spacing: 0.5px;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #34C759;
+            font-weight: 500;
+        }
+
+        /* Terminal Connection Status */
+        .terminal-mode .connection-status {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #00ff88;
+            letter-spacing: 0.5px;
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            background: #34C759;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .terminal-mode .connection-dot {
+            background: #00ff88;
+            box-shadow: 0 0 8px #00ff88;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Chat Messages */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message-bubble {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.4;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-user {
+            align-self: flex-end;
+            background: #007AFF;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-system {
+            align-self: flex-start;
+            background: #E9E9EB;
+            color: #000000;
+            border-bottom-left-radius: 4px;
+        }
+
+        .dark .message-system {
+            background: #2C2C2E;
+            color: white;
+        }
+
+        .message-code {
+            align-self: flex-start;
+            background: #F5F5F7;
+            color: #1C1C1E;
+            border-bottom-left-radius: 4px;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            max-width: 90%;
+        }
+
+        .dark .message-code {
+            background: #1C1C1E;
+            color: #E5E5E7;
+        }
+
+        .message-timestamp {
+            font-size: 11px;
+            color: #8E8E93;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        /* Input Bar */
+        .input-bar {
+            padding: 12px 16px 34px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: white;
+        }
+
+        .dark .input-bar {
+            background: #000000;
+            border-top-color: rgba(255,255,255,0.1);
+        }
+
+        /* Terminal Input Bar */
+        .terminal-mode .input-bar {
+            background: rgba(10, 14, 26, 0.95);
+            border-top: 2px solid #1a2332;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-field {
+            flex: 1;
+            background: #F5F5F7;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 16px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .dark .input-field {
+            background: #1C1C1E;
+            color: white;
+        }
+
+        /* Terminal Input Field */
+        .terminal-mode .input-field {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(26, 35, 50, 0.6);
+            border: 1px solid #2a3f5f;
+            color: #60efff;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+        }
+
+        .terminal-mode .input-field::placeholder {
+            color: #4a6080;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .input-field::placeholder {
+            color: #8E8E93;
+        }
+
+        .quick-action-btn, .send-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 18px;
+        }
+
+        .quick-action-btn {
+            background: transparent;
+        }
+
+        .send-btn {
+            background: #007AFF;
+            color: white;
+        }
+
+        /* Terminal Send Button */
+        .terminal-mode .send-btn {
+            background: linear-gradient(135deg, #60efff 0%, #ff6b9d 50%, #ff3366 100%);
+            box-shadow: 0 0 12px rgba(96, 239, 255, 0.4);
+        }
+
+        .send-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* Empty State */
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+            gap: 20px;
+        }
+
+        /* Terminal Empty State */
+        .terminal-mode .empty-state {
+            background: radial-gradient(ellipse at center,
+                rgba(96, 239, 255, 0.15) 0%,
+                rgba(255, 107, 157, 0.1) 40%,
+                rgba(255, 51, 102, 0.05) 70%,
+                rgba(10, 14, 26, 0) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-mode .empty-state::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle,
+                rgba(96, 239, 255, 0.2) 0%,
+                rgba(255, 107, 157, 0.15) 50%,
+                rgba(255, 51, 102, 0.1) 100%);
+            border-radius: 50%;
+            filter: blur(60px);
+            animation: gradientPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes gradientPulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .builder-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 4px 16px rgba(0,122,255,0.3);
+        }
+
+        /* Terminal Builder Logo */
+        .terminal-mode .builder-logo {
+            position: relative;
+            z-index: 1;
+            width: 100px;
+            height: 100px;
+            background: rgba(10, 14, 26, 0.8);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #60efff 0%, #ff6b9d 50%, #ff3366 100%) 1;
+            border-radius: 16px;
+            box-shadow:
+                0 0 20px rgba(96, 239, 255, 0.3),
+                0 0 40px rgba(255, 107, 157, 0.2),
+                inset 0 0 20px rgba(96, 239, 255, 0.1);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 48px;
+        }
+
+        .terminal-mode .builder-logo::before {
+            content: '>';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            font-size: 16px;
+            color: #60efff;
+            font-weight: 700;
+        }
+
+        .terminal-mode .builder-logo::after {
+            content: '_';
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            font-size: 20px;
+            color: #ff6b9d;
+            font-weight: 700;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .empty-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* Terminal Title */
+        .terminal-mode .empty-title {
+            position: relative;
+            z-index: 1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60efff 0%, #ff6b9d 50%, #ff3366 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .terminal-mode .empty-title::before {
+            content: '$ ';
+            color: #00ff88;
+            -webkit-text-fill-color: #00ff88;
+        }
+
+        .empty-subtitle {
+            font-size: 15px;
+            color: #8E8E93;
+            line-height: 1.5;
+        }
+
+        /* Terminal Subtitle */
+        .terminal-mode .empty-subtitle {
+            position: relative;
+            z-index: 1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #7a9bc0;
+            line-height: 1.7;
+            max-width: 280px;
+            letter-spacing: 0.3px;
+        }
+
+        .terminal-mode .empty-subtitle::before {
+            content: '// ';
+            color: #4a6080;
+        }
+
+        /* Terminal Scanlines Effect */
+        .terminal-mode .empty-state::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1) 0px,
+                transparent 1px,
+                transparent 2px,
+                rgba(0, 0, 0, 0.1) 3px
+            );
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        /* Quick Actions Modal */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: flex-end;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-sheet {
+            width: 100%;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 24px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .dark .modal-sheet {
+            background: #1C1C1E;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-handle {
+            width: 40px;
+            height: 5px;
+            background: #C7C7CC;
+            border-radius: 3px;
+            margin: 0 auto 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .quick-action-card {
+            background: #F5F5F7;
+            border: none;
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dark .quick-action-card {
+            background: #2C2C2E;
+        }
+
+        .quick-action-card:active {
+            transform: scale(0.96);
+            background: #E5E5E7;
+        }
+
+        .dark .quick-action-card:active {
+            background: #3C3C3E;
+        }
+
+        .quick-action-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .quick-action-label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Connection Screen */
+        .connection-screen {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .connection-card {
+            background: #F5F5F7;
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .dark .connection-card {
+            background: #1C1C1E;
+        }
+
+        .connection-card-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .connection-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .dark .connection-row {
+            border-bottom-color: rgba(255,255,255,0.05);
+        }
+
+        .connection-row:last-child {
+            border-bottom: none;
+        }
+
+        .connection-label {
+            font-size: 15px;
+            color: #8E8E93;
+        }
+
+        .connection-value {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .connect-button {
+            width: 100%;
+            background: #34C759;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .connect-button:active {
+            transform: scale(0.98);
+        }
+
+        .connect-button.disconnect {
+            background: #FF3B30;
+        }
+
+        .help-section {
+            background: #F5F5F7;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .dark .help-section {
+            background: #1C1C1E;
+        }
+
+        .help-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .help-text {
+            font-size: 14px;
+            color: #8E8E93;
+            line-height: 1.5;
+        }
+
+        /* Hide screens */
+        .screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Annotations */
+        .annotation {
+            position: absolute;
+            background: rgba(255,59,48,0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>BuilderOS Mobile - iOS Design Preview</h2>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Dark Mode</button>
+        <div class="screen-selector">
+            <button class="screen-btn active" onclick="showScreen('chat')">Chat Screen</button>
+            <button class="screen-btn" onclick="showScreen('empty')">Empty State</button>
+            <button class="screen-btn" onclick="showScreen('quick-actions')">Quick Actions</button>
+            <button class="screen-btn" onclick="showScreen('connection')">Connection</button>
+        </div>
+    </div>
+
+    <div class="device-frame" id="deviceFrame">
+        <div class="screen-content" id="screenContent">
+            <!-- Chat Screen -->
+            <div class="screen active" id="chat-screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>📶 📡 🔋</span>
+                </div>
+                <div class="header">
+                    <span class="header-title">BuilderOS</span>
+                    <div class="connection-status">
+                        <span class="connection-dot"></span>
+                        <span>Connected</span>
+                    </div>
+                </div>
+                <div class="messages-container">
+                    <div class="message-bubble message-user">
+                        What's the status of my capsules?
+                    </div>
+                    <div class="message-bubble message-system">
+                        You have 7 active capsules. All systems operational. Would you like a detailed breakdown?
+                    </div>
+                    <div class="message-bubble message-user">
+                        Yes, show me the details
+                    </div>
+                    <div class="message-bubble message-code">
+✓ jellyfin-server-ops: Running
+✓ brandjack: Active
+✓ builder-system-mobile: Development
+✓ ecommerce: Production
+✓ jar-label-automation: Active
+✓ instagram-cropper: Ready
+✓ builder-system: Core System</div>
+                    <div class="message-bubble message-system">
+                        All capsules are healthy. Memory usage at 64%, no alerts.
+                        <div class="message-timestamp">9:41 AM</div>
+                    </div>
+                </div>
+                <div class="input-bar">
+                    <button class="quick-action-btn" onclick="showModal()">⚡</button>
+                    <input type="text" class="input-field" placeholder="Ask Jarvis...">
+                    <button class="send-btn">↑</button>
+                </div>
+            </div>
+
+            <!-- Empty State Screen (Terminal Aesthetic) -->
+            <div class="screen" id="empty-screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>📶 📡 🔋</span>
+                </div>
+                <div class="header">
+                    <span class="header-title">BuilderOS</span>
+                    <div class="connection-status">
+                        <span class="connection-dot"></span>
+                        <span>Connected</span>
+                    </div>
+                </div>
+                <div class="empty-state">
+                    <div class="builder-logo">🏗️</div>
+                    <div class="empty-title">BuilderOS</div>
+                    <div class="empty-subtitle">
+                        Your mobile companion for managing capsules, coordinating agents, and monitoring the Builder System on the go.
+                    </div>
+                </div>
+                <div class="input-bar">
+                    <button class="quick-action-btn" onclick="showModal()">⚡</button>
+                    <input type="text" class="input-field" placeholder="$ _">
+                    <button class="send-btn">↑</button>
+                </div>
+            </div>
+
+            <!-- Quick Actions Screen -->
+            <div class="screen" id="quick-actions-screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>📶 📡 🔋</span>
+                </div>
+                <div class="header">
+                    <span class="header-title">BuilderOS</span>
+                    <div class="connection-status">
+                        <span class="connection-dot"></span>
+                        <span>Connected</span>
+                    </div>
+                </div>
+                <div class="messages-container">
+                    <div class="message-bubble message-system">
+                        How can I help you today?
+                    </div>
+                </div>
+                <div class="input-bar">
+                    <button class="quick-action-btn" onclick="showModal()">⚡</button>
+                    <input type="text" class="input-field" placeholder="Ask Jarvis...">
+                    <button class="send-btn">↑</button>
+                </div>
+                <div class="modal-overlay show">
+                    <div class="modal-sheet">
+                        <div class="modal-handle"></div>
+                        <div class="modal-title">Quick Actions</div>
+                        <div class="quick-actions-grid">
+                            <button class="quick-action-card">
+                                <div class="quick-action-icon">📊</div>
+                                <div class="quick-action-label">System Status</div>
+                            </button>
+                            <button class="quick-action-card">
+                                <div class="quick-action-icon">🏗️</div>
+                                <div class="quick-action-label">List Capsules</div>
+                            </button>
+                            <button class="quick-action-card">
+                                <div class="quick-action-icon">🚀</div>
+                                <div class="quick-action-label">Deploy</div>
+                            </button>
+                            <button class="quick-action-card">
+                                <div class="quick-action-icon">🔍</div>
+                                <div class="quick-action-label">Search Logs</div>
+                            </button>
+                            <button class="quick-action-card">
+                                <div class="quick-action-icon">🧠</div>
+                                <div class="quick-action-label">Memory Query</div>
+                            </button>
+                            <button class="quick-action-card">
+                                <div class="quick-action-icon">⚙️</div>
+                                <div class="quick-action-label">Settings</div>
+                            </button>
+                        </div>
+                        <input type="text" class="input-field" placeholder="Or type a custom command..." style="width: 100%;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connection Screen -->
+            <div class="screen" id="connection-screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>📶 📡 🔋</span>
+                </div>
+                <div class="header">
+                    <span class="header-title">Connection</span>
+                    <div></div>
+                </div>
+                <div class="connection-screen">
+                    <div class="connection-card">
+                        <div class="connection-card-title">BuilderOS Status</div>
+                        <div class="connection-row">
+                            <span class="connection-label">Status</span>
+                            <span class="connection-value" style="color: #34C759;">● Connected</span>
+                        </div>
+                        <div class="connection-row">
+                            <span class="connection-label">Server</span>
+                            <span class="connection-value">Local MacBook</span>
+                        </div>
+                        <div class="connection-row">
+                            <span class="connection-label">Version</span>
+                            <span class="connection-value">2.1.0</span>
+                        </div>
+                        <div class="connection-row">
+                            <span class="connection-label">Latency</span>
+                            <span class="connection-value">24ms</span>
+                        </div>
+                    </div>
+
+                    <button class="connect-button disconnect">Disconnect</button>
+
+                    <div class="help-section">
+                        <div class="help-title">Connection Help</div>
+                        <div class="help-text">
+                            Ensure your iPhone and Mac are on the same Wi-Fi network. The BuilderOS backend must be running on your Mac for the mobile app to connect.
+                        </div>
+                    </div>
+
+                    <div class="connection-card">
+                        <div class="connection-card-title">Recent Activity</div>
+                        <div class="connection-row">
+                            <span class="connection-label">Last Sync</span>
+                            <span class="connection-value">2 min ago</span>
+                        </div>
+                        <div class="connection-row">
+                            <span class="connection-label">Messages</span>
+                            <span class="connection-value">47 today</span>
+                        </div>
+                        <div class="connection-row">
+                            <span class="connection-label">Tasks</span>
+                            <span class="connection-value">12 completed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isDark = false;
+
+        function toggleTheme() {
+            isDark = !isDark;
+            const deviceFrame = document.getElementById('deviceFrame');
+            const screenContent = document.getElementById('screenContent');
+
+            if (isDark) {
+                deviceFrame.classList.add('dark');
+                screenContent.classList.add('terminal-mode');
+            } else {
+                deviceFrame.classList.remove('dark');
+                screenContent.classList.remove('terminal-mode');
+            }
+        }
+
+        function showScreen(screenName) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            // Show selected screen
+            document.getElementById(screenName + '-screen').classList.add('active');
+
+            // Update button states
+            document.querySelectorAll('.screen-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function showModal() {
+            showScreen('quick-actions');
+            document.querySelectorAll('.screen-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === 'Quick Actions') {
+                    btn.classList.add('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Rathole Server Configuration
+# Deploy this on Oracle Cloud VM
+
+[server]
+bind_addr = "0.0.0.0:2333"
+
+# BuilderOS API Service
+[server.services.builderios-api]
+token = "HwH+lXVxgZu4/R9Q9oxtqbL8g2SAKRznTKBSUp51+qg="
+bind_addr = "0.0.0.0:8080"
+
+# SSH Service
+[server.services.ssh]
+token = "TDCykmZHR1CaBKysDc+18HYE+05C9AVyCBxvDVYIb3I="
+bind_addr = "0.0.0.0:2222"
+
+# Transport Security
+[server.transport]
+type = "noise"

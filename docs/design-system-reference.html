@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuilderOS Mobile - Design System Reference</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', sans-serif;
+            background: #f5f5f7;
+            padding: 40px 20px;
+            color: #1d1d1f;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #6e6e73;
+            margin-bottom: 48px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        h2 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1d1d1f;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            margin-top: 32px;
+            color: #1d1d1f;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .color-swatch {
+            border-radius: 12px;
+            padding: 80px 16px 16px 16px;
+            position: relative;
+            border: 1px solid #e5e5ea;
+        }
+
+        .color-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .color-value {
+            font-size: 12px;
+            color: #6e6e73;
+            font-family: 'SF Mono', Menlo, monospace;
+        }
+
+        .typography-sample {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e5e5ea;
+        }
+
+        .typography-sample:last-child {
+            border-bottom: none;
+        }
+
+        .type-label {
+            font-size: 12px;
+            color: #6e6e73;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .spacing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .spacing-item {
+            text-align: center;
+        }
+
+        .spacing-bar {
+            background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+            height: 40px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+
+        .spacing-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .spacing-value {
+            font-size: 11px;
+            color: #6e6e73;
+        }
+
+        .button-grid {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        .btn-secondary {
+            background: #f5f5f7;
+            color: #007aff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8ed;
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.95);
+        }
+
+        .btn-disabled {
+            background: #d1d1d6;
+            color: #8e8e93;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: not-allowed;
+        }
+
+        .card-example {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge-active {
+            background: rgba(52, 199, 89, 0.2);
+            color: #34c759;
+        }
+
+        .badge-development {
+            background: rgba(0, 122, 255, 0.2);
+            color: #007aff;
+        }
+
+        .badge-testing {
+            background: rgba(255, 149, 0, 0.2);
+            color: #ff9500;
+        }
+
+        .badge-archived {
+            background: rgba(142, 142, 147, 0.2);
+            color: #8e8e93;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .icon-item {
+            text-align: center;
+            padding: 16px;
+            background: #f5f5f7;
+            border-radius: 12px;
+        }
+
+        .icon-size {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .icon-label {
+            font-size: 10px;
+            color: #6e6e73;
+        }
+
+        .gradient-demo {
+            height: 120px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .note {
+            background: #f5f5f7;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 24px;
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .note strong {
+            color: #1d1d1f;
+        }
+
+        .animation-demo {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #007aff;
+            color: white;
+            border-radius: 10px;
+            margin: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .animation-fast { animation: pulse 0.15s ease; }
+        .animation-normal { animation: pulse 0.25s ease; }
+        .animation-slow { animation: pulse 0.35s ease; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+        }
+
+        .code {
+            font-family: 'SF Mono', Menlo, monospace;
+            background: #f5f5f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BuilderOS Mobile Design System</h1>
+        <p class="subtitle">Source of Truth: Swift Implementation (October 2025)</p>
+
+        <!-- Colors -->
+        <div class="section">
+            <h2>Color Palette</h2>
+
+            <h3>Brand Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch" style="background: #007aff;">
+                    <div class="color-name" style="color: white;">Primary</div>
+                    <div class="color-value" style="color: rgba(255,255,255,0.8);">.blue / #007AFF</div>
+                </div>
+                <div class="color-swatch" style="background: #5856d6;">
+                    <div class="color-name" style="color: white;">Accent Gradient</div>
+                    <div class="color-value" style="color: rgba(255,255,255,0.8);">.purple / #5856D6</div>
+                </div>
+            </div>
+
+            <h3>Status Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch" style="background: #34c759;">
+                    <div class="color-name" style="color: white;">Success</div>
+                    <div class="color-value" style="color: rgba(255,255,255,0.8);">.green / #34C759</div>
+                </div>
+                <div class="color-swatch" style="background: #ff9500;">
+                    <div class="color-name" style="color: white;">Warning</div>
+                    <div class="color-value" style="color: rgba(255,255,255,0.8);">.orange / #FF9500</div>
+                </div>
+                <div class="color-swatch" style="background: #ff3b30;">
+                    <div class="color-name" style="color: white;">Error</div>
+                    <div class="color-value" style="color: rgba(255,255,255,0.8);">.red / #FF3B30</div>
+                </div>
+                <div class="color-swatch" style="background: #007aff;">
+                    <div class="color-name" style="color: white;">Info</div>
+                    <div class="color-value" style="color: rgba(255,255,255,0.8);">.blue / #007AFF</div>
+                </div>
+            </div>
+
+            <h3>Tailscale Brand</h3>
+            <div class="color-grid">
+                <div class="color-swatch" style="background: #2E3338;">
+                    <div class="color-name" style="color: white;">Tailscale Primary</div>
+                    <div class="color-value" style="color: rgba(255,255,255,0.8);">#2E3338</div>
+                </div>
+                <div class="color-swatch" style="background: #598FFF;">
+                    <div class="color-name" style="color: white;">Tailscale Accent</div>
+                    <div class="color-value" style="color: rgba(255,255,255,0.8);">#598FFF</div>
+                </div>
+            </div>
+
+            <h3>Semantic Colors (Adaptive)</h3>
+            <p style="font-size: 14px; color: #6e6e73; margin-bottom: 16px;">These colors automatically adapt to Light/Dark mode</p>
+            <div class="color-grid">
+                <div class="color-swatch" style="background: #1d1d1f;">
+                    <div class="color-name" style="color: white;">Text Primary</div>
+                    <div class="color-value" style="color: rgba(255,255,255,0.8);">.primary</div>
+                </div>
+                <div class="color-swatch" style="background: #6e6e73;">
+                    <div class="color-name" style="color: white;">Text Secondary</div>
+                    <div class="color-value" style="color: rgba(255,255,255,0.8);">.secondary</div>
+                </div>
+                <div class="color-swatch" style="background: #ffffff; border: 2px solid #e5e5ea;">
+                    <div class="color-name">Background Primary</div>
+                    <div class="color-value">.systemBackground</div>
+                </div>
+                <div class="color-swatch" style="background: #f5f5f7;">
+                    <div class="color-name">Background Secondary</div>
+                    <div class="color-value">.secondarySystemBackground</div>
+                </div>
+            </div>
+
+            <h3>Gradients</h3>
+            <div class="gradient-demo" style="background: linear-gradient(135deg, #007aff 0%, rgba(0, 122, 255, 0.7) 100%);">
+                Primary Gradient
+            </div>
+            <div class="code">LinearGradient(colors: [.blue, .blue.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing)</div>
+
+            <div class="gradient-demo" style="background: linear-gradient(90deg, #007aff 0%, #5856d6 100%); margin-top: 16px;">
+                Accent Gradient
+            </div>
+            <div class="code">LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)</div>
+        </div>
+
+        <!-- Typography -->
+        <div class="section">
+            <h2>Typography System</h2>
+
+            <h3>Display Fonts (SF Pro Rounded)</h3>
+            <div class="typography-sample">
+                <div class="type-label">Display Large • 57pt Bold Rounded</div>
+                <div style="font-size: 57px; font-weight: 700;">BuilderOS</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Display Medium • 45pt Bold Rounded</div>
+                <div style="font-size: 45px; font-weight: 700;">Mobile App</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Display Small • 36pt Bold Rounded</div>
+                <div style="font-size: 36px; font-weight: 700;">System Status</div>
+            </div>
+
+            <h3>Headline Fonts (SF Pro Rounded)</h3>
+            <div class="typography-sample">
+                <div class="type-label">Headline Large • 32pt Semibold Rounded</div>
+                <div style="font-size: 32px; font-weight: 600;">Dashboard</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Headline Medium • 28pt Semibold Rounded</div>
+                <div style="font-size: 28px; font-weight: 600;">Connected</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Headline Small • 24pt Semibold Rounded</div>
+                <div style="font-size: 24px; font-weight: 600;">Settings</div>
+            </div>
+
+            <h3>Title Fonts (SF Pro Default)</h3>
+            <div class="typography-sample">
+                <div class="type-label">Title Large • 22pt Semibold</div>
+                <div style="font-size: 22px; font-weight: 600;">Capsule Name</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Title Medium • 16pt Semibold</div>
+                <div style="font-size: 16px; font-weight: 600;">Section Header</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Title Small • 14pt Semibold</div>
+                <div style="font-size: 14px; font-weight: 600;">Description</div>
+            </div>
+
+            <h3>Body Fonts (SF Pro Default)</h3>
+            <div class="typography-sample">
+                <div class="type-label">Body Large • 16pt Regular</div>
+                <div style="font-size: 16px;">Access your BuilderOS system from anywhere with secure Cloudflare Tunnel integration.</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Body Medium • 14pt Regular</div>
+                <div style="font-size: 14px;">This is the standard body text used throughout the app for readable content.</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Body Small • 12pt Regular</div>
+                <div style="font-size: 12px;">Smaller body text for supplementary information and compact displays.</div>
+            </div>
+
+            <h3>Label Fonts (SF Pro Default)</h3>
+            <div class="typography-sample">
+                <div class="type-label">Label Large • 14pt Medium</div>
+                <div style="font-size: 14px; font-weight: 500;">Status: Connected</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Label Medium • 12pt Medium</div>
+                <div style="font-size: 12px; font-weight: 500; color: #6e6e73;">Tunnel URL</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Label Small • 11pt Medium</div>
+                <div style="font-size: 11px; font-weight: 500; color: #6e6e73;">CLOUDFLARE TUNNEL</div>
+            </div>
+
+            <h3>Monospaced Fonts (SF Mono)</h3>
+            <div class="typography-sample">
+                <div class="type-label">Mono Large • 16pt Regular Monospaced</div>
+                <div style="font-size: 16px; font-family: 'SF Mono', Menlo, monospace;">https://builderos-xyz.trycloudflare.com</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Mono Medium • 14pt Regular Monospaced</div>
+                <div style="font-size: 14px; font-family: 'SF Mono', Menlo, monospace;">API_KEY_12345678</div>
+            </div>
+            <div class="typography-sample">
+                <div class="type-label">Mono Small • 12pt Regular Monospaced</div>
+                <div style="font-size: 12px; font-family: 'SF Mono', Menlo, monospace;">/Users/Ty/BuilderOS/capsules</div>
+            </div>
+        </div>
+
+        <!-- Spacing -->
+        <div class="section">
+            <h2>Spacing System</h2>
+            <p style="font-size: 14px; color: #6e6e73; margin-bottom: 24px;">8pt base grid with 4pt sub-grid</p>
+
+            <div class="spacing-grid">
+                <div class="spacing-item">
+                    <div class="spacing-bar" style="width: 20%;"></div>
+                    <div class="spacing-label">XS</div>
+                    <div class="spacing-value">4pt</div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-bar" style="width: 40%;"></div>
+                    <div class="spacing-label">SM</div>
+                    <div class="spacing-value">8pt</div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-bar" style="width: 60%;"></div>
+                    <div class="spacing-label">MD</div>
+                    <div class="spacing-value">12pt</div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-bar" style="width: 80%;"></div>
+                    <div class="spacing-label">Base</div>
+                    <div class="spacing-value">16pt</div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-bar" style="width: 100%;"></div>
+                    <div class="spacing-label">LG</div>
+                    <div class="spacing-value">24pt</div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-bar" style="width: 100%;"></div>
+                    <div class="spacing-label">XL</div>
+                    <div class="spacing-value">32pt</div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-bar" style="width: 100%;"></div>
+                    <div class="spacing-label">XXL</div>
+                    <div class="spacing-value">48pt</div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-bar" style="width: 100%;"></div>
+                    <div class="spacing-label">XXXL</div>
+                    <div class="spacing-value">64pt</div>
+                </div>
+            </div>
+
+            <h3>Corner Radius</h3>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px;">
+                <div style="width: 80px; height: 80px; background: #007aff; border-radius: 4px;"></div>
+                <div style="text-align: center; width: 80px;">
+                    <div style="font-size: 11px; margin-top: 4px; font-weight: 600;">XS • 4pt</div>
+                </div>
+                <div style="width: 80px; height: 80px; background: #007aff; border-radius: 8px;"></div>
+                <div style="text-align: center; width: 80px;">
+                    <div style="font-size: 11px; margin-top: 4px; font-weight: 600;">SM • 8pt</div>
+                </div>
+                <div style="width: 80px; height: 80px; background: #007aff; border-radius: 12px;"></div>
+                <div style="text-align: center; width: 80px;">
+                    <div style="font-size: 11px; margin-top: 4px; font-weight: 600;">MD • 12pt</div>
+                </div>
+                <div style="width: 80px; height: 80px; background: #007aff; border-radius: 16px;"></div>
+                <div style="text-align: center; width: 80px;">
+                    <div style="font-size: 11px; margin-top: 4px; font-weight: 600;">LG • 16pt</div>
+                </div>
+                <div style="width: 80px; height: 80px; background: #007aff; border-radius: 20px;"></div>
+                <div style="text-align: center; width: 80px;">
+                    <div style="font-size: 11px; margin-top: 4px; font-weight: 600;">XL • 20pt</div>
+                </div>
+                <div style="width: 80px; height: 80px; background: #007aff; border-radius: 50%;"></div>
+                <div style="text-align: center; width: 80px;">
+                    <div style="font-size: 11px; margin-top: 4px; font-weight: 600;">Circle</div>
+                </div>
+            </div>
+
+            <h3>Icon Sizes</h3>
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <div class="icon-size" style="font-size: 16px;">🧊</div>
+                    <div class="icon-label">SM • 16pt</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon-size" style="font-size: 24px;">🧊</div>
+                    <div class="icon-label">MD • 24pt</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon-size" style="font-size: 32px;">🧊</div>
+                    <div class="icon-label">LG • 32pt</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon-size" style="font-size: 48px;">🧊</div>
+                    <div class="icon-label">XL • 48pt</div>
+                </div>
+                <div class="icon-item">
+                    <div class="icon-size" style="font-size: 64px;">🧊</div>
+                    <div class="icon-label">XXL • 64pt</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="section">
+            <h2>Button Styles</h2>
+
+            <h3>Primary Button</h3>
+            <div class="button-grid">
+                <button class="btn-primary">Continue</button>
+                <button class="btn-primary">Test Connection</button>
+                <button class="btn-primary">Get Started</button>
+            </div>
+            <div style="margin-top: 12px; font-size: 13px; color: #6e6e73;">
+                • Background: Blue gradient<br>
+                • Text: White, Semibold<br>
+                • Padding: 12pt vertical, 20pt horizontal<br>
+                • Corner radius: 12pt<br>
+                • Press: Scale 0.95, 0.1s ease
+            </div>
+
+            <h3>Secondary Button</h3>
+            <div class="button-grid">
+                <button class="btn-secondary">Cancel</button>
+                <button class="btn-secondary">Back</button>
+                <button class="btn-secondary">Update</button>
+            </div>
+            <div style="margin-top: 12px; font-size: 13px; color: #6e6e73;">
+                • Background: .systemGray5<br>
+                • Text: Blue<br>
+                • Padding: 12pt vertical, 20pt horizontal<br>
+                • Corner radius: 10pt<br>
+                • Press: Scale 0.95, 0.1s ease
+            </div>
+
+            <h3>Disabled State</h3>
+            <div class="button-grid">
+                <button class="btn-disabled">Disabled</button>
+            </div>
+            <div style="margin-top: 12px; font-size: 13px; color: #6e6e73;">
+                • Background: Gray<br>
+                • Text: Secondary gray<br>
+                • Cursor: Not allowed
+            </div>
+        </div>
+
+        <!-- Components -->
+        <div class="section">
+            <h2>Component Library</h2>
+
+            <h3>Cards (.ultraThinMaterial)</h3>
+            <div class="card-example">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <div style="font-size: 24px;">✓</div>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 4px;">Connected</div>
+                        <div style="font-size: 13px; color: #6e6e73;">BuilderOS Mobile</div>
+                    </div>
+                </div>
+                <div style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px; margin-top: 12px;">
+                    <div style="font-size: 12px; color: #6e6e73; font-family: 'SF Mono', monospace;">https://builderos-xyz.trycloudflare.com</div>
+                </div>
+            </div>
+            <div style="font-size: 13px; color: #6e6e73; margin-top: 12px;">
+                • Background: rgba(255, 255, 255, 0.8) + blur(20px)<br>
+                • Border: 1px solid rgba(0,0,0,0.05)<br>
+                • Corner radius: 12pt<br>
+                • Padding: 20pt
+            </div>
+
+            <h3>Status Badges</h3>
+            <div style="margin-top: 16px;">
+                <span class="status-badge badge-active">Active</span>
+                <span class="status-badge badge-development">Development</span>
+                <span class="status-badge badge-testing">Testing</span>
+                <span class="status-badge badge-archived">Archived</span>
+            </div>
+            <div style="font-size: 13px; color: #6e6e73; margin-top: 12px;">
+                • Font: 11pt, Semibold<br>
+                • Padding: 6pt vertical, 12pt horizontal<br>
+                • Corner radius: 8pt<br>
+                • Background: Status color at 20% opacity<br>
+                • Text: Status color at 100%
+            </div>
+
+            <h3>Form Fields</h3>
+            <div style="margin-top: 16px;">
+                <div style="margin-bottom: 8px; font-size: 12px; color: #6e6e73;">CLOUDFLARE TUNNEL URL</div>
+                <input type="text" placeholder="https://builderos-xyz.trycloudflare.com"
+                       style="width: 100%; padding: 12px 16px; border: none; background: #f5f5f7;
+                              border-radius: 10px; font-family: 'SF Mono', monospace; font-size: 14px;">
+            </div>
+            <div style="font-size: 13px; color: #6e6e73; margin-top: 12px;">
+                • Background: .systemGray6<br>
+                • Font: Monospaced (for URLs/keys)<br>
+                • Padding: 12pt vertical, 16pt horizontal<br>
+                • Corner radius: 10pt<br>
+                • No autocapitalization
+            </div>
+        </div>
+
+        <!-- Animation -->
+        <div class="section">
+            <h2>Animation System</h2>
+
+            <h3>Durations</h3>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px;">
+                <div class="animation-demo animation-fast" onclick="this.classList.add('animation-fast'); setTimeout(() => this.classList.remove('animation-fast'), 150);">
+                    Fast (0.15s)
+                </div>
+                <div class="animation-demo animation-normal" onclick="this.classList.add('animation-normal'); setTimeout(() => this.classList.remove('animation-normal'), 250);">
+                    Normal (0.25s)
+                </div>
+                <div class="animation-demo animation-slow" onclick="this.classList.add('animation-slow'); setTimeout(() => this.classList.remove('animation-slow'), 350);">
+                    Slow (0.35s)
+                </div>
+            </div>
+            <div style="font-size: 13px; color: #6e6e73; margin-top: 16px;">
+                Click each button to see the animation duration
+            </div>
+
+            <h3>Spring Presets</h3>
+            <div style="margin-top: 16px; font-size: 14px;">
+                <div style="margin-bottom: 12px;">
+                    <strong>Spring Fast:</strong> Response 0.3, Damping 0.7 (quick, snappy)
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <strong>Spring Normal:</strong> Response 0.4, Damping 0.8 (balanced)
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <strong>Spring Bouncy:</strong> Response 0.5, Damping 0.6 (playful)
+                </div>
+            </div>
+
+            <h3>Common Patterns</h3>
+            <div style="margin-top: 16px; font-size: 14px;">
+                <div style="margin-bottom: 12px;">
+                    <strong>Button Press:</strong> Scale 0.95, 0.1s ease-in-out
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <strong>Screen Transitions:</strong> Spring animation (0.3s response, 0.7 damping)
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <strong>Sheet Presentation:</strong> Spring animation with material blur
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Notes -->
+        <div class="note">
+            <strong>Implementation Note:</strong> This design system is extracted from the actual Swift implementation in
+            <span class="code">/src/Utilities/</span> and <span class="code">/src/BuilderSystemMobile/Common/Theme.swift</span>.
+            All values shown here match the production code as of October 23, 2025. For complete specifications and screen designs,
+            see <span class="code">docs/CURRENT_DESIGN.md</span>.
+        </div>
+
+        <div class="note" style="background: #e3f2fd;">
+            <strong>🎨 Design Workflow:</strong> This HTML reference is for quick visual reference.
+            The Swift source code in <span class="code">/src/</span> is the single source of truth.
+            When making design changes, update the Swift code first, then regenerate this documentation.
+        </div>
+    </div>
+
+    <script>
+        // Add click-to-copy for color values
+        document.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.style.cursor = 'pointer';
+            swatch.addEventListener('click', function() {
+                const value = this.querySelector('.color-value').textContent;
+                navigator.clipboard.writeText(value);
+
+                const originalBorder = this.style.border;
+                this.style.border = '2px solid #34c759';
+                setTimeout(() => {
+                    this.style.border = originalBorder;
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>

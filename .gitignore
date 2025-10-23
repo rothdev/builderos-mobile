@@ -1,0 +1,81 @@
+# Xcode
+.DS_Store
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+DerivedData/
+*.hmap
+*.ipa
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+
+# Swift Package Manager
+/.build
+/Packages
+.swiftpm/
+Package.resolved
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Xcode project backups
+src/.xcodeproj-backups/
+
+# Credentials & Secrets
+.netrc
+.env
+.env.*
+!.env.example
+deployment/CREDENTIALS.md
+*.pem
+*.p12
+*.mobileprovision
+
+# iOS Code Signing
+*.certSigningRequest
+*.p8
+
+# Testing
+*.gcda
+*.gcno
+*.profdata
+*.coverage
+.test_results/
+
+# Build artifacts
+*.dSYM.zip
+*.dSYM
+*.app.dSYM
+
+# Temporary files
+*.swp
+*.swo
+*~
+.tmp/
+
+# macOS
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Documentation builds
+docs/.build/
+.docc-build/
+
+# IMPORTANT: Keep the project file tracked
+!*.xcodeproj/
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/project.xcworkspace/
+!*.xcodeproj/project.xcworkspace/contents.xcworkspacedata

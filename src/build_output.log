@@ -1,0 +1,8 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project BuilderOS.xcodeproj -scheme BuilderOS -destination "platform=iOS Simulator,name=iPhone 17 Pro" clean build
+
+2025-10-22 20:18:28.581 xcodebuild[42226:330402] Writing error result bundle to /var/folders/20/3xcpyry55_zgfv5s55gy8y700000gp/T/ResultBundle_2025-22-10_20-18-0028.xcresult
+xcodebuild: error: Unable to read project 'BuilderOS.xcodeproj'.
+	Reason: Failed to load project at '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS.xcodeproj' for an unknown reason.
+
+

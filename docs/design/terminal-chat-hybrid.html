@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BuilderOS Terminal Chat - Pixel Perfect SwiftUI Match</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Mono', 'Monaco', 'Menlo', 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1e2e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* iPhone Frame */
+        .phone-container {
+            width: 390px;
+            height: 844px;
+            background: #000;
+            border-radius: 47px;
+            box-shadow: 0 0 0 12px #1a1a1a, 0 0 60px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Dynamic Island */
+        .dynamic-island {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 37px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 10000;
+        }
+
+        /* Screen */
+        .screen {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Terminal Background (lines 57-98) */
+        .terminal-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Base: #0a0e1a = rgb(10, 14, 26) */
+            background: rgb(10, 14, 26);
+            z-index: 1;
+        }
+
+        /* Radial Gradient Overlay */
+        .radial-gradient {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1.2);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle at center,
+                rgba(96, 239, 255, 0.15) 0%,      /* #60efff cyan */
+                rgba(255, 107, 157, 0.1) 30%,     /* #ff6b9d pink */
+                rgba(255, 51, 102, 0.05) 50%,     /* #ff3366 red */
+                transparent 70%
+            );
+            animation: pulse 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1.3); }
+        }
+
+        /* Scanlines (lines 85-98) */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1) 0px,
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Content Container */
+        .content {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* Terminal Header (lines 101-154) */
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            /* Background: rgba(10, 14, 26, 0.8) with ultraThinMaterial */
+            background: rgba(10, 14, 26, 0.8);
+            backdrop-filter: blur(20px);
+            /* Bottom border: #1a2332 = rgb(26, 35, 50) */
+            border-bottom: 2px solid rgb(26, 35, 50);
+            margin-top: 44px; /* Safe area */
+        }
+
+        .header-title {
+            /* Font: 15px bold monospaced */
+            font-size: 15px;
+            font-weight: bold;
+            /* LINEAR GRADIENT: cyan → pink → red */
+            background: linear-gradient(90deg,
+                rgb(96, 239, 255) 0%,      /* #60efff cyan */
+                rgb(255, 107, 157) 50%,    /* #ff6b9d pink */
+                rgb(255, 51, 102) 100%     /* #ff3366 red */
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            /* 8px circle, green #00ff88 = rgb(0, 255, 136) */
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgb(0, 255, 136);
+            /* Shadow with 0.6 opacity */
+            box-shadow: 0 0 4px rgba(0, 255, 136, 0.6);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 4px rgba(0, 255, 136, 0.6); }
+            100% { box-shadow: 0 0 8px rgba(0, 255, 136, 0.6); }
+        }
+
+        .status-text {
+            /* 11px medium monospaced, green, letter-spacing 0.5px */
+            font-size: 11px;
+            font-weight: 500;
+            color: rgb(0, 255, 136);
+            letter-spacing: 0.5px;
+        }
+
+        /* Messages Container */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+        }
+
+        .message {
+            padding: 0 20px;
+            margin-bottom: 16px;
+        }
+
+        /* Message View (lines 291-316) */
+        .message-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .message-prompt {
+            /* 16px bold */
+            font-size: 16px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .message-prompt.user {
+            /* User: green #00ff88 */
+            color: rgb(0, 255, 136);
+        }
+
+        .message-prompt.system {
+            /* System: cyan #60efff */
+            color: rgb(96, 239, 255);
+        }
+
+        .message-text {
+            /* 15px regular monospaced */
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .message-text.user {
+            /* User: white 100% opacity */
+            color: rgba(255, 255, 255, 1.0);
+        }
+
+        .message-text.system {
+            /* System: white 90% opacity */
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Timestamp (lines 307-312) */
+        .message-timestamp {
+            /* 11px monospaced, gray 50% opacity */
+            font-size: 11px;
+            color: rgba(128, 128, 128, 0.5);
+            margin-top: 6px;
+            /* Padding-left 26px (aligned with text after prompt) */
+            padding-left: 26px;
+        }
+
+        /* Input Bar (lines 319-396) */
+        .terminal-input-bar {
+            padding: 12px 16px 34px 16px;
+            /* Background: rgba(10, 14, 26, 0.95) with ultraThinMaterial */
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(20px);
+            /* Top border: #1a2332 */
+            border-top: 2px solid rgb(26, 35, 50);
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Lightning Bolt Button (lines 322-338) */
+        .bolt-button {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .bolt-icon {
+            width: 18px;
+            height: 18px;
+            /* Gradient fill: cyan to pink */
+            background: linear-gradient(135deg,
+                rgb(96, 239, 255) 0%,      /* #60efff */
+                rgb(255, 107, 157) 100%    /* #ff6b9d */
+            );
+            /* Using mask for SVG icon */
+            -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M240.5 224H352a16 16 0 0 0 13.8-24L176 24a16 16 0 0 0-27.8 16l56 232H96a16 16 0 0 0-13.8 24L272 488a16 16 0 0 0 27.8-16l-56-232z"/></svg>') center/contain no-repeat;
+            mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M240.5 224H352a16 16 0 0 0 13.8-24L176 24a16 16 0 0 0-27.8 16l56 232H96a16 16 0 0 0-13.8 24L272 488a16 16 0 0 0 27.8-16l-56-232z"/></svg>') center/contain no-repeat;
+        }
+
+        /* Input Field (lines 341-358) */
+        .input-field {
+            flex: 1;
+            padding: 10px 16px;
+            /* Background: rgba(26, 35, 50, 0.6) */
+            background: rgba(26, 35, 50, 0.6);
+            /* Border: rgb(42, 63, 95) */
+            border: 1px solid rgb(42, 63, 95);
+            border-radius: 20px;
+            /* Text color: cyan #60efff */
+            color: rgb(96, 239, 255);
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .input-field::placeholder {
+            /* Placeholder: "$ _" in cyan */
+            color: rgb(96, 239, 255);
+            opacity: 0.7;
+        }
+
+        /* Send Button (lines 361-381) */
+        .send-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            /* Gradient: cyan → pink → red */
+            background: linear-gradient(135deg,
+                rgb(96, 239, 255) 0%,      /* #60efff */
+                rgb(255, 107, 157) 50%,    /* #ff6b9d */
+                rgb(255, 51, 102) 100%     /* #ff3366 */
+            );
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            /* Shadow: cyan glow, 0.4 opacity, 12px radius */
+            box-shadow: 0 0 12px rgba(96, 239, 255, 0.4);
+            flex-shrink: 0;
+        }
+
+        .send-icon {
+            /* Arrow.up icon, 16px bold, white */
+            width: 16px;
+            height: 16px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 83px;
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 8px;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .tab-icon {
+            font-size: 24px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .tab-item.active .tab-label {
+            color: rgb(96, 239, 255);
+        }
+
+        .tab-item:not(.active) .tab-label {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Scrollbar */
+        .messages-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: rgba(96, 239, 255, 0.3);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="dynamic-island"></div>
+
+        <div class="screen">
+            <!-- Terminal Background -->
+            <div class="terminal-background">
+                <div class="radial-gradient"></div>
+            </div>
+            <div class="scanlines"></div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Header -->
+                <div class="terminal-header">
+                    <div class="header-title">$ BuilderOS</div>
+                    <div class="connection-status">
+                        <div class="status-dot"></div>
+                        <div class="status-text">CONNECTED</div>
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div class="messages-container">
+                    <!-- User Message -->
+                    <div class="message">
+                        <div class="message-content">
+                            <div class="message-prompt user">&gt;</div>
+                            <div class="message-text user">claude code</div>
+                        </div>
+                    </div>
+
+                    <!-- System Response -->
+                    <div class="message">
+                        <div class="message-content">
+                            <div class="message-prompt system">$</div>
+                            <div class="message-text system">Command received: 'claude code'
+
+Chat integration with Jarvis/Codex coming soon. For now, try: status, capsules, help</div>
+                        </div>
+                        <div class="message-timestamp">21:24:21</div>
+                    </div>
+                </div>
+
+                <!-- Input Bar -->
+                <div class="terminal-input-bar">
+                    <div class="input-container">
+                        <button class="bolt-button">
+                            <div class="bolt-icon"></div>
+                        </button>
+                        <input type="text" class="input-field" placeholder="$ _">
+                        <button class="send-button">
+                            <svg class="send-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab Bar -->
+                <div class="tab-bar">
+                    <div class="tab-item">
+                        <div class="tab-icon">📊</div>
+                        <div class="tab-label">Dashboard</div>
+                    </div>
+                    <div class="tab-item active">
+                        <div class="tab-icon">💬</div>
+                        <div class="tab-label">Terminal</div>
+                    </div>
+                    <div class="tab-item">
+                        <div class="tab-icon">👁️</div>
+                        <div class="tab-label">Preview</div>
+                    </div>
+                    <div class="tab-item">
+                        <div class="tab-icon">⚙️</div>
+                        <div class="tab-label">Settings</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-focus input
+        const input = document.querySelector('.input-field');
+        const sendButton = document.querySelector('.send-button');
+        const messagesContainer = document.querySelector('.messages-container');
+
+        // Send message function
+        function sendMessage() {
+            const text = input.value.trim();
+            if (text) {
+                // Create user message
+                const userMsg = document.createElement('div');
+                userMsg.className = 'message';
+                userMsg.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-prompt user">&gt;</div>
+                        <div class="message-text user">${escapeHtml(text)}</div>
+                    </div>
+                `;
+                messagesContainer.appendChild(userMsg);
+
+                // Clear input
+                input.value = '';
+
+                // Simulate system response
+                setTimeout(() => {
+                    const systemMsg = document.createElement('div');
+                    const now = new Date();
+                    const timestamp = now.toTimeString().split(' ')[0]; // HH:mm:ss
+
+                    systemMsg.className = 'message';
+                    systemMsg.innerHTML = `
+                        <div class="message-content">
+                            <div class="message-prompt system">$</div>
+                            <div class="message-text system">Command received: '${escapeHtml(text)}'
+
+Chat integration with Jarvis/Codex coming soon. For now, try: status, capsules, help</div>
+                        </div>
+                        <div class="message-timestamp">${timestamp}</div>
+                    `;
+                    messagesContainer.appendChild(systemMsg);
+
+                    // Scroll to bottom
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 800);
+
+                // Scroll to bottom
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Send button click
+        sendButton.addEventListener('click', sendMessage);
+
+        // Enter key to send
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Initial scroll to show messages
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    </script>
+</body>
+</html>

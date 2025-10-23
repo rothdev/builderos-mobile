@@ -1,0 +1,27 @@
+for the builder system. #include "../common.cherri"
+
+/* Generated shortcut: Check Builder Status */
+/* Generated on: 2025-08-12T09:33:48.220728 */
+
+#define color green
+#define glyph checkmark.circle
+#define name CheckBuilderStatus
+
+// Builder System variables
+@builderSystem = "Builder System automation"
+
+// Action: ssh_connect
+@sshTarget = "builder_server"
+// SSH connection would be established here
+
+// Action: run_command
+@command = "~/Documents/Builder/tools/daily_audit.sh"
+// Command would be executed here
+
+// Action: show_result
+// Show result action - handled by alert
+
+
+// Builder System completion
+@completionMessage = "Shortcut executed from builder-system-mobile capsule"
+alert(completionMessage)

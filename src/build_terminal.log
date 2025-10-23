@@ -1,0 +1,208 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project BuilderOS.xcodeproj -scheme BuilderOS -destination "platform=iOS Simulator,name=iPhone 17 Pro" clean build
+
+2025-10-22 20:20:02.468 xcodebuild[46539:339620] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+** CLEAN SUCCEEDED **
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (1 target)
+    Target 'BuilderOS' in project 'BuilderOS' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: 5a905e2191d41d5289055a1c060fecdc
+Build description path: /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/XCBuildData/5a905e2191d41d5289055a1c060fecdc.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk /Users/Ty/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -o /Users/Ty/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache
+
+CreateBuildDirectory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS.xcodeproj
+    builtin-create-build-directory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products
+
+CreateBuildDirectory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS.xcodeproj
+    builtin-create-build-directory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex
+
+CreateBuildDirectory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS.xcodeproj
+    builtin-create-build-directory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/ExplicitPrecompiledModules
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS.xcodeproj
+    builtin-create-build-directory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS.xcodeproj
+    builtin-create-build-directory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator
+
+CreateBuildDirectory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS.xcodeproj
+    builtin-create-build-directory /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS-d7c9c1774b3e2a42a96833519fda90a8-VFS-iphonesimulator/all-product-headers.yaml
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS.xcodeproj
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS-d7c9c1774b3e2a42a96833519fda90a8-VFS-iphonesimulator/all-product-headers.yaml
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources/Entitlements-Simulated.plist (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources/Entitlements-Simulated.plist
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/empty-BuilderOS.plist (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/empty-BuilderOS.plist
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS_const_extract_protocols.json (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS-OutputFileMap.json (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.hmap (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.hmap
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS.SwiftConstValuesFileList (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS.SwiftFileList (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS.SwiftFileList
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS.LinkFileList (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS.LinkFileList
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.DependencyStaticMetadataFileList (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.DependencyMetadataFileList (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-project-headers.hmap (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-project-headers.hmap
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-own-target-headers.hmap (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-own-target-headers.hmap
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-generated-files.hmap (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-generated-files.hmap
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-all-target-headers.hmap (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-all-target-headers.hmap
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-all-non-framework-target-headers.hmap (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-all-non-framework-target-headers.hmap
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-DebugDylibPath-normal-arm64.txt (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-DebugDylibPath-normal-arm64.txt
+
+WriteAuxiliaryFile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-DebugDylibInstallName-normal-arm64.txt (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    write-file /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-DebugDylibInstallName-normal-arm64.txt
+
+MkDir /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator/BuilderOS.app (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    /bin/mkdir -p /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator/BuilderOS.app
+
+ProcessProductPackaging "" /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.app-Simulated.xcent (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    
+    Entitlements:
+    
+    {
+    "application-identifier" = "8XKPD356D2.com.builderos.app";
+}
+    
+    builtin-productPackagingUtility -entitlements -format xml -o /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.app-Simulated.xcent
+
+ProcessProductPackagingDER /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.app-Simulated.xcent /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.app-Simulated.xcent.der (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    /usr/bin/derq query -f xml -i /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.app-Simulated.xcent -o /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.app-Simulated.xcent.der --raw
+
+Ld /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator/BuilderOS.app/__preview.dylib normal (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0-simulator -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -O0 -L/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator -F/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator -install_name @rpath/BuilderOS.debug.dylib -dead_strip -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS_dependency_info.dat -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __entitlements -Xlinker /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.app-Simulated.xcent -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __ents_der -Xlinker /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS.app-Simulated.xcent.der -Xlinker -no_adhoc_codesign -o /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator/BuilderOS.app/__preview.dylib
+
+GenerateAssetSymbols /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Assets.xcassets (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Assets.xcassets --compile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator/BuilderOS.app --output-format human-readable-text --notices --warnings --export-dependency-info /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/assetcatalog_dependencies --output-partial-info-plist /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/assetcatalog_generated_info.plist --app-icon AppIcon --compress-pngs --enable-on-demand-resources YES --development-region en --target-device iphone --target-device ipad --minimum-deployment-target 17.0 --platform iphonesimulator --bundle-identifier com.builderos.app --generate-swift-asset-symbol-extensions NO --generate-swift-asset-symbols /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources/GeneratedAssetSymbols.swift --generate-objc-asset-symbols /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources/GeneratedAssetSymbols.h --generate-asset-symbol-index /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+/* com.apple.actool.notices */
+/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Assets.xcassets: warning: Failed to read file attributes for "/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Assets.xcassets"
+    Failure Reason: No such file or directory
+/* com.apple.actool.compilation-results */
+/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources/GeneratedAssetSymbols.h
+/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources/GeneratedAssetSymbols.swift
+
+
+MkDir /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/assetcatalog_output/thinned (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    /bin/mkdir -p /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/assetcatalog_output/thinned
+
+MkDir /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/assetcatalog_output/unthinned (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    /bin/mkdir -p /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/assetcatalog_output/unthinned
+
+CompileAssetCatalogVariant thinned /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator/BuilderOS.app /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Assets.xcassets (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Assets.xcassets --compile /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/assetcatalog_dependencies_thinned --output-partial-info-plist /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --compress-pngs --enable-on-demand-resources YES --filter-for-thinning-device-configuration iPhone18,1 --filter-for-device-os-version 26.0.1 --development-region en --target-device iphone --target-device ipad --minimum-deployment-target 17.0 --platform iphonesimulator
+
+SwiftDriver\ Compilation\ Requirements BuilderOS normal arm64 com.apple.xcode.tools.swift.compiler (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name BuilderOS -Onone -enforce-exclusivity\=checked @/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS.SwiftFileList -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/Ty/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator -F /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/Ty/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache -output-file-map /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/Ty/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/Ty/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/Ty/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS_const_extract_protocols.json -Xcc -iquote -Xcc /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-generated-files.hmap -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-own-target-headers.hmap -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-all-target-headers.hmap -Xcc -iquote -Xcc /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-project-headers.hmap -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources-normal/arm64 -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources/arm64 -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources -emit-objc-header -emit-objc-header-path /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS-Swift.h -working-directory /Users/Ty/BuilderOS/capsules/builder-system-mobile/src -experimental-emit-module-separately -disable-cmo
+error: Build input files cannot be found: '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/BuilderOSApp.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/MainContentView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/TerminalChatView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/DashboardView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/LocalhostPreviewView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/SettingsView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/OnboardingView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/CapsuleDetailView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Services/TailscaleConnectionManager.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Services/BuilderOSAPIClient.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Models/Capsule.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Models/SystemStatus.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Models/TailscaleDevice.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Utilities/Colors.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Utilities/Typography.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Utilities/Spacing.swift'. Did you forget to declare these files as outputs of any script phases or custom build rules which produce them? (in target 'BuilderOS' from project 'BuilderOS')
+
+SwiftDriver\ Compilation BuilderOS normal arm64 com.apple.xcode.tools.swift.compiler (in target 'BuilderOS' from project 'BuilderOS')
+    cd /Users/Ty/BuilderOS/capsules/builder-system-mobile/src
+    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name BuilderOS -Onone -enforce-exclusivity\=checked @/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS.SwiftFileList -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -target arm64-apple-ios17.0-simulator -g -module-cache-path /Users/Ty/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator -F /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/Ty/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-26257891a6c027eb51374368541b8346.sdkstatcache -output-file-map /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/Ty/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/Ty/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/Ty/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS_const_extract_protocols.json -Xcc -iquote -Xcc /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-generated-files.hmap -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-own-target-headers.hmap -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-all-target-headers.hmap -Xcc -iquote -Xcc /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/BuilderOS-project-headers.hmap -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources-normal/arm64 -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources/arm64 -Xcc -I/Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/DerivedSources -emit-objc-header -emit-objc-header-path /Users/Ty/Library/Developer/Xcode/DerivedData/BuilderOS-cxgkhznlxmcvtvdofwyyffjxhppl/Build/Intermediates.noindex/BuilderOS.build/Debug-iphonesimulator/BuilderOS.build/Objects-normal/arm64/BuilderOS-Swift.h -working-directory /Users/Ty/BuilderOS/capsules/builder-system-mobile/src -experimental-emit-module-separately -disable-cmo
+error: Build input files cannot be found: '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/BuilderOSApp.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/MainContentView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/TerminalChatView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/DashboardView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/LocalhostPreviewView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/SettingsView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/OnboardingView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Views/CapsuleDetailView.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Services/TailscaleConnectionManager.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Services/BuilderOSAPIClient.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Models/Capsule.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Models/SystemStatus.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Models/TailscaleDevice.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Utilities/Colors.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Utilities/Typography.swift', '/Users/Ty/BuilderOS/capsules/builder-system-mobile/src/BuilderOS/Utilities/Spacing.swift'. Did you forget to declare these files as outputs of any script phases or custom build rules which produce them? (in target 'BuilderOS' from project 'BuilderOS')
+
+** BUILD FAILED **
+
+
+The following build commands failed:
+	SwiftDriver\ Compilation\ Requirements BuilderOS normal arm64 com.apple.xcode.tools.swift.compiler (in target 'BuilderOS' from project 'BuilderOS')
+	SwiftDriver\ Compilation BuilderOS normal arm64 com.apple.xcode.tools.swift.compiler (in target 'BuilderOS' from project 'BuilderOS')
+	Building project BuilderOS with scheme BuilderOS
+(3 failures)

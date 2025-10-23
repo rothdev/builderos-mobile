@@ -1,0 +1,20 @@
+# Rathole Client Configuration
+# Deploy this on Mac (BuilderOS host)
+# IMPORTANT: Replace ORACLE_VM_IP with your Oracle Cloud public IP
+
+[client]
+remote_addr = "ORACLE_VM_IP:2333"
+
+# BuilderOS API Service
+[client.services.builderios-api]
+token = "HwH+lXVxgZu4/R9Q9oxtqbL8g2SAKRznTKBSUp51+qg="
+local_addr = "127.0.0.1:8080"
+
+# SSH Service
+[client.services.ssh]
+token = "TDCykmZHR1CaBKysDc+18HYE+05C9AVyCBxvDVYIb3I="
+local_addr = "127.0.0.1:22"
+
+# Transport Security
+[client.transport]
+type = "noise"

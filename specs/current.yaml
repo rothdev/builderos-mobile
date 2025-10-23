@@ -1,0 +1,132 @@
+name: builder-system-mobile
+version: "0.1.0"
+status: development
+
+description: |
+  Native iOS mobile application providing mobile access to BuilderOS capabilities,
+  including capsule management, agent coordination, system monitoring, and on-the-go
+  Builder System operations from iPhone and iPad devices.
+
+technical:
+  stack:
+    - Swift 5.9+
+    - SwiftUI
+    - iOS SDK 17+
+    - Xcode 15+
+    - URLSession (networking)
+    - CoreData (local storage)
+
+  dependencies:
+    external:
+      - iOS 17+ runtime
+      - BuilderOS backend APIs
+      - Push notification services (APNs)
+      - iCloud (optional sync)
+    internal:
+      - BuilderOS agent coordination APIs
+      - Builder Memory MCP integration
+      - Capsule status APIs
+      - System monitoring APIs
+
+  architecture:
+    type: native_mobile_mvc
+    components:
+      - name: dashboard_view
+        purpose: Overview of active capsules and system status
+      - name: capsule_manager
+        purpose: Browse, view, and manage capsule lifecycle
+      - name: agent_coordinator
+        purpose: Initiate and monitor agent task execution
+      - name: system_monitor
+        purpose: Real-time health metrics and performance tracking
+      - name: notification_handler
+        purpose: Push notifications for system alerts and task completion
+      - name: data_sync_engine
+        purpose: Bidirectional sync with BuilderOS backend
+      - name: offline_cache
+        purpose: Local storage for documentation and offline access
+
+capabilities:
+  - Mobile capsule dashboard
+  - Capsule status monitoring
+  - Agent task initiation
+  - System health checks
+  - Push notifications
+  - Offline documentation access
+  - Builder Memory queries
+  - Quick actions and shortcuts
+  - System performance metrics
+  - Task history and logs
+  - iOS Shortcuts integration
+  - Widget support (planned)
+  - Siri integration (planned)
+
+integration:
+  apis:
+    - BuilderOS REST APIs
+    - Capsule status endpoints
+    - Agent coordination APIs
+    - System monitoring APIs
+    - Builder Memory MCP
+
+  data_storage:
+    - src/ios/: iOS application source code
+    - src/BuilderSystemMobile/: App bundle and resources
+    - CoreData: Local database for cache
+    - UserDefaults: App preferences
+
+  mcps_required:
+    - builder-memory (for knowledge queries)
+
+data:
+  storage:
+    - src/ios/BuilderSystemMobile/: Swift source files
+    - BuilderSystemMobile.xcodeproj/: Xcode project
+    - ops/: Operations scripts
+    - runs/: Execution logs
+
+  retention:
+    cache: 30 days
+    logs: 14 days
+    offline_docs: until updated
+
+  privacy:
+    - No sensitive data stored locally
+    - Secure API authentication
+    - Optional biometric authentication
+    - Data encrypted at rest
+
+maintenance:
+  schedule: as_needed
+  monitoring:
+    - App performance and crashes
+    - API connectivity and latency
+    - Sync status and conflicts
+    - Battery and memory usage
+    - iOS version compatibility
+
+  automation:
+    - Automated build via Xcode Cloud (planned)
+    - TestFlight distribution
+    - Cache cleanup on app launch
+    - Background sync when available
+
+quality:
+  testing:
+    - Unit tests for business logic
+    - UI tests for critical flows
+    - Integration tests with BuilderOS APIs
+    - Performance testing
+
+  performance:
+    - Fast app launch (<2 seconds)
+    - Responsive UI (60fps)
+    - Efficient network usage
+    - Low battery impact
+
+security:
+  - Secure API token storage in Keychain
+  - TLS/HTTPS for all network requests
+  - Optional biometric authentication
+  - No sensitive data in logs
+  - App Transport Security compliance

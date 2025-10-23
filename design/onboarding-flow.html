@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuilderOS Mobile - Onboarding Flow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: #f0f0f0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #6e6e73;
+            margin-bottom: 40px;
+        }
+
+        .screens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(393px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        /* Phone Frame */
+        .phone-frame {
+            width: 393px;
+            height: 852px;
+            background: #1d1d1f;
+            border-radius: 50px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .notch {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 30px;
+            background: #1d1d1f;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 42px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen-label {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .screen-description {
+            text-align: center;
+            margin-top: 4px;
+            font-size: 13px;
+            color: #6e6e73;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 40px;
+            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+            text-align: center;
+        }
+
+        .app-icon {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            margin-bottom: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .welcome-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .welcome-subtitle {
+            font-size: 17px;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.5;
+            margin-bottom: 48px;
+        }
+
+        .welcome-button {
+            background: white;
+            color: #007AFF;
+            padding: 16px 48px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .welcome-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Tailscale Auth Screen */
+        .auth-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: #f5f5f7;
+        }
+
+        .auth-header {
+            padding: 60px 32px 32px 32px;
+            text-align: center;
+        }
+
+        .auth-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 122, 255, 0.1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 24px auto;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+        }
+
+        .auth-description {
+            font-size: 15px;
+            color: #6e6e73;
+            line-height: 1.5;
+        }
+
+        .auth-options {
+            flex: 1;
+            padding: 24px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .auth-button {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .auth-button:active {
+            transform: scale(0.98);
+            background: #f5f5f7;
+        }
+
+        .auth-button-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-button-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        /* Discovery Screen */
+        .discovery-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 40px;
+            background: white;
+            text-align: center;
+        }
+
+        .discovery-animation {
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            background: rgba(0, 122, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .discovery-pulse {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            border: 3px solid #007AFF;
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .discovery-icon {
+            font-size: 48px;
+            z-index: 1;
+        }
+
+        .discovery-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+        }
+
+        .discovery-description {
+            font-size: 15px;
+            color: #6e6e73;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .discovery-status {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f5f5f7;
+            border-radius: 10px;
+        }
+
+        .status-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: #1d1d1f;
+            font-weight: 500;
+        }
+
+        .status-check {
+            color: #34C759;
+        }
+
+        .status-loading {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* API Key Screen */
+        .api-key-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: white;
+        }
+
+        .api-header {
+            padding: 60px 32px 32px 32px;
+            text-align: center;
+        }
+
+        .api-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 122, 255, 0.1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 24px auto;
+        }
+
+        .api-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+        }
+
+        .api-description {
+            font-size: 15px;
+            color: #6e6e73;
+            line-height: 1.5;
+        }
+
+        .api-form {
+            flex: 1;
+            padding: 24px 32px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: #f5f5f7;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'SF Mono', monospace;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            background: white;
+            border-color: #007AFF;
+        }
+
+        .form-hint {
+            font-size: 13px;
+            color: #6e6e73;
+            margin-top: 8px;
+        }
+
+        .continue-button {
+            width: 100%;
+            background: #007AFF;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .continue-button:active {
+            transform: scale(0.98);
+            background: #0051D5;
+        }
+
+        .continue-button.disabled {
+            background: #e5e5e7;
+            color: #86868b;
+            cursor: not-allowed;
+        }
+
+        /* Success Screen */
+        .success-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 40px;
+            background: white;
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: rgba(52, 199, 89, 0.1);
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            margin-bottom: 32px;
+        }
+
+        .success-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+        }
+
+        .success-description {
+            font-size: 15px;
+            color: #6e6e73;
+            line-height: 1.5;
+            margin-bottom: 40px;
+        }
+
+        .success-button {
+            background: #007AFF;
+            color: white;
+            padding: 16px 48px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .success-button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BuilderOS Mobile — Onboarding Flow</h1>
+        <p class="subtitle">First-time setup experience for new users</p>
+
+        <div class="screens-grid">
+            <!-- Screen 1: Welcome -->
+            <div>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <div class="screen">
+                        <div class="welcome-screen">
+                            <div class="app-icon">⚡</div>
+                            <div class="welcome-title">BuilderOS</div>
+                            <div class="welcome-subtitle">
+                                Secure remote access to your Mac development environment from anywhere
+                            </div>
+                            <div class="welcome-button">Get Started</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">Step 1: Welcome Screen</div>
+                <div class="screen-description">App intro and value proposition</div>
+            </div>
+
+            <!-- Screen 2: Tailscale Auth -->
+            <div>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <div class="screen">
+                        <div class="auth-screen">
+                            <div class="auth-header">
+                                <div class="auth-icon">🔐</div>
+                                <div class="auth-title">Connect to Tailscale</div>
+                                <div class="auth-description">
+                                    Sign in to establish a secure VPN connection to your Mac
+                                </div>
+                            </div>
+                            <div class="auth-options">
+                                <div class="auth-button">
+                                    <div class="auth-button-icon">🐙</div>
+                                    <div class="auth-button-text">Continue with GitHub</div>
+                                </div>
+                                <div class="auth-button">
+                                    <div class="auth-button-icon">🔵</div>
+                                    <div class="auth-button-text">Continue with Google</div>
+                                </div>
+                                <div class="auth-button">
+                                    <div class="auth-button-icon">🪟</div>
+                                    <div class="auth-button-text">Continue with Microsoft</div>
+                                </div>
+                                <div class="auth-button">
+                                    <div class="auth-button-icon">✉️</div>
+                                    <div class="auth-button-text">Continue with Email</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">Step 2: Tailscale OAuth</div>
+                <div class="screen-description">One-time authentication via OAuth provider</div>
+            </div>
+
+            <!-- Screen 3: Auto-Discovery -->
+            <div>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <div class="screen">
+                        <div class="discovery-screen">
+                            <div class="discovery-animation">
+                                <div class="discovery-pulse"></div>
+                                <div class="discovery-pulse" style="animation-delay: 0.5s;"></div>
+                                <div class="discovery-icon">🔍</div>
+                            </div>
+                            <div class="discovery-title">Discovering Devices</div>
+                            <div class="discovery-description">
+                                Looking for your Mac on the Tailscale network...
+                            </div>
+                            <div class="discovery-status">
+                                <div class="status-item">
+                                    <div class="status-icon status-check">✓</div>
+                                    <div class="status-text">Connected to Tailscale</div>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-icon status-loading">⏳</div>
+                                    <div class="status-text">Scanning for devices...</div>
+                                </div>
+                                <div class="status-item" style="opacity: 0.5;">
+                                    <div class="status-icon">○</div>
+                                    <div class="status-text">Connecting to Mac</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">Step 3: Auto-Discovery</div>
+                <div class="screen-description">Automatic Mac detection on Tailscale network</div>
+            </div>
+
+            <!-- Screen 4: API Key Entry -->
+            <div>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <div class="screen">
+                        <div class="api-key-screen">
+                            <div class="api-header">
+                                <div class="api-icon">🔑</div>
+                                <div class="api-title">Enter API Key</div>
+                                <div class="api-description">
+                                    Get your API key from the BuilderOS terminal on your Mac
+                                </div>
+                            </div>
+                            <div class="api-form">
+                                <div class="form-group">
+                                    <label class="form-label">Mac Device</label>
+                                    <input type="text" class="form-input" value="roth-macbook-pro" readonly style="color: #6e6e73;">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Tailscale IP</label>
+                                    <input type="text" class="form-input" value="100.66.202.6" readonly style="color: #6e6e73;">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">API Key</label>
+                                    <input type="password" class="form-input" placeholder="Enter your API key" value="sk_test_1234...">
+                                    <div class="form-hint">
+                                        Run <code style="background: #f5f5f7; padding: 2px 6px; border-radius: 4px;">cd ~/BuilderOS/api && ./server_mode.sh</code> on your Mac
+                                    </div>
+                                </div>
+                                <div class="continue-button">
+                                    Continue
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">Step 4: API Key Entry</div>
+                <div class="screen-description">Secure API authentication with Mac</div>
+            </div>
+
+            <!-- Screen 5: Success -->
+            <div>
+                <div class="phone-frame">
+                    <div class="notch"></div>
+                    <div class="screen">
+                        <div class="success-screen">
+                            <div class="success-icon">✓</div>
+                            <div class="success-title">You're All Set!</div>
+                            <div class="success-description">
+                                Your iPhone is now securely connected to your Mac via Tailscale. You can now monitor capsules, run commands, and manage your BuilderOS remotely.
+                            </div>
+                            <div class="success-button">Go to Dashboard</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">Step 5: Success</div>
+                <div class="screen-description">Confirmation and transition to main app</div>
+            </div>
+        </div>
+
+        <!-- Flow Diagram -->
+        <div style="background: white; padding: 32px; border-radius: 16px; margin-top: 40px;">
+            <h2 style="font-size: 28px; font-weight: 600; margin-bottom: 24px; color: #1d1d1f;">Onboarding User Flow</h2>
+            <div style="font-family: 'SF Mono', monospace; font-size: 14px; line-height: 2; color: #1d1d1f;">
+                <div style="margin-bottom: 16px;">
+                    <strong>1. Welcome Screen</strong><br>
+                    ├─ Show app icon and branding<br>
+                    ├─ Explain value proposition (secure remote access)<br>
+                    └─ "Get Started" CTA → Tailscale Auth
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <strong>2. Tailscale OAuth</strong><br>
+                    ├─ Present auth options (GitHub, Google, Microsoft, Email)<br>
+                    ├─ User selects provider → Opens OAuth web flow<br>
+                    ├─ User authenticates → Returns to app<br>
+                    └─ VPN connection established → Auto-Discovery
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <strong>3. Auto-Discovery</strong><br>
+                    ├─ Show "Discovering Devices" animation<br>
+                    ├─ Scan Tailscale network for Mac (by hostname)<br>
+                    ├─ Display progress indicators:<br>
+                    │  ├─ ✓ Connected to Tailscale<br>
+                    │  ├─ ⏳ Scanning for devices...<br>
+                    │  └─ ○ Connecting to Mac<br>
+                    ├─ Found Mac → Extract Tailscale IP<br>
+                    └─ Success → API Key Entry
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <strong>4. API Key Entry</strong><br>
+                    ├─ Show discovered Mac name (read-only)<br>
+                    ├─ Show Tailscale IP (read-only)<br>
+                    ├─ User enters API key from Mac terminal<br>
+                    ├─ Hint: Show command to run on Mac<br>
+                    ├─ Validate API key with test request<br>
+                    └─ Valid → Store in Keychain → Success Screen
+                </div>
+
+                <div>
+                    <strong>5. Success Screen</strong><br>
+                    ├─ Show checkmark icon and confirmation<br>
+                    ├─ Explain what user can now do<br>
+                    └─ "Go to Dashboard" → Main App (Dashboard Tab)
+                </div>
+            </div>
+        </div>
+
+        <!-- Design Notes -->
+        <div style="background: #f5f5f7; padding: 32px; border-radius: 16px; margin-top: 24px; border: 2px solid #e5e5e7;">
+            <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 16px; color: #1d1d1f;">Implementation Notes</h2>
+            <div style="font-size: 15px; line-height: 1.8; color: #1d1d1f;">
+                <p style="margin-bottom: 12px;"><strong>Skip Logic:</strong> If user has previously authenticated (API key in Keychain), skip onboarding entirely and go straight to Dashboard.</p>
+
+                <p style="margin-bottom: 12px;"><strong>Error Handling:</strong> Each step should handle failures gracefully with "Retry" button and clear error messages (e.g., "Mac not found on network", "Invalid API key").</p>
+
+                <p style="margin-bottom: 12px;"><strong>Animations:</strong> Use native iOS spring animations (0.3-0.5s) for screen transitions. Pulse animation on discovery screen to indicate active scanning.</p>
+
+                <p style="margin-bottom: 12px;"><strong>Accessibility:</strong> All buttons have minimum 44pt touch targets. VoiceOver labels on all interactive elements. Dynamic Type support for text scaling.</p>
+
+                <p style="margin-bottom: 12px;"><strong>Network Timeout:</strong> Auto-discovery times out after 30 seconds with option to retry or manually enter Mac IP.</p>
+
+                <p><strong>Security:</strong> API key stored in iOS Keychain (kSecClassGenericPassword). Never displayed in plain text after initial entry. OAuth tokens managed by Tailscale SDK.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

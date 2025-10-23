@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuilderOS App Icon - Design Options</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1e2e 100%);
+            color: white;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #60efff 0%, #ff6b9d 50%, #ff3366 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 18px;
+            margin-bottom: 60px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+
+        .option-card {
+            background: rgba(26, 35, 50, 0.4);
+            border: 2px solid rgba(96, 239, 255, 0.2);
+            border-radius: 24px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .option-card:hover {
+            border-color: rgba(96, 239, 255, 0.6);
+            box-shadow: 0 0 40px rgba(96, 239, 255, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .option-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #60efff 0%, #ff6b9d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .option-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .icon-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 40px;
+            background: rgba(10, 14, 26, 0.6);
+            border-radius: 16px;
+        }
+
+        /* Icon styles */
+        .icon {
+            border-radius: 22.37%;
+            position: relative;
+        }
+
+        .icon-large {
+            width: 256px;
+            height: 256px;
+        }
+
+        /* Option 1: Terminal Cube */
+        .icon-cube {
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a2332 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .icon-cube::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle at center,
+                rgba(96, 239, 255, 0.3) 0%,
+                rgba(255, 107, 157, 0.2) 30%,
+                rgba(255, 51, 102, 0.1) 50%,
+                transparent 70%
+            );
+        }
+
+        .cube-symbol {
+            position: relative;
+            z-index: 2;
+            width: 140px;
+            height: 140px;
+        }
+
+        .cube-face {
+            position: absolute;
+            border: 4px solid;
+            border-image: linear-gradient(135deg, #60efff 0%, #ff6b9d 50%, #ff3366 100%) 1;
+        }
+
+        .cube-top {
+            width: 80px;
+            height: 40px;
+            transform: skewY(-30deg) translateY(0px) translateX(30px);
+            background: linear-gradient(135deg, rgba(96, 239, 255, 0.3) 0%, rgba(255, 107, 157, 0.2) 100%);
+        }
+
+        .cube-left {
+            width: 40px;
+            height: 80px;
+            transform: skewX(-30deg) translateY(20px) translateX(0px);
+            background: linear-gradient(180deg, rgba(96, 239, 255, 0.2) 0%, rgba(255, 51, 102, 0.2) 100%);
+        }
+
+        .cube-right {
+            width: 40px;
+            height: 80px;
+            transform: skewX(30deg) translateY(20px) translateX(80px);
+            background: linear-gradient(180deg, rgba(255, 107, 157, 0.3) 0%, rgba(255, 51, 102, 0.2) 100%);
+        }
+
+        /* Option 2: Terminal Prompt */
+        .icon-prompt {
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a2332 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .icon-prompt::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle at center,
+                rgba(0, 255, 136, 0.3) 0%,
+                rgba(96, 239, 255, 0.2) 30%,
+                transparent 60%
+            );
+        }
+
+        .prompt-symbol {
+            position: relative;
+            z-index: 2;
+            font-size: 180px;
+            font-weight: 900;
+            font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+            background: linear-gradient(135deg, #00ff88 0%, #60efff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 60px rgba(0, 255, 136, 0.6);
+            filter: drop-shadow(0 0 40px rgba(96, 239, 255, 0.4));
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: -8px; /* Fine-tune vertical centering */
+        }
+
+        /* Option 3: Abstract Gradient Cube */
+        .icon-abstract {
+            background: #0a0e1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .abstract-shape {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            z-index: 2;
+        }
+
+        .shape-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 32px;
+        }
+
+        .shape-layer-1 {
+            background: linear-gradient(135deg, #60efff 0%, #ff6b9d 100%);
+            transform: rotate(0deg);
+            opacity: 0.9;
+        }
+
+        .shape-layer-2 {
+            background: linear-gradient(225deg, #ff6b9d 0%, #ff3366 100%);
+            transform: rotate(30deg) scale(0.85);
+            opacity: 0.8;
+        }
+
+        .shape-layer-3 {
+            background: linear-gradient(315deg, #60efff 0%, #00ff88 100%);
+            transform: rotate(60deg) scale(0.7);
+            opacity: 0.7;
+        }
+
+        .shape-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        /* Size preview */
+        .size-preview {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .size-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .size-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Home screen mockup */
+        .mockup-section {
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .mockup-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .iphone-mockup {
+            display: inline-block;
+            background: #000;
+            border-radius: 47px;
+            padding: 12px;
+            box-shadow: 0 0 0 12px #1a1a1a, 0 0 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .iphone-screen {
+            width: 390px;
+            height: 844px;
+            background: linear-gradient(180deg, #1a1e2e 0%, #0a0e1a 100%);
+            border-radius: 39px;
+            padding: 60px 24px 40px;
+            position: relative;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 37px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 100;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 32px;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            padding: 0 8px;
+        }
+
+        .app-icon-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .app-icon-home {
+            width: 72px;
+            height: 72px;
+        }
+
+        .app-name {
+            font-size: 12px;
+            color: white;
+            text-align: center;
+        }
+
+        .other-app {
+            width: 72px;
+            height: 72px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Specs section */
+        .specs-section {
+            margin-top: 80px;
+            background: rgba(26, 35, 50, 0.3);
+            border: 2px solid rgba(96, 239, 255, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .specs-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .spec-item {
+            background: rgba(10, 14, 26, 0.4);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(96, 239, 255, 0.1);
+        }
+
+        .spec-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            font-size: 14px;
+            color: #60efff;
+            font-weight: 600;
+            font-family: 'SF Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BuilderOS App Icon</h1>
+        <p class="subtitle">Three design options matching the terminal aesthetic</p>
+
+        <div class="options-grid">
+            <!-- Option 1: Terminal Cube -->
+            <div class="option-card">
+                <h3 class="option-title">Option 1: Terminal Cube</h3>
+                <p class="option-desc">Isometric cube with gradient borders representing building blocks and terminal structure</p>
+
+                <div class="icon-display">
+                    <div class="icon icon-large icon-cube">
+                        <div class="cube-symbol">
+                            <div class="cube-face cube-top"></div>
+                            <div class="cube-face cube-left"></div>
+                            <div class="cube-face cube-right"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="size-preview">
+                    <div class="size-item">
+                        <div class="icon icon-cube" style="width: 120px; height: 120px;">
+                            <div class="cube-symbol" style="width: 70px; height: 70px;">
+                                <div class="cube-face cube-top" style="width: 40px; height: 20px; transform: skewY(-30deg) translateY(0px) translateX(15px); border-width: 2px;"></div>
+                                <div class="cube-face cube-left" style="width: 20px; height: 40px; transform: skewX(-30deg) translateY(10px) translateX(0px); border-width: 2px;"></div>
+                                <div class="cube-face cube-right" style="width: 20px; height: 40px; transform: skewX(30deg) translateY(10px) translateX(40px); border-width: 2px;"></div>
+                            </div>
+                        </div>
+                        <span class="size-label">120px</span>
+                    </div>
+                    <div class="size-item">
+                        <div class="icon icon-cube" style="width: 80px; height: 80px;">
+                            <div class="cube-symbol" style="width: 46px; height: 46px;">
+                                <div class="cube-face cube-top" style="width: 26px; height: 13px; transform: skewY(-30deg) translateY(0px) translateX(10px); border-width: 1.5px;"></div>
+                                <div class="cube-face cube-left" style="width: 13px; height: 26px; transform: skewX(-30deg) translateY(6.5px) translateX(0px); border-width: 1.5px;"></div>
+                                <div class="cube-face cube-right" style="width: 13px; height: 26px; transform: skewX(30deg) translateY(6.5px) translateX(26px); border-width: 1.5px;"></div>
+                            </div>
+                        </div>
+                        <span class="size-label">80px</span>
+                    </div>
+                    <div class="size-item">
+                        <div class="icon icon-cube" style="width: 40px; height: 40px;">
+                            <div class="cube-symbol" style="width: 23px; height: 23px;">
+                                <div class="cube-face cube-top" style="width: 13px; height: 6.5px; transform: skewY(-30deg) translateY(0px) translateX(5px); border-width: 1px;"></div>
+                                <div class="cube-face cube-left" style="width: 6.5px; height: 13px; transform: skewX(-30deg) translateY(3.25px) translateX(0px); border-width: 1px;"></div>
+                                <div class="cube-face cube-right" style="width: 6.5px; height: 13px; transform: skewX(30deg) translateY(3.25px) translateX(13px); border-width: 1px;"></div>
+                            </div>
+                        </div>
+                        <span class="size-label">40px</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Option 2: Terminal Prompt -->
+            <div class="option-card">
+                <h3 class="option-title">Option 2: Terminal Prompt ">"</h3>
+                <p class="option-desc">Bold terminal prompt symbol with green-to-cyan gradient and glow effect</p>
+
+                <div class="icon-display">
+                    <div class="icon icon-large icon-prompt">
+                        <div class="prompt-symbol">&gt;</div>
+                    </div>
+                </div>
+
+                <div class="size-preview">
+                    <div class="size-item">
+                        <div class="icon icon-prompt" style="width: 120px; height: 120px;">
+                            <div class="prompt-symbol" style="font-size: 84px;">&gt;</div>
+                        </div>
+                        <span class="size-label">120px</span>
+                    </div>
+                    <div class="size-item">
+                        <div class="icon icon-prompt" style="width: 80px; height: 80px;">
+                            <div class="prompt-symbol" style="font-size: 56px;">&gt;</div>
+                        </div>
+                        <span class="size-label">80px</span>
+                    </div>
+                    <div class="size-item">
+                        <div class="icon icon-prompt" style="width: 40px; height: 40px;">
+                            <div class="prompt-symbol" style="font-size: 28px;">&gt;</div>
+                        </div>
+                        <span class="size-label">40px</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Option 3: Abstract Gradient Cube -->
+            <div class="option-card">
+                <h3 class="option-title">Option 3: Abstract Layers</h3>
+                <p class="option-desc">Layered rounded squares with rotating gradients creating depth and dimension</p>
+
+                <div class="icon-display">
+                    <div class="icon icon-large icon-abstract">
+                        <div class="abstract-shape">
+                            <div class="shape-layer shape-layer-1"></div>
+                            <div class="shape-layer shape-layer-2"></div>
+                            <div class="shape-layer shape-layer-3"></div>
+                            <div class="shape-center"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="size-preview">
+                    <div class="size-item">
+                        <div class="icon icon-abstract" style="width: 120px; height: 120px;">
+                            <div class="abstract-shape" style="width: 80px; height: 80px;">
+                                <div class="shape-layer shape-layer-1" style="border-radius: 16px;"></div>
+                                <div class="shape-layer shape-layer-2" style="border-radius: 16px;"></div>
+                                <div class="shape-layer shape-layer-3" style="border-radius: 16px;"></div>
+                                <div class="shape-center" style="width: 20px; height: 20px; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                        <span class="size-label">120px</span>
+                    </div>
+                    <div class="size-item">
+                        <div class="icon icon-abstract" style="width: 80px; height: 80px;">
+                            <div class="abstract-shape" style="width: 53px; height: 53px;">
+                                <div class="shape-layer shape-layer-1" style="border-radius: 11px;"></div>
+                                <div class="shape-layer shape-layer-2" style="border-radius: 11px;"></div>
+                                <div class="shape-layer shape-layer-3" style="border-radius: 11px;"></div>
+                                <div class="shape-center" style="width: 13px; height: 13px; border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                        <span class="size-label">80px</span>
+                    </div>
+                    <div class="size-item">
+                        <div class="icon icon-abstract" style="width: 40px; height: 40px;">
+                            <div class="abstract-shape" style="width: 27px; height: 27px;">
+                                <div class="shape-layer shape-layer-1" style="border-radius: 5px;"></div>
+                                <div class="shape-layer shape-layer-2" style="border-radius: 5px;"></div>
+                                <div class="shape-layer shape-layer-3" style="border-radius: 5px;"></div>
+                                <div class="shape-center" style="width: 7px; height: 7px; border-radius: 2px;"></div>
+                            </div>
+                        </div>
+                        <span class="size-label">40px</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- iPhone Home Screen Mockup -->
+        <div class="mockup-section">
+            <h2 class="mockup-title">On iPhone Home Screen (Option 2 Preview)</h2>
+            <div class="iphone-mockup">
+                <div class="iphone-screen">
+                    <div class="dynamic-island"></div>
+                    <div class="status-bar">
+                        <span>9:41</span>
+                        <span>100%</span>
+                    </div>
+                    <div class="app-grid">
+                        <div class="app-icon-wrapper">
+                            <div class="other-app"></div>
+                            <span class="app-name">Messages</span>
+                        </div>
+                        <div class="app-icon-wrapper">
+                            <div class="icon icon-prompt app-icon-home">
+                                <div class="prompt-symbol" style="font-size: 50px;">&gt;</div>
+                            </div>
+                            <span class="app-name">BuilderOS</span>
+                        </div>
+                        <div class="app-icon-wrapper">
+                            <div class="other-app"></div>
+                            <span class="app-name">Settings</span>
+                        </div>
+                        <div class="app-icon-wrapper">
+                            <div class="other-app"></div>
+                            <span class="app-name">Safari</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Specs -->
+        <div class="specs-section">
+            <h3 class="specs-title">iOS App Icon Specifications</h3>
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <div class="spec-label">App Store</div>
+                    <div class="spec-value">1024×1024px</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">iPhone Home Screen</div>
+                    <div class="spec-value">180×180px @3x</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Settings</div>
+                    <div class="spec-value">87×87px @3x</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Spotlight</div>
+                    <div class="spec-value">120×120px @3x</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Notification</div>
+                    <div class="spec-value">60×60px @3x</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Corner Radius</div>
+                    <div class="spec-value">22.37% of size</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Color Space</div>
+                    <div class="spec-value">sRGB or Display P3</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Transparency</div>
+                    <div class="spec-value">Not allowed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

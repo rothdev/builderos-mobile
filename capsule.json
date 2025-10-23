@@ -1,0 +1,21 @@
+{
+  "name": "builderos-mobile",
+  "version": "1.0.0",
+  "lane": "standard",
+  "type": "system-agent",
+  "description": "Auto-generated capsule configuration - update as needed",
+  "created": "2025-08-12",
+  "owner": "builder-system",
+  "status": "active",
+  "dependencies": {
+    "claude": ">=3.0",
+    "bash": ">=4.0"
+  },
+  "outputs": {
+    "logs": "runs/logs/",
+    "data": "runs/data/"
+  },
+  "mcp_overrides": {
+    "GitHub Builder MCP": { "enabled": true }
+  }
+}

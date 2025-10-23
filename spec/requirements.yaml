@@ -1,0 +1,54 @@
+project:
+  name: Builder System Mobile
+  slug: builder-system-mobile
+  branch: app
+  targets: ["ios_app"]
+  app_kind: personal
+
+objectives:
+  - Mobile-first chat interface for Builder System remote access and control.
+  - Connect to Builder System server via SSH with session management.
+  - Chat-style interface optimized for mobile interaction with Claude Code / CodeX.
+  - Voice input via Whisper dictation with one-tap recording for command entry.
+  - Voice output via TTS for accessibility and hands-free operation.
+  - Push notifications for critical Builder System events and approvals.
+  - Clean, modern iOS design following system Light/Dark Mode.
+  - Quick access to common Builder operations (health checks, capsule builds, status).
+
+constraints:
+  budget_tokens: 0
+  runtime_envs: ["iOS", "SSH"]
+  secrets: ["SSH_PRIVATE_KEY", "APNS_AUTH_KEY"]
+
+inputs:
+  data_sources: ["Builder System SSH endpoint", "Claude Code sessions", "CodeX sessions"]
+
+outputs:
+  deliverables:
+    - Native iOS application
+    - SSH connection and session management
+    - Chat-style interface with voice I/O
+    - Push notification integration
+    - Builder System operation shortcuts
+
+definition_of_done:
+  - App connects to Builder System server and establishes SSH session in ≤3s.
+  - Chat interface displays Builder System output with mobile-optimized formatting.
+  - Voice input via Whisper with one-tap start/stop transcribes and sends commands accurately.
+  - Voice output via TTS reads Builder System responses clearly.
+  - Push notifications for critical events arrive and deep-link to relevant context.
+  - Light/Dark theme follows iOS system settings automatically.
+  - Common Builder operations accessible via quick actions or chat commands.
+
+notes:
+  focus: "Personal mobile companion for Builder System - prioritize usability over terminal accuracy"
+  risks:
+    - Push notifications require Apple Developer setup and server-side helper
+    - SSH key management and security on mobile device
+  assumptions:
+    - User has Builder System running on accessible server
+    - User willing to install lightweight notification helper on server
+
+handoff:
+  base_path: "~/Documents/Builder/capsules/builder-system-mobile/"
+dependencies: []

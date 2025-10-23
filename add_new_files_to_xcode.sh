@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Add new multi-tab terminal files to Xcode project
+#
+# Usage: Open the Xcode project and drag these files into the appropriate groups
+#
+
+echo "🔧 Adding new files to Xcode project..."
+echo ""
+echo "New files to add to Xcode project:"
+echo ""
+echo "📁 Models group:"
+echo "  - src/Models/TerminalTab.swift"
+echo ""
+echo "📁 Views group:"
+echo "  - src/Views/TerminalTabButton.swift"
+echo "  - src/Views/TerminalTabBar.swift"
+echo "  - src/Views/MultiTabTerminalView.swift"
+echo ""
+echo "📝 Manual steps:"
+echo "1. Open the Xcode project:"
+echo "   open 'src/BuilderOS Mobile.xcodeproj'"
+echo ""
+echo "2. In Xcode Project Navigator:"
+echo "   - Right-click on 'Models' group → 'Add Files to \"BuilderOS Mobile\"...'"
+echo "   - Select 'src/Models/TerminalTab.swift'"
+echo "   - Uncheck 'Copy items if needed' (we want references, not copies)"
+echo "   - Click 'Add'"
+echo ""
+echo "3. Repeat for Views:"
+echo "   - Right-click on 'Views' group → 'Add Files to \"BuilderOS Mobile\"...'"
+echo "   - Select all three new View files:"
+echo "     * TerminalTabButton.swift"
+echo "     * TerminalTabBar.swift"
+echo "     * MultiTabTerminalView.swift"
+echo "   - Uncheck 'Copy items if needed'"
+echo "   - Click 'Add'"
+echo ""
+echo "✅ After adding files, build the project (Cmd+B) to verify"
+echo ""
+echo "Opening Xcode project..."
+open "src/BuilderOS Mobile.xcodeproj"

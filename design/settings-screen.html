@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuilderOS Mobile - Settings Screen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: #f0f0f0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .phone-frame {
+            width: 393px;
+            height: 852px;
+            background: #1d1d1f;
+            border-radius: 50px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            position: relative;
+        }
+
+        .notch {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 30px;
+            background: #1d1d1f;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #f5f5f7;
+            border-radius: 42px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 54px;
+            background: #f5f5f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 24px 8px 24px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .time {
+            color: #1d1d1f;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            color: #1d1d1f;
+        }
+
+        /* Content */
+        .content {
+            height: calc(100% - 54px - 83px);
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .content::-webkit-scrollbar {
+            width: 0;
+        }
+
+        /* Header */
+        .header {
+            background: #f5f5f7;
+            padding: 0 20px 20px 20px;
+        }
+
+        .header-title {
+            font-size: 34px;
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+
+        /* Settings Group */
+        .settings-group {
+            margin-bottom: 32px;
+        }
+
+        .group-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6e6e73;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 20px;
+            margin-bottom: 8px;
+        }
+
+        .group-container {
+            background: white;
+            border-radius: 12px;
+            margin: 0 16px;
+            overflow: hidden;
+        }
+
+        /* Settings Row */
+        .settings-row {
+            padding: 12px 16px;
+            border-bottom: 0.5px solid #e5e5e7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 56px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .settings-row:last-child {
+            border-bottom: none;
+        }
+
+        .settings-row:active {
+            background: #f5f5f7;
+        }
+
+        .row-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .row-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 122, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .row-content {
+            flex: 1;
+        }
+
+        .row-title {
+            font-size: 16px;
+            font-weight: 400;
+            color: #1d1d1f;
+            margin-bottom: 2px;
+        }
+
+        .row-subtitle {
+            font-size: 13px;
+            color: #6e6e73;
+        }
+
+        .row-value {
+            font-size: 15px;
+            color: #6e6e73;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .row-chevron {
+            color: #c7c7cc;
+            font-size: 14px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            width: 51px;
+            height: 31px;
+            background: #e5e5e7;
+            border-radius: 16px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.on {
+            background: #34C759;
+        }
+
+        .toggle-knob {
+            width: 27px;
+            height: 27px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.on .toggle-knob {
+            transform: translateX(20px);
+        }
+
+        /* Status Badge in Settings */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            gap: 6px;
+        }
+
+        .badge-connected {
+            background: rgba(52, 199, 89, 0.1);
+            color: #34C759;
+        }
+
+        .badge-disconnected {
+            background: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Device List */
+        .device-item {
+            padding: 12px 16px;
+            border-bottom: 0.5px solid #e5e5e7;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .device-item:last-child {
+            border-bottom: none;
+        }
+
+        .device-item:active {
+            background: #f5f5f7;
+        }
+
+        .device-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .device-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .device-type {
+            font-size: 12px;
+            color: #6e6e73;
+            background: #f5f5f7;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .device-ip {
+            font-size: 14px;
+            color: #6e6e73;
+            font-family: 'SF Mono', monospace;
+        }
+
+        /* Button Styles */
+        .button-row {
+            padding: 12px 16px;
+            border-bottom: 0.5px solid #e5e5e7;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .button-row:last-child {
+            border-bottom: none;
+        }
+
+        .button-primary {
+            color: #007AFF;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .button-destructive {
+            color: #FF3B30;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .button-row:active {
+            background: #f5f5f7;
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 83px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 0.5px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding: 8px 16px 0 16px;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .tab-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .tab-item.active {
+            color: #007AFF;
+        }
+
+        .tab-item:not(.active) {
+            color: #8e8e93;
+        }
+
+        /* Input Field */
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            background: #f5f5f7;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'SF Mono', monospace;
+            outline: none;
+        }
+
+        .input-field:focus {
+            background: #e5e5e7;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="notch"></div>
+        <div class="screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="time">9:41</div>
+                <div class="status-icons">
+                    <span>📶</span>
+                    <span>📡</span>
+                    <span>🔋</span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Header -->
+                <div class="header">
+                    <div class="header-title">Settings</div>
+                </div>
+
+                <!-- Connection Settings -->
+                <div class="settings-group">
+                    <div class="group-title">Connection</div>
+                    <div class="group-container">
+                        <div class="settings-row">
+                            <div class="row-left">
+                                <div class="row-icon">🔗</div>
+                                <div class="row-content">
+                                    <div class="row-title">Tailscale Status</div>
+                                    <div class="row-subtitle">VPN connection active</div>
+                                </div>
+                            </div>
+                            <div class="status-badge badge-connected">
+                                <span class="badge-dot"></span>
+                                Connected
+                            </div>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="row-left">
+                                <div class="row-icon">🔄</div>
+                                <div class="row-content">
+                                    <div class="row-title">Auto-Connect</div>
+                                    <div class="row-subtitle">Connect on app launch</div>
+                                </div>
+                            </div>
+                            <div class="toggle-switch on">
+                                <div class="toggle-knob"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Devices -->
+                <div class="settings-group">
+                    <div class="group-title">Tailscale Devices</div>
+                    <div class="group-container">
+                        <div class="device-item">
+                            <div class="device-header">
+                                <div class="device-name">roth-macbook-pro</div>
+                                <div class="device-type">macOS</div>
+                            </div>
+                            <div class="device-ip">100.66.202.6</div>
+                        </div>
+
+                        <div class="device-item">
+                            <div class="device-header">
+                                <div class="device-name">ty-iphone</div>
+                                <div class="device-type">iOS</div>
+                            </div>
+                            <div class="device-ip">100.66.201.8</div>
+                        </div>
+
+                        <div class="device-item">
+                            <div class="device-header">
+                                <div class="device-name">rpi-home</div>
+                                <div class="device-type">Linux</div>
+                            </div>
+                            <div class="device-ip">100.66.203.15</div>
+                        </div>
+
+                        <div class="button-row">
+                            <div class="button-primary">Refresh Devices</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Configuration -->
+                <div class="settings-group">
+                    <div class="group-title">BuilderOS API</div>
+                    <div class="group-container">
+                        <div class="settings-row">
+                            <div class="row-left">
+                                <div class="row-icon">🔑</div>
+                                <div class="row-content">
+                                    <div class="row-title">API Key</div>
+                                    <div class="row-subtitle">Stored securely in Keychain</div>
+                                </div>
+                            </div>
+                            <div class="row-chevron">›</div>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="row-left">
+                                <div class="row-icon" style="background: rgba(52, 199, 89, 0.1);">✓</div>
+                                <div class="row-content">
+                                    <div class="row-title">API Status</div>
+                                    <div class="row-subtitle">32ms latency</div>
+                                </div>
+                            </div>
+                            <div class="row-value">Healthy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Power Controls -->
+                <div class="settings-group">
+                    <div class="group-title">Mac Power Controls</div>
+                    <div class="group-container">
+                        <div class="settings-row">
+                            <div class="row-left">
+                                <div class="row-icon" style="background: rgba(255, 149, 0, 0.1);">💤</div>
+                                <div class="row-content">
+                                    <div class="row-title">Sleep Mac</div>
+                                    <div class="row-subtitle">Put Mac to sleep remotely</div>
+                                </div>
+                            </div>
+                            <div class="row-chevron">›</div>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="row-left">
+                                <div class="row-icon" style="background: rgba(52, 199, 89, 0.1);">⚡</div>
+                                <div class="row-content">
+                                    <div class="row-title">Wake Mac</div>
+                                    <div class="row-subtitle">Requires Raspberry Pi setup</div>
+                                </div>
+                            </div>
+                            <div class="row-chevron">›</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- App Settings -->
+                <div class="settings-group">
+                    <div class="group-title">App Settings</div>
+                    <div class="group-container">
+                        <div class="settings-row">
+                            <div class="row-left">
+                                <div class="row-icon">🔔</div>
+                                <div class="row-content">
+                                    <div class="row-title">Notifications</div>
+                                    <div class="row-subtitle">Capsule alerts and updates</div>
+                                </div>
+                            </div>
+                            <div class="toggle-switch on">
+                                <div class="toggle-knob"></div>
+                            </div>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="row-left">
+                                <div class="row-icon">🌙</div>
+                                <div class="row-content">
+                                    <div class="row-title">Appearance</div>
+                                    <div class="row-subtitle">Automatic</div>
+                                </div>
+                            </div>
+                            <div class="row-chevron">›</div>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="row-left">
+                                <div class="row-icon">📊</div>
+                                <div class="row-content">
+                                    <div class="row-title">Analytics</div>
+                                    <div class="row-subtitle">Help improve the app</div>
+                                </div>
+                            </div>
+                            <div class="toggle-switch">
+                                <div class="toggle-knob"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About -->
+                <div class="settings-group">
+                    <div class="group-title">About</div>
+                    <div class="group-container">
+                        <div class="settings-row">
+                            <div class="row-left">
+                                <div class="row-icon">ℹ️</div>
+                                <div class="row-content">
+                                    <div class="row-title">Version</div>
+                                </div>
+                            </div>
+                            <div class="row-value">1.0.0 (1)</div>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="row-left">
+                                <div class="row-icon">📄</div>
+                                <div class="row-content">
+                                    <div class="row-title">Privacy Policy</div>
+                                </div>
+                            </div>
+                            <div class="row-chevron">›</div>
+                        </div>
+
+                        <div class="button-row">
+                            <div class="button-destructive">Sign Out</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Bar -->
+            <div class="tab-bar">
+                <div class="tab-item">
+                    <div class="tab-icon">📊</div>
+                    <div class="tab-label">Dashboard</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">💬</div>
+                    <div class="tab-label">Chat</div>
+                </div>
+                <div class="tab-item">
+                    <div class="tab-icon">🔍</div>
+                    <div class="tab-label">Preview</div>
+                </div>
+                <div class="tab-item active">
+                    <div class="tab-icon">⚙️</div>
+                    <div class="tab-label">Settings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle switches interaction
+        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                toggle.classList.toggle('on');
+            });
+        });
+    </script>
+</body>
+</html>

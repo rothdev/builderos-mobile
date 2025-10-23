@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuilderOS Mobile - Design System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+            background: #f5f5f7;
+            padding: 40px 20px;
+            color: #1d1d1f;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            margin-bottom: 48px;
+        }
+
+        h2 {
+            font-size: 36px;
+            font-weight: 600;
+            margin: 48px 0 24px 0;
+            letter-spacing: -0.3px;
+        }
+
+        h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 32px 0 16px 0;
+        }
+
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        /* Color Palette */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .color-swatch {
+            border-radius: 12px;
+            padding: 24px;
+            color: white;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .color-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .color-value {
+            font-size: 13px;
+            opacity: 0.9;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+
+        .color-usage {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        /* Typography */
+        .type-scale {
+            margin: 24px 0;
+        }
+
+        .type-sample {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #e5e5e7;
+        }
+
+        .type-sample:last-child {
+            border-bottom: none;
+        }
+
+        .type-label {
+            font-size: 12px;
+            color: #6e6e73;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .type-display {
+            margin-bottom: 8px;
+        }
+
+        .type-specs {
+            font-size: 13px;
+            color: #86868b;
+            font-family: 'SF Mono', monospace;
+        }
+
+        /* Component Showcase */
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .component-card {
+            background: #f5f5f7;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .component-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6e6e73;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 48px;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #007AFF;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0051D5;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 122, 255, 0.1);
+            color: #007AFF;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 122, 255, 0.15);
+            transform: scale(1.02);
+        }
+
+        .btn-destructive {
+            background: #FF3B30;
+            color: white;
+        }
+
+        .btn-disabled {
+            background: #e5e5e7;
+            color: #86868b;
+            cursor: not-allowed;
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            gap: 6px;
+        }
+
+        .badge-active {
+            background: rgba(52, 199, 89, 0.1);
+            color: #34C759;
+        }
+
+        .badge-development {
+            background: rgba(0, 122, 255, 0.1);
+            color: #007AFF;
+        }
+
+        .badge-testing {
+            background: rgba(255, 149, 0, 0.1);
+            color: #FF9500;
+        }
+
+        .badge-error {
+            background: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .card-header {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .card-body {
+            font-size: 15px;
+            color: #6e6e73;
+            line-height: 1.5;
+        }
+
+        /* Spacing System */
+        .spacing-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .spacing-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .spacing-label {
+            font-family: 'SF Mono', monospace;
+            font-size: 14px;
+            color: #6e6e73;
+            min-width: 120px;
+        }
+
+        .spacing-visual {
+            height: 24px;
+            background: #007AFF;
+            border-radius: 4px;
+        }
+
+        .spacing-value {
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+            color: #86868b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BuilderOS Mobile</h1>
+        <p class="subtitle">iOS Design System — iOS 17+ Native Patterns</p>
+
+        <!-- Color System -->
+        <div class="section">
+            <h2>Color System</h2>
+            <p style="color: #6e6e73; margin-bottom: 24px;">Semantic colors that adapt to Light and Dark mode using iOS system colors.</p>
+
+            <h3>Brand Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch" style="background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);">
+                    <div class="color-name">Primary</div>
+                    <div class="color-value">#007AFF</div>
+                    <div class="color-usage">Main actions, links, highlights</div>
+                </div>
+
+                <div class="color-swatch" style="background: linear-gradient(135deg, #5856D6 0%, #3634A3 100%);">
+                    <div class="color-name">Secondary</div>
+                    <div class="color-value">#5856D6</div>
+                    <div class="color-usage">Secondary actions, accents</div>
+                </div>
+
+                <div class="color-swatch" style="background: linear-gradient(135deg, #598FFF 0%, #2E3338 100%);">
+                    <div class="color-name">Tailscale Accent</div>
+                    <div class="color-value">#598FFF</div>
+                    <div class="color-usage">VPN status, connection indicators</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 32px;">Status Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch" style="background: #34C759;">
+                    <div class="color-name">Success</div>
+                    <div class="color-value">#34C759</div>
+                    <div class="color-usage">Active capsules, connected status</div>
+                </div>
+
+                <div class="color-swatch" style="background: #FF9500;">
+                    <div class="color-name">Warning</div>
+                    <div class="color-value">#FF9500</div>
+                    <div class="color-usage">Testing status, alerts</div>
+                </div>
+
+                <div class="color-swatch" style="background: #FF3B30;">
+                    <div class="color-name">Error</div>
+                    <div class="color-value">#FF3B30</div>
+                    <div class="color-usage">Errors, destructive actions</div>
+                </div>
+
+                <div class="color-swatch" style="background: #007AFF;">
+                    <div class="color-name">Info</div>
+                    <div class="color-value">#007AFF</div>
+                    <div class="color-usage">Development status, information</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 32px;">Semantic Colors (Adaptive)</h3>
+            <div class="color-grid">
+                <div class="color-swatch" style="background: #1d1d1f; color: white;">
+                    <div class="color-name">Text Primary</div>
+                    <div class="color-value">systemLabel</div>
+                    <div class="color-usage">Primary text content</div>
+                </div>
+
+                <div class="color-swatch" style="background: #6e6e73;">
+                    <div class="color-name">Text Secondary</div>
+                    <div class="color-value">secondaryLabel</div>
+                    <div class="color-usage">Secondary text, captions</div>
+                </div>
+
+                <div class="color-swatch" style="background: #ffffff; color: #1d1d1f; border: 1px solid #e5e5e7;">
+                    <div class="color-name">Background Primary</div>
+                    <div class="color-value">systemBackground</div>
+                    <div class="color-usage">Main background</div>
+                </div>
+
+                <div class="color-swatch" style="background: #f5f5f7; color: #1d1d1f;">
+                    <div class="color-name">Background Secondary</div>
+                    <div class="color-value">secondarySystemBackground</div>
+                    <div class="color-usage">Cards, grouped content</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typography System -->
+        <div class="section">
+            <h2>Typography System</h2>
+            <p style="color: #6e6e73; margin-bottom: 24px;">SF Pro font system with Dynamic Type support for accessibility.</p>
+
+            <div class="type-scale">
+                <div class="type-sample">
+                    <div class="type-label">Display Large</div>
+                    <div class="type-display" style="font-size: 57px; font-weight: 700;">BuilderOS</div>
+                    <div class="type-specs">57px / Bold / SF Pro Rounded / Line height: 1.05</div>
+                </div>
+
+                <div class="type-sample">
+                    <div class="type-label">Display Medium</div>
+                    <div class="type-display" style="font-size: 45px; font-weight: 700;">Dashboard</div>
+                    <div class="type-specs">45px / Bold / SF Pro Rounded / Line height: 1.1</div>
+                </div>
+
+                <div class="type-sample">
+                    <div class="type-label">Headline Large</div>
+                    <div class="type-display" style="font-size: 32px; font-weight: 600;">System Status</div>
+                    <div class="type-specs">32px / Semibold / SF Pro Rounded / Line height: 1.15</div>
+                </div>
+
+                <div class="type-sample">
+                    <div class="type-label">Title Large</div>
+                    <div class="type-display" style="font-size: 22px; font-weight: 600;">Active Capsules</div>
+                    <div class="type-specs">22px / Semibold / SF Pro / Line height: 1.2</div>
+                </div>
+
+                <div class="type-sample">
+                    <div class="type-label">Body Medium</div>
+                    <div class="type-display" style="font-size: 14px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+                    <div class="type-specs">14px / Regular / SF Pro / Line height: 1.4</div>
+                </div>
+
+                <div class="type-sample">
+                    <div class="type-label">Label Medium (Captions)</div>
+                    <div class="type-display" style="font-size: 12px; color: #6e6e73;">Updated 2 minutes ago</div>
+                    <div class="type-specs">12px / Medium / SF Pro / Line height: 1.3</div>
+                </div>
+
+                <div class="type-sample">
+                    <div class="type-label">Monospaced Medium (Code, IPs, Keys)</div>
+                    <div class="type-display" style="font-size: 14px; font-family: 'SF Mono', monospace; background: #f5f5f7; padding: 8px 12px; border-radius: 6px; display: inline-block;">100.66.202.6</div>
+                    <div class="type-specs">14px / Regular / SF Mono / Monospaced for technical data</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spacing System -->
+        <div class="section">
+            <h2>Spacing System</h2>
+            <p style="color: #6e6e73; margin-bottom: 24px;">8pt base grid system for consistent layouts and rhythm.</p>
+
+            <div class="spacing-grid">
+                <div class="spacing-item">
+                    <div class="spacing-label">xs (4pt)</div>
+                    <div class="spacing-visual" style="width: 4px;"></div>
+                    <div class="spacing-value">Minimal spacing, tight groups</div>
+                </div>
+
+                <div class="spacing-item">
+                    <div class="spacing-label">sm (8pt)</div>
+                    <div class="spacing-visual" style="width: 8px;"></div>
+                    <div class="spacing-value">Small spacing, related elements</div>
+                </div>
+
+                <div class="spacing-item">
+                    <div class="spacing-label">md (12pt)</div>
+                    <div class="spacing-visual" style="width: 12px;"></div>
+                    <div class="spacing-value">Compact spacing</div>
+                </div>
+
+                <div class="spacing-item">
+                    <div class="spacing-label">base (16pt)</div>
+                    <div class="spacing-visual" style="width: 16px;"></div>
+                    <div class="spacing-value">Default spacing, card padding</div>
+                </div>
+
+                <div class="spacing-item">
+                    <div class="spacing-label">lg (24pt)</div>
+                    <div class="spacing-visual" style="width: 24px;"></div>
+                    <div class="spacing-value">Large spacing, section dividers</div>
+                </div>
+
+                <div class="spacing-item">
+                    <div class="spacing-label">xl (32pt)</div>
+                    <div class="spacing-visual" style="width: 32px;"></div>
+                    <div class="spacing-value">Extra large spacing</div>
+                </div>
+
+                <div class="spacing-item">
+                    <div class="spacing-label">xxl (48pt)</div>
+                    <div class="spacing-visual" style="width: 48px;"></div>
+                    <div class="spacing-value">Major section breaks</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 32px;">Touch Targets</h3>
+            <div class="spacing-grid">
+                <div class="spacing-item">
+                    <div class="spacing-label">Minimum (44pt)</div>
+                    <div class="spacing-visual" style="width: 44px; height: 44px; background: rgba(0, 122, 255, 0.2);"></div>
+                    <div class="spacing-value">Apple HIG minimum for all tappable elements</div>
+                </div>
+
+                <div class="spacing-item">
+                    <div class="spacing-label">Comfortable (48pt)</div>
+                    <div class="spacing-visual" style="width: 48px; height: 48px; background: rgba(0, 122, 255, 0.3);"></div>
+                    <div class="spacing-value">Recommended for primary actions</div>
+                </div>
+
+                <div class="spacing-item">
+                    <div class="spacing-label">Large (56pt)</div>
+                    <div class="spacing-visual" style="width: 56px; height: 56px; background: rgba(0, 122, 255, 0.4);"></div>
+                    <div class="spacing-value">Large interactive elements</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Component Library -->
+        <div class="section">
+            <h2>Component Library</h2>
+            <p style="color: #6e6e73; margin-bottom: 24px;">Reusable iOS components with all states and variants.</p>
+
+            <div class="component-grid">
+                <!-- Buttons -->
+                <div class="component-card">
+                    <div class="component-title">Buttons - Primary</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <button class="btn btn-primary">Connect</button>
+                        <button class="btn btn-primary">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 12.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l5-5a1 1 0 00-1.414-1.414L10 12.586z"/>
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-title">Buttons - Secondary</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <button class="btn btn-secondary">Settings</button>
+                        <button class="btn btn-secondary">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="component-card">
+                    <div class="component-title">Buttons - States</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <button class="btn btn-destructive">Sleep Mac</button>
+                        <button class="btn btn-disabled" disabled>Disabled</button>
+                    </div>
+                </div>
+
+                <!-- Status Badges -->
+                <div class="component-card">
+                    <div class="component-title">Status Badges</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="badge badge-active">
+                            <span class="status-dot"></span>
+                            Active
+                        </div>
+                        <div class="badge badge-development">
+                            <span class="status-dot"></span>
+                            Development
+                        </div>
+                        <div class="badge badge-testing">
+                            <span class="status-dot"></span>
+                            Testing
+                        </div>
+                        <div class="badge badge-error">
+                            <span class="status-dot"></span>
+                            Error
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cards -->
+                <div class="component-card">
+                    <div class="component-title">Card Component</div>
+                    <div class="card">
+                        <div class="card-header">Capsule Name</div>
+                        <div class="card-body">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.
+                        </div>
+                        <div style="margin-top: 12px;">
+                            <span class="badge badge-active">
+                                <span class="status-dot"></span>
+                                Active
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connection Status -->
+                <div class="component-card">
+                    <div class="component-title">Connection Status</div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(52, 199, 89, 0.1); border-radius: 12px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #34C759;"></div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 15px; color: #1d1d1f;">Connected</div>
+                                <div style="font-size: 13px; color: #6e6e73;">100.66.202.6</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255, 149, 0, 0.1); border-radius: 12px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #FF9500; animation: pulse 2s infinite;">
+                                <style>
+                                    @keyframes pulse {
+                                        0%, 100% { opacity: 1; }
+                                        50% { opacity: 0.5; }
+                                    }
+                                </style>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 15px; color: #1d1d1f;">Connecting...</div>
+                                <div style="font-size: 13px; color: #6e6e73;">Searching for devices</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255, 59, 48, 0.1); border-radius: 12px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #FF3B30;"></div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 15px; color: #1d1d1f;">Disconnected</div>
+                                <div style="font-size: 13px; color: #6e6e73;">Tap to reconnect</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Design Principles -->
+        <div class="section">
+            <h2>Design Principles</h2>
+
+            <h3>iOS 17+ Native Patterns</h3>
+            <ul style="color: #6e6e73; line-height: 1.8; font-size: 15px; margin-left: 24px;">
+                <li>SF Pro font system with Dynamic Type support</li>
+                <li>Semantic colors that adapt to Light/Dark mode automatically</li>
+                <li>8pt grid system for consistent spacing and rhythm</li>
+                <li>44pt minimum touch targets (Apple HIG compliance)</li>
+                <li>Native iOS components: TabView, NavigationStack, Form, List</li>
+                <li>Spring animations with iOS-native curves (0.3s-0.5s duration)</li>
+                <li>Pull-to-refresh gesture on scrollable views</li>
+                <li>Haptic feedback on key interactions</li>
+            </ul>
+
+            <h3 style="margin-top: 24px;">Accessibility First</h3>
+            <ul style="color: #6e6e73; line-height: 1.8; font-size: 15px; margin-left: 24px;">
+                <li>VoiceOver labels on all interactive elements</li>
+                <li>Dynamic Type support for text scaling</li>
+                <li>High contrast mode compatibility</li>
+                <li>Color-blind friendly status indicators (icons + color)</li>
+                <li>Keyboard navigation support on iPadOS</li>
+                <li>Reduce Motion support for animations</li>
+            </ul>
+
+            <h3 style="margin-top: 24px;">Performance Targets</h3>
+            <ul style="color: #6e6e73; line-height: 1.8; font-size: 15px; margin-left: 24px;">
+                <li>60fps animations on iPhone 12 and newer</li>
+                <li>Launch time under 400ms</li>
+                <li>API response rendering under 100ms</li>
+                <li>Smooth scrolling with lazy loading for capsule grid</li>
+                <li>Optimized for iOS 17+ (no backward compatibility needed)</li>
+            </ul>
+        </div>
+
+        <!-- Usage Notes -->
+        <div class="section" style="background: #f5f5f7; border: 2px solid #e5e5e7;">
+            <h2 style="font-size: 20px;">Implementation Notes for Mobile Dev</h2>
+            <div style="color: #6e6e73; line-height: 1.8; font-size: 15px;">
+                <p style="margin-bottom: 16px;"><strong>Color References:</strong> Use existing Colors.swift definitions. All colors are semantic and adapt to Light/Dark mode automatically.</p>
+
+                <p style="margin-bottom: 16px;"><strong>Typography:</strong> Use existing Typography.swift definitions. All fonts support Dynamic Type for accessibility.</p>
+
+                <p style="margin-bottom: 16px;"><strong>Spacing:</strong> Use existing Spacing.swift constants. All layouts follow 8pt grid for visual consistency.</p>
+
+                <p style="margin-bottom: 16px;"><strong>Components:</strong> Build using SwiftUI native components (Button, Card from existing design system). Reference Theme.swift for button styles.</p>
+
+                <p style="margin-bottom: 16px;"><strong>Animations:</strong> Use springNormal for most interactions, springFast for quick responses, springBouncy for celebration effects.</p>
+
+                <p><strong>Assets:</strong> Use SF Symbols for all icons. No custom icon assets needed - SF Symbols are native, accessible, and adapt to Dynamic Type.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BuilderOS - Liquid Glass Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0a0415 0%, #1a0a2e 50%, #2d1b4e 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background gradient */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(96, 239, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 107, 157, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.08) 0%, transparent 50%);
+            animation: gradientShift 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-5%, -5%) rotate(5deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 428px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Navigation tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, rgba(96, 239, 255, 0.2) 0%, rgba(255, 107, 157, 0.2) 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(96, 239, 255, 0.3);
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Empty State Screen */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .crane-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 32px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 24px;
+            border: 2px solid transparent;
+            background-image: linear-gradient(135deg, #0a0415, #1a0a2e),
+                              linear-gradient(135deg, rgba(96, 239, 255, 0.6), rgba(255, 107, 157, 0.6));
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            box-shadow:
+                0 8px 32px rgba(96, 239, 255, 0.2),
+                0 0 60px rgba(255, 107, 157, 0.15);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .gradient-text {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60efff 0%, #ff6b9d 50%, #ff3366 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: rgba(96, 239, 255, 0.7);
+            line-height: 1.6;
+            max-width: 280px;
+            margin: 0 auto 32px;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(96, 239, 255, 0.4);
+            border-radius: 16px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .cta-button:hover {
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px rgba(96, 239, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(96, 239, 255, 0.2), rgba(255, 107, 157, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .header-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .header-info p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+            margin-bottom: 16px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 16px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.user .message-bubble {
+            animation-name: slideInRight;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .message-bubble {
+            max-width: 75%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .message.system .message-bubble {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-bubble {
+            background: rgba(96, 239, 255, 0.15);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(96, 239, 255, 0.3);
+            color: white;
+            box-shadow: 0 4px 16px rgba(96, 239, 255, 0.2);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 6px;
+        }
+
+        .chat-input-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            padding: 8px;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .send-button {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #60efff, #ff6b9d);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(96, 239, 255, 0.4);
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 24px rgba(96, 239, 255, 0.6);
+        }
+
+        /* Status Cards */
+        .status-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(96, 239, 255, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(96, 239, 255, 0.2), rgba(255, 107, 157, 0.2));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60efff, #ff6b9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .card-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .stat-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #60efff;
+        }
+
+        /* Settings Screen */
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+
+        .setting-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .setting-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .setting-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .setting-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, rgba(96, 239, 255, 0.15), rgba(255, 107, 157, 0.15));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .setting-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .setting-info p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .setting-chevron {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 18px;
+        }
+
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #60efff, #ff6b9d);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toggle-switch.active::after {
+            left: 23px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(96, 239, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(96, 239, 255, 0.5);
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 388px;
+            width: calc(100% - 40px);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-item.active {
+            background: rgba(96, 239, 255, 0.15);
+            color: #60efff;
+        }
+
+        .tab-item-icon {
+            font-size: 22px;
+        }
+
+        .tab-item-label {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 428px) {
+            .container {
+                padding: 16px;
+            }
+
+            .crane-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 52px;
+            }
+
+            .gradient-text {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchScreen('empty')">Empty</button>
+            <button class="nav-tab" onclick="switchScreen('chat')">Chat</button>
+            <button class="nav-tab" onclick="switchScreen('status')">Status</button>
+            <button class="nav-tab" onclick="switchScreen('settings')">Settings</button>
+        </div>
+
+        <!-- Empty State Screen -->
+        <div class="screen active" id="empty-screen">
+            <div class="empty-state">
+                <div class="crane-icon">🏗️</div>
+                <h1 class="gradient-text">$ BUILDEROS</h1>
+                <p class="subtitle">Your intelligent build system powered by Claude Code. Ready to create anything.</p>
+                <button class="cta-button">
+                    <span>Start Building</span>
+                    <span>→</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Screen -->
+        <div class="screen" id="chat-screen">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="header-icon">🤖</div>
+                    <div class="header-info">
+                        <h3>Jarvis</h3>
+                        <p>Online • Ready to assist</p>
+                    </div>
+                </div>
+
+                <div class="chat-messages">
+                    <div class="message system">
+                        <div class="message-bubble">
+                            <div>Hello! I'm Jarvis, your BuilderOS assistant. How can I help you build today?</div>
+                            <div class="message-time">9:41 AM</div>
+                        </div>
+                    </div>
+
+                    <div class="message user">
+                        <div class="message-bubble">
+                            <div>Create a new iOS app for fitness tracking</div>
+                            <div class="message-time">9:42 AM</div>
+                        </div>
+                    </div>
+
+                    <div class="message system">
+                        <div class="message-bubble">
+                            <div>Perfect! I'll set up a fitness tracking app capsule. This will include SwiftUI components, HealthKit integration, and a clean data architecture. Give me a moment...</div>
+                            <div class="message-time">9:42 AM</div>
+                        </div>
+                    </div>
+
+                    <div class="message system">
+                        <div class="message-bubble">
+                            <div>✅ Created capsule "fitness-tracker"<br>✅ Initialized Xcode project<br>✅ Configured HealthKit permissions<br><br>Ready to start building!</div>
+                            <div class="message-time">9:43 AM</div>
+                        </div>
+                    </div>
+
+                    <div class="message user">
+                        <div class="message-bubble">
+                            <div>What's the project structure?</div>
+                            <div class="message-time">9:44 AM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" placeholder="Ask Jarvis anything...">
+                    <button class="send-button">↑</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Screen -->
+        <div class="screen" id="status-screen">
+            <div class="status-grid">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-icon">📊</div>
+                        <div class="card-title">System Overview</div>
+                    </div>
+                    <div class="card-value">24</div>
+                    <div class="card-label">Active Capsules</div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="stat-row">
+                        <span class="stat-label">Production</span>
+                        <span class="stat-value">7 capsules</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Testing</span>
+                        <span class="stat-value">18 capsules</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Templates</span>
+                        <span class="stat-value">4 available</span>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-icon">⚡</div>
+                        <div class="card-title">Performance</div>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Build Success Rate</span>
+                        <span class="stat-value">98.5%</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Avg Build Time</span>
+                        <span class="stat-value">2.3s</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Last Audit</span>
+                        <span class="stat-value">Today 9:10 AM</span>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-icon">🧠</div>
+                        <div class="card-title">Memory Intelligence</div>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Learned Patterns</span>
+                        <span class="stat-value">36</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Knowledge Docs</span>
+                        <span class="stat-value">189</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Status</span>
+                        <span class="stat-value">✓ Operational</span>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="card-icon">🤖</div>
+                        <div class="card-title">Available Agents</div>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Design & Dev</span>
+                        <span class="stat-value">10 agents</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Business</span>
+                        <span class="stat-value">6 agents</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Technical</span>
+                        <span class="stat-value">6 agents</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Screen -->
+        <div class="screen" id="settings-screen">
+            <div class="settings-section">
+                <div class="section-title">Appearance</div>
+                <div class="setting-item">
+                    <div class="setting-left">
+                        <div class="setting-icon">🎨</div>
+                        <div class="setting-info">
+                            <h4>Theme</h4>
+                            <p>Liquid Glass (Dark)</p>
+                        </div>
+                    </div>
+                    <span class="setting-chevron">›</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-left">
+                        <div class="setting-icon">✨</div>
+                        <div class="setting-info">
+                            <h4>Animations</h4>
+                            <p>Smooth transitions enabled</p>
+                        </div>
+                    </div>
+                    <div class="toggle-switch active"></div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="section-title">Intelligence</div>
+                <div class="setting-item">
+                    <div class="setting-left">
+                        <div class="setting-icon">🧠</div>
+                        <div class="setting-info">
+                            <h4>Memory System</h4>
+                            <p>36 patterns, 189 docs</p>
+                        </div>
+                    </div>
+                    <span class="setting-chevron">›</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-left">
+                        <div class="setting-icon">🤖</div>
+                        <div class="setting-info">
+                            <h4>Agent Preferences</h4>
+                            <p>Manage specialist agents</p>
+                        </div>
+                    </div>
+                    <span class="setting-chevron">›</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-left">
+                        <div class="setting-icon">🔄</div>
+                        <div class="setting-info">
+                            <h4>Auto-Context Loading</h4>
+                            <p>Load capsule context automatically</p>
+                        </div>
+                    </div>
+                    <div class="toggle-switch active"></div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="section-title">Build System</div>
+                <div class="setting-item">
+                    <div class="setting-left">
+                        <div class="setting-icon">📦</div>
+                        <div class="setting-info">
+                            <h4>Capsules</h4>
+                            <p>7 production, 18 testing</p>
+                        </div>
+                    </div>
+                    <span class="setting-chevron">›</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-left">
+                        <div class="setting-icon">🔧</div>
+                        <div class="setting-info">
+                            <h4>Build Pipeline</h4>
+                            <p>Configure validation & deploy</p>
+                        </div>
+                    </div>
+                    <span class="setting-chevron">›</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-left">
+                        <div class="setting-icon">📊</div>
+                        <div class="setting-info">
+                            <h4>Daily Audits</h4>
+                            <p>9:10 AM • LaunchAgent</p>
+                        </div>
+                    </div>
+                    <div class="toggle-switch active"></div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="section-title">Security</div>
+                <div class="setting-item">
+                    <div class="setting-left">
+                        <div class="setting-icon">🔐</div>
+                        <div class="setting-info">
+                            <h4>API Keys</h4>
+                            <p>Strongbox integration</p>
+                        </div>
+                    </div>
+                    <span class="setting-chevron">›</span>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-left">
+                        <div class="setting-icon">🛡️</div>
+                        <div class="setting-info">
+                            <h4>Privacy Controls</h4>
+                            <p>MCP memory & backups</p>
+                        </div>
+                    </div>
+                    <span class="setting-chevron">›</span>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="section-title">About</div>
+                <div class="setting-item">
+                    <div class="setting-left">
+                        <div class="setting-icon">ℹ️</div>
+                        <div class="setting-info">
+                            <h4>BuilderOS</h4>
+                            <p>Version 2.0.0 (Mobile)</p>
+                        </div>
+                    </div>
+                    <span class="setting-chevron">›</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Bar (iOS-style) -->
+    <div class="tab-bar">
+        <button class="tab-item active">
+            <div class="tab-item-icon">💬</div>
+            <div class="tab-item-label">Chat</div>
+        </button>
+        <button class="tab-item">
+            <div class="tab-item-icon">📊</div>
+            <div class="tab-item-label">Status</div>
+        </button>
+        <button class="tab-item">
+            <div class="tab-item-icon">🏗️</div>
+            <div class="tab-item-label">Build</div>
+        </button>
+        <button class="tab-item">
+            <div class="tab-item-icon">⚙️</div>
+            <div class="tab-item-label">Settings</div>
+        </button>
+    </div>
+
+    <script>
+        function switchScreen(screenName) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            // Show selected screen
+            document.getElementById(screenName + '-screen').classList.add('active');
+
+            // Update nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Toggle switches
+        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Tab bar interaction
+        document.querySelectorAll('.tab-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Auto-focus chat input when on chat screen
+        document.querySelector('.chat-input').addEventListener('focus', function() {
+            this.parentElement.style.borderColor = 'rgba(96, 239, 255, 0.4)';
+        });
+
+        document.querySelector('.chat-input').addEventListener('blur', function() {
+            this.parentElement.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BuilderOS Mobile - Design Prototypes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* iOS Safe Area */
+            --safe-area-top: env(safe-area-inset-top, 44px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 34px);
+
+            /* Spacing (8pt grid) */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-base: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+
+            /* Corner Radius */
+            --radius-xs: 4px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+
+            /* Icon Sizes */
+            --icon-sm: 16px;
+            --icon-md: 24px;
+            --icon-lg: 32px;
+            --icon-xl: 48px;
+
+            /* Layout */
+            --min-touch-target: 44px;
+            --touch-target: 48px;
+            --screen-padding: 20px;
+            --card-padding: 16px;
+
+            /* Light Mode Colors */
+            --color-primary: #007AFF;
+            --color-secondary: rgba(0, 122, 255, 0.7);
+            --color-accent: #5856D6;
+
+            --color-success: #34C759;
+            --color-warning: #FF9500;
+            --color-error: #FF3B30;
+            --color-info: #007AFF;
+
+            --color-text-primary: #000000;
+            --color-text-secondary: rgba(60, 60, 67, 0.6);
+            --color-bg-primary: #FFFFFF;
+            --color-bg-secondary: #F2F2F7;
+            --color-bg-tertiary: #E5E5EA;
+
+            --color-user-message: #007AFF;
+            --color-system-message: #F2F2F7;
+            --color-code-bg: #E5E5EA;
+
+            /* Tab Bar */
+            --tab-bar-height: calc(49px + var(--safe-area-bottom));
+            --tab-bar-bg: rgba(249, 249, 249, 0.94);
+            --tab-bar-border: rgba(0, 0, 0, 0.3);
+
+            /* Blur Effects */
+            --material-regular: rgba(255, 255, 255, 0.7);
+            --material-thick: rgba(255, 255, 255, 0.85);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode Colors */
+            --color-primary: #0A84FF;
+            --color-secondary: rgba(10, 132, 255, 0.7);
+            --color-accent: #5E5CE6;
+
+            --color-success: #32D74B;
+            --color-warning: #FF9F0A;
+            --color-error: #FF453A;
+            --color-info: #0A84FF;
+
+            --color-text-primary: #FFFFFF;
+            --color-text-secondary: rgba(235, 235, 245, 0.6);
+            --color-bg-primary: #000000;
+            --color-bg-secondary: #1C1C1E;
+            --color-bg-tertiary: #2C2C2E;
+
+            --color-user-message: #0A84FF;
+            --color-system-message: #2C2C2E;
+            --color-code-bg: #3A3A3C;
+
+            --tab-bar-bg: rgba(28, 28, 30, 0.94);
+            --tab-bar-border: rgba(255, 255, 255, 0.3);
+
+            --material-regular: rgba(28, 28, 30, 0.7);
+            --material-thick: rgba(28, 28, 30, 0.85);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Container for phone mockup */
+        .phone-container {
+            max-width: 430px;
+            margin: 40px auto;
+            background: var(--color-bg-primary);
+            border-radius: 55px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .phone-frame {
+            width: 100%;
+            aspect-ratio: 430 / 932;
+            background: var(--color-bg-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: var(--safe-area-top);
+            background: var(--color-bg-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-lg);
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .status-bar-left {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .status-bar-right {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--color-bg-primary);
+            height: calc(100% - var(--safe-area-top) - var(--tab-bar-height));
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            background: var(--material-thick);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: var(--spacing-md) var(--screen-padding);
+            border-bottom: 0.5px solid var(--color-bg-tertiary);
+        }
+
+        .nav-bar-title {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--tab-bar-height);
+            background: var(--tab-bar-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 0.5px solid var(--tab-bar-border);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 8px;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 0;
+            text-decoration: none;
+        }
+
+        .tab-item.active {
+            color: var(--color-primary);
+        }
+
+        .tab-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--material-regular);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-md);
+            padding: var(--card-padding);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+            min-height: var(--min-touch-target);
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-secondary);
+            color: var(--color-primary);
+        }
+
+        /* Screen Navigation */
+        .screen-nav {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: var(--material-thick);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .screen-nav select {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-bg-tertiary);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--material-thick);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-sm) var(--spacing-md);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-secondary { color: var(--color-text-secondary); }
+        .mt-sm { margin-top: var(--spacing-sm); }
+        .mt-md { margin-top: var(--spacing-md); }
+        .mt-lg { margin-top: var(--spacing-lg); }
+        .mt-xl { margin-top: var(--spacing-xl); }
+        .mb-sm { margin-bottom: var(--spacing-sm); }
+        .mb-md { margin-bottom: var(--spacing-md); }
+        .mb-lg { margin-bottom: var(--spacing-lg); }
+        .p-md { padding: var(--spacing-md); }
+        .p-lg { padding: var(--spacing-lg); }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .flex-column { flex-direction: column; }
+
+        @media (max-width: 480px) {
+            .phone-container {
+                margin: 0;
+                border-radius: 0;
+                max-width: 100%;
+            }
+
+            .screen-nav,
+            .theme-toggle {
+                position: static;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="screen-nav">
+        <label for="screen-select" style="font-weight: 600; margin-right: 8px;">Screen:</label>
+        <select id="screen-select" onchange="switchScreen(this.value)">
+            <option value="onboarding">Onboarding</option>
+            <option value="dashboard">Dashboard</option>
+            <option value="chat">Chat</option>
+            <option value="preview">Localhost Preview</option>
+            <option value="settings">Settings</option>
+            <option value="capsule-detail">Capsule Detail</option>
+        </select>
+    </div>
+
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+        <span id="theme-icon">🌙</span>
+    </div>
+
+    <div class="phone-container">
+        <div class="phone-frame" id="phone-frame">
+            <!-- Status Bar (persistent across all screens) -->
+            <div class="status-bar">
+                <div class="status-bar-left">
+                    <span id="time">9:41</span>
+                </div>
+                <div class="status-bar-right">
+                    <span>📶</span>
+                    <span>📡</span>
+                    <span>🔋</span>
+                </div>
+            </div>
+
+            <!-- Screens will be loaded here -->
+            <div id="screen-container"></div>
+
+            <!-- Tab Bar (hidden on onboarding) -->
+            <div class="tab-bar" id="tab-bar" style="display: none;">
+                <a href="#" class="tab-item active" onclick="switchScreen('dashboard'); return false;">
+                    <div class="tab-icon">📊</div>
+                    <div class="tab-label">Dashboard</div>
+                </a>
+                <a href="#" class="tab-item" onclick="switchScreen('chat'); return false;">
+                    <div class="tab-icon">💬</div>
+                    <div class="tab-label">Chat</div>
+                </a>
+                <a href="#" class="tab-item" onclick="switchScreen('preview'); return false;">
+                    <div class="tab-icon">🌐</div>
+                    <div class="tab-label">Preview</div>
+                </a>
+                <a href="#" class="tab-item" onclick="switchScreen('settings'); return false;">
+                    <div class="tab-icon">⚙️</div>
+                    <div class="tab-label">Settings</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="screens.js"></script>
+    <script>
+        // Theme Management
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                icon.textContent = '🌙';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                icon.textContent = '☀️';
+            }
+        }
+
+        // Screen Management
+        function switchScreen(screenName) {
+            const container = document.getElementById('screen-container');
+            const tabBar = document.getElementById('tab-bar');
+            const select = document.getElementById('screen-select');
+
+            // Update select value
+            select.value = screenName;
+
+            // Show/hide tab bar
+            if (screenName === 'onboarding') {
+                tabBar.style.display = 'none';
+            } else {
+                tabBar.style.display = 'flex';
+            }
+
+            // Update active tab
+            document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
+            if (screenName === 'dashboard') {
+                document.querySelectorAll('.tab-item')[0].classList.add('active');
+            } else if (screenName === 'chat') {
+                document.querySelectorAll('.tab-item')[1].classList.add('active');
+            } else if (screenName === 'preview') {
+                document.querySelectorAll('.tab-item')[2].classList.add('active');
+            } else if (screenName === 'settings') {
+                document.querySelectorAll('.tab-item')[3].classList.add('active');
+            }
+
+            // Load screen content
+            loadScreen(screenName);
+        }
+
+        function loadScreen(screenName) {
+            const container = document.getElementById('screen-container');
+
+            if (window.screens && window.screens[screenName]) {
+                container.innerHTML = window.screens[screenName];
+            } else {
+                container.innerHTML = '<div class="content-area p-lg text-center">Screen not found</div>';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial time
+            updateTime();
+            setInterval(updateTime, 1000);
+
+            // Load initial screen
+            switchScreen('onboarding');
+        });
+
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('time').textContent = `${hours}:${minutes}`;
+        }
+    </script>
+</body>
+</html>
