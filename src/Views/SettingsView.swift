@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import Inject
 
 struct SettingsView: View {
     @EnvironmentObject var apiClient: BuilderOSAPIClient
+    @ObserveInjection var inject
 
     @State private var apiKey: String = ""
     @State private var showAPIKeyInput = false
@@ -69,13 +71,13 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
-            .alert("Sign Out", isPresented: $showSignOutAlert) {
+            .alert("Clear API Key", isPresented: $showSignOutAlert) {
                 Button("Cancel", role: .cancel) { }
-                Button("Sign Out", role: .destructive) {
+                Button("Clear", role: .destructive) {
                     signOut()
                 }
             } message: {
-                Text("This will clear your stored API key from Keychain.")
+                Text("This will clear your stored API key from Keychain. You'll need to re-enter it to connect.")
             }
             .sheet(isPresented: $showAPIKeyInput) {
                 APIKeyInputSheet(apiKey: $apiKey, onSave: saveAPIKey)
@@ -86,14 +88,15 @@ struct SettingsView: View {
                 Text(powerAlertMessage)
             }
         }
+        .enableInjection()
     }
 
     private var connectionStatus: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Status")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.labelMedium)
+                    .foregroundStyle(Color.textSecondary)
 
                 HStack(spacing: 6) {
                     Circle()
@@ -101,7 +104,7 @@ struct SettingsView: View {
                         .frame(width: 8, height: 8)
 
                     Text(apiClient.isConnected ? "Connected" : "Disconnected")
-                        .font(.headline)
+                        .font(.titleMedium)
                 }
             }
 
@@ -117,13 +120,12 @@ struct SettingsView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Tunnel URL")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.labelMedium)
+                    .foregroundStyle(Color.textSecondary)
 
                 Text(apiClient.tunnelURL)
-                    .font(.caption)
-                    .foregroundStyle(.primary)
-                    .fontDesign(.monospaced)
+                    .font(.monoSmall)
+                    .foregroundStyle(Color.textPrimary)
                     .lineLimit(1)
             }
 
@@ -137,7 +139,7 @@ struct SettingsView: View {
         } label: {
             HStack {
                 Spacer()
-                Text("Sign Out of Tailscale")
+                Text("Clear API Key")
                 Spacer()
             }
         }
@@ -147,15 +149,15 @@ struct SettingsView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("API Key")
-                    .font(.subheadline)
+                    .font(.labelMedium)
 
                 if apiClient.hasAPIKey {
                     Text("Configured")
-                        .font(.caption)
+                        .font(.labelSmall)
                         .foregroundStyle(.green)
                 } else {
                     Text("Not configured")
-                        .font(.caption)
+                        .font(.labelSmall)
                         .foregroundStyle(.orange)
                 }
             }
@@ -323,7 +325,12 @@ struct APIKeyInputSheet: View {
     }
 }
 
-#Preview {
+#Preview("Connected") {
     SettingsView()
-        .environmentObject(BuilderOSAPIClient())
+        .environmentObject(BuilderOSAPIClient.mockWithData())
+}
+
+#Preview("No API Key") {
+    SettingsView()
+        .environmentObject(BuilderOSAPIClient.mockDisconnected())
 }

@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import Inject
 
 struct MainContentView: View {
     @EnvironmentObject var apiClient: BuilderOSAPIClient
+    @ObserveInjection var inject
 
     var body: some View {
         TabView {
@@ -17,7 +19,7 @@ struct MainContentView: View {
                     Label("Dashboard", systemImage: "square.grid.2x2.fill")
                 }
 
-            MultiTabTerminalView()
+            TerminalChatView()
                 .tabItem {
                     Label("Terminal", systemImage: "terminal.fill")
                 }
@@ -32,10 +34,11 @@ struct MainContentView: View {
                     Label("Settings", systemImage: "gearshape.fill")
                 }
         }
+        .enableInjection()
     }
 }
 
 #Preview {
     MainContentView()
-        .environmentObject(BuilderOSAPIClient())
+        .environmentObject(BuilderOSAPIClient.mockWithData())
 }

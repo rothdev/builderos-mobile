@@ -31,11 +31,11 @@ struct OnboardingView: View {
 
                 VStack(spacing: 16) {
                     Text("BuilderOS")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .font(.displayLarge)
 
                     Text("Connect to your Mac")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
+                        .font(.titleLarge)
+                        .foregroundStyle(Color.textSecondary)
                 }
 
                 Spacer()
@@ -90,14 +90,14 @@ struct OnboardingView: View {
                 .foregroundStyle(.blue)
 
             Text("Access your BuilderOS system from anywhere")
-                .font(.headline)
+                .font(.titleMedium)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.primary)
+                .foregroundStyle(Color.textPrimary)
 
             Text("Securely connect to your Mac using Cloudflare Tunnel. Fast, encrypted, and works with VPNs.")
-                .font(.subheadline)
+                .font(.bodyMedium)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.textSecondary)
                 .frame(maxWidth: 300)
         }
     }
@@ -109,19 +109,19 @@ struct OnboardingView: View {
                 .foregroundStyle(.blue)
 
             Text("Enter Connection Details")
-                .font(.headline)
+                .font(.titleMedium)
 
             VStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Cloudflare Tunnel URL")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.labelMedium)
+                        .foregroundStyle(Color.textSecondary)
 
                     TextField("https://builderos-xyz.trycloudflare.com", text: $tunnelURL)
                         .textContentType(.URL)
                         .autocapitalization(.none)
                         .keyboardType(.URL)
-                        .font(.system(.body, design: .monospaced))
+                        .font(.monoMedium)
                         .textInputAutocapitalization(.never)
                         .padding()
                         .background(Color(.systemGray6))
@@ -130,13 +130,13 @@ struct OnboardingView: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("API Key")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.labelMedium)
+                        .foregroundStyle(Color.textSecondary)
 
                     SecureField("Enter API Key", text: $apiKey)
                         .textContentType(.password)
                         .autocapitalization(.none)
-                        .font(.system(.body, design: .monospaced))
+                        .font(.monoMedium)
                         .padding()
                         .background(Color(.systemGray6))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -145,8 +145,8 @@ struct OnboardingView: View {
             .padding(.horizontal)
 
             Text("Get these from your Mac's BuilderOS server output")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(.bodySmall)
+                .foregroundStyle(Color.textSecondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 280)
         }
@@ -159,25 +159,24 @@ struct OnboardingView: View {
                     .scaleEffect(1.5)
                     .padding()
                 Text("Testing connection...")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.bodyMedium)
+                    .foregroundStyle(Color.textSecondary)
             } else if apiClient.isConnected {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 60))
                     .foregroundStyle(.green)
 
                 Text("Connected!")
-                    .font(.headline)
+                    .font(.titleMedium)
 
                 VStack(spacing: 8) {
                     Text("BuilderOS Mobile")
-                        .font(.title3)
+                        .font(.titleLarge)
                         .fontWeight(.semibold)
 
                     Text(tunnelURL)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fontDesign(.monospaced)
+                        .font(.monoSmall)
+                        .foregroundStyle(Color.textSecondary)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
@@ -190,12 +189,12 @@ struct OnboardingView: View {
                     .foregroundStyle(.orange)
 
                 Text("Connection failed")
-                    .font(.headline)
+                    .font(.titleMedium)
 
                 Text("Check your tunnel URL and API key, and make sure your Mac's BuilderOS server is running.")
-                    .font(.subheadline)
+                    .font(.bodyMedium)
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.textSecondary)
                     .frame(maxWidth: 300)
             }
         }
@@ -300,5 +299,5 @@ struct OnboardingView: View {
 
 #Preview {
     OnboardingView()
-        .environmentObject(BuilderOSAPIClient())
+        .environmentObject(BuilderOSAPIClient.mockDisconnected())
 }

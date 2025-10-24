@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import Inject
 
 struct MultiTabTerminalView: View {
     @EnvironmentObject var apiClient: BuilderOSAPIClient
+    @ObserveInjection var inject
     @State private var tabs: [TerminalTab] = [TerminalTab(profile: .shell)]
     @State private var selectedTabId: UUID
 
@@ -43,6 +45,7 @@ struct MultiTabTerminalView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
+        .enableInjection()
     }
 
     // MARK: - Tab Management
@@ -71,5 +74,5 @@ struct MultiTabTerminalView: View {
 
 #Preview {
     MultiTabTerminalView()
-        .environmentObject(BuilderOSAPIClient())
+        .environmentObject(BuilderOSAPIClient.mockWithData())
 }

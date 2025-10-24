@@ -20,6 +20,7 @@ DerivedData/
 *.xccheckout
 
 # Swift Package Manager
+.build/
 /.build
 /Packages
 .swiftpm/

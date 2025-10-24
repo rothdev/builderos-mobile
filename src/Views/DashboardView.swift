@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import Inject
 
 struct DashboardView: View {
     @EnvironmentObject var apiClient: BuilderOSAPIClient
+    @ObserveInjection var inject
     @State private var systemStatus: SystemStatus?
     @State private var isRefreshing = false
     @State private var isLoading = false
@@ -33,7 +35,7 @@ struct DashboardView: View {
                 }
                 .padding()
             }
-            .navigationTitle("BuilderOS")
+            .navigationTitle("BuilderOS 🔥 HOT RELOAD TEST")
             .refreshable {
                 await refreshData()
             }
@@ -41,6 +43,7 @@ struct DashboardView: View {
                 await loadInitialData()
             }
         }
+        .enableInjection()
     }
 
     private var connectionStatusCard: some View {
@@ -48,16 +51,16 @@ struct DashboardView: View {
             HStack {
                 Image(systemName: apiClient.isConnected ? "checkmark.circle.fill" : "xmark.circle.fill")
                     .foregroundStyle(apiClient.isConnected ? .green : .red)
-                    .font(.title2)
+                    .font(.titleLarge)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(apiClient.isConnected ? "Connected" : "Disconnected")
-                        .font(.headline)
+                        .font(.titleMedium)
 
                     if apiClient.isConnected {
                         Text("BuilderOS Mobile")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .font(.bodyMedium)
+                            .foregroundStyle(Color.textSecondary)
                     }
                 }
 
@@ -73,17 +76,16 @@ struct DashboardView: View {
 
                 HStack {
                     Label(apiClient.tunnelURL, systemImage: "network")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fontDesign(.monospaced)
+                        .font(.monoSmall)
+                        .foregroundStyle(Color.textSecondary)
                         .lineLimit(1)
                         .truncationMode(.middle)
 
                     Spacer()
 
                     Label("Cloudflare Tunnel", systemImage: "lock.shield.fill")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.labelSmall)
+                        .foregroundStyle(Color.textSecondary)
                 }
             }
         }
@@ -96,7 +98,7 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("System Status")
-                    .font(.headline)
+                    .font(.titleMedium)
 
                 Spacer()
 
@@ -106,8 +108,8 @@ struct DashboardView: View {
                         .frame(width: 8, height: 8)
 
                     Text(status.healthStatus.displayName)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(.bodyMedium)
+                        .foregroundStyle(Color.textSecondary)
                 }
             }
 
@@ -128,14 +130,14 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.caption)
+                    .font(.labelSmall)
                 Text(title)
-                    .font(.caption)
+                    .font(.labelSmall)
             }
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Color.textSecondary)
 
             Text(value)
-                .font(.title3)
+                .font(.titleSmall)
                 .fontWeight(.semibold)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -146,8 +148,8 @@ struct DashboardView: View {
 
     private var capsulesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Capsules")
-                .font(.headline)
+            Text("🔥 Capsules - HOT RELOAD WORKS!")
+                .font(.titleMedium)
                 .padding(.horizontal, 4)
 
             if isLoading {
@@ -179,11 +181,11 @@ struct DashboardView: View {
         VStack(spacing: 12) {
             Image(systemName: "cube.transparent")
                 .font(.system(size: 48))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.textSecondary)
 
             Text("No capsules found")
-                .font(.headline)
-                .foregroundStyle(.secondary)
+                .font(.titleMedium)
+                .foregroundStyle(Color.textSecondary)
         }
         .frame(maxWidth: .infinity)
         .padding(40)
@@ -220,6 +222,7 @@ struct DashboardView: View {
 // MARK: - Capsule Card Component
 struct CapsuleCard: View {
     let capsule: Capsule
+    @ObserveInjection var inject
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -231,23 +234,34 @@ struct CapsuleCard: View {
             }
 
             Text(capsule.name)
-                .font(.subheadline)
+                .font(.labelLarge)
                 .fontWeight(.semibold)
                 .lineLimit(2)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(capsule.description)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(.bodySmall)
+                .foregroundStyle(Color.textSecondary)
                 .lineLimit(2)
         }
         .padding()
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .enableInjection()
     }
 }
 
-#Preview {
+#Preview("Connected") {
     DashboardView()
-        .environmentObject(BuilderOSAPIClient())
+        .environmentObject(BuilderOSAPIClient.mockWithData())
+}
+
+#Preview("Disconnected") {
+    DashboardView()
+        .environmentObject(BuilderOSAPIClient.mockDisconnected())
+}
+
+#Preview("Loading") {
+    DashboardView()
+        .environmentObject(BuilderOSAPIClient.mockLoading())
 }

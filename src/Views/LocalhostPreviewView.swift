@@ -56,18 +56,17 @@ struct LocalhostPreviewView: View {
     private var connectionHeader: some View {
         HStack(spacing: 12) {
             Image(systemName: "network")
-                .font(.title3)
+                .font(.titleSmall)
                 .foregroundColor(.blue)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(apiClient.isConnected ? "Connected" : "Not Connected")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.titleMedium)
 
                 if apiClient.isConnected {
                     Text("Cloudflare Tunnel")
-                        .font(.system(size: 12))
-                        .fontDesign(.monospaced)
-                        .foregroundColor(.secondary)
+                        .font(.monoSmall)
+                        .foregroundColor(Color.textSecondary)
                 }
             }
 
@@ -114,7 +113,7 @@ struct LocalhostPreviewView: View {
                 loadCustomPort()
             } label: {
                 Text("Go")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.titleMedium)
                     .foregroundColor(.white)
                     .frame(width: 60)
                     .padding(.vertical, 8)
@@ -137,11 +136,11 @@ struct LocalhostPreviewView: View {
                 .foregroundColor(.blue.opacity(0.3))
 
             Text("Preview Localhost")
-                .font(.system(size: 22, weight: .semibold))
+                .font(.titleLarge)
 
             Text("Select a quick link or enter\na custom port to preview\nyour dev servers via Cloudflare Tunnel.")
-                .font(.system(size: 15))
-                .foregroundColor(.secondary)
+                .font(.bodyMedium)
+                .foregroundColor(Color.textSecondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
 
@@ -194,17 +193,17 @@ struct QuickLinkButton: View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(link.name)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.titleMedium)
 
                 Text(":\(link.port)")
-                    .font(.system(size: 12))
+                    .font(.monoSmall)
                     .opacity(isSelected ? 0.8 : 1.0)
 
                 Text(link.description)
-                    .font(.system(size: 10))
+                    .font(.bodySmall)
                     .opacity(isSelected ? 0.7 : 1.0)
             }
-            .foregroundColor(isSelected ? .white : .primary)
+            .foregroundColor(isSelected ? .white : Color.textPrimary)
             .frame(width: 140, alignment: .leading)
             .padding(12)
             .background(isSelected ? Color.blue : Color(.secondarySystemBackground))

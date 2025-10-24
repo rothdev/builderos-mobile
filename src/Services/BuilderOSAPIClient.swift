@@ -66,6 +66,38 @@ class BuilderOSAPIClient: ObservableObject {
         print("Wake Mac API call (stub)")
     }
 
+    // MARK: - Preview Helpers
+
+    /// Create a mock API client with sample data for previews
+    static func mockWithData() -> BuilderOSAPIClient {
+        let client = BuilderOSAPIClient()
+        client.isConnected = true
+        client.hasAPIKey = true
+        client.capsules = Capsule.mockList
+        client.systemStatus = SystemStatus.mock
+        return client
+    }
+
+    /// Create a disconnected mock client for testing error states
+    static func mockDisconnected() -> BuilderOSAPIClient {
+        let client = BuilderOSAPIClient()
+        client.isConnected = false
+        client.hasAPIKey = false
+        client.lastError = "Unable to connect to BuilderOS"
+        return client
+    }
+
+    /// Create a loading state mock client
+    static func mockLoading() -> BuilderOSAPIClient {
+        let client = BuilderOSAPIClient()
+        client.isLoading = true
+        client.isConnected = true
+        client.hasAPIKey = true
+        return client
+    }
+
+    // MARK: - API Methods
+
     func healthCheck() async -> Bool {
         isLoading = true
         lastError = nil

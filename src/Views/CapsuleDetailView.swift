@@ -21,7 +21,7 @@ struct CapsuleDetailView: View {
 
                         Text(capsule.path)
                             .font(.bodySmall)
-                            .foregroundColor(.textSecondary)
+                            .foregroundColor(Color.textSecondary)
                             .lineLimit(1)
                     }
 
@@ -48,7 +48,7 @@ struct CapsuleDetailView: View {
 
                     Text(capsule.description)
                         .font(.bodyMedium)
-                        .foregroundColor(.textSecondary)
+                        .foregroundColor(Color.textSecondary)
                 }
 
                 // Tags
@@ -66,7 +66,7 @@ struct CapsuleDetailView: View {
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 6)
                                         .background(Color.backgroundSecondary)
-                                        .foregroundColor(.textPrimary)
+                                        .foregroundColor(Color.textPrimary)
                                         .cornerRadius(8)
                                 }
                             }
@@ -103,7 +103,7 @@ struct CapsuleDetailView: View {
         case .testing:
             return .statusWarning
         case .archived:
-            return .textSecondary
+            return Color.textSecondary
         }
     }
 
@@ -123,11 +123,11 @@ struct MetricRow: View {
         HStack {
             Text(label)
                 .font(.bodyMedium)
-                .foregroundColor(.textSecondary)
+                .foregroundColor(Color.textSecondary)
             Spacer()
             Text(value)
                 .font(.bodyMedium)
-                .foregroundColor(.textPrimary)
+                .foregroundColor(Color.textPrimary)
         }
     }
 }

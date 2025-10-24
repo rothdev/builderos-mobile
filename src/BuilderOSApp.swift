@@ -12,6 +12,13 @@ struct BuilderOSApp: App {
     @StateObject private var apiClient = BuilderOSAPIClient()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 
+    init() {
+        #if DEBUG
+        // Load InjectionIII bundle for hot reload on real devices
+        Bundle(path: "/Applications/InjectionIII.app/Contents/Resources/iOSInjection.bundle")?.load()
+        #endif
+    }
+
     var body: some Scene {
         WindowGroup {
             if hasCompletedOnboarding {

@@ -2,32 +2,56 @@
 //  MainContentView.swift
 //  BuilderSystemMobile
 //
-//  Main app content after onboarding
+//  Main app content after onboarding - Self-contained preview version
 //
 
 import SwiftUI
 
+// Mock types for preview
+struct Capsule: Identifiable {
+    let id = UUID()
+    let title: String
+    let purpose: String
+}
+
+@MainActor
+class BuilderOSAPIClient: ObservableObject {
+    @Published var isConnected: Bool = false
+    @Published var tunnelURL: String = "https://tunnel.example.com"
+
+    func listCapsules() async throws -> [Capsule] {
+        return []
+    }
+
+    func sleepMac() async throws {
+        // Mock implementation
+    }
+}
+
 struct MainContentView: View {
-    @EnvironmentObject var apiClient: BuilderOSAPIClient
+    @StateObject private var apiClient = BuilderOSAPIClient()
 
     var body: some View {
         TabView {
             DashboardView()
+                .environmentObject(apiClient)
                 .tabItem {
                     Label("Dashboard", systemImage: "house.fill")
                 }
 
             CapsulesListView()
+                .environmentObject(apiClient)
                 .tabItem {
                     Label("Capsules", systemImage: "cube.box.fill")
                 }
 
-            MultiTabTerminalView()
+            TerminalPlaceholder()
                 .tabItem {
                     Label("Terminal", systemImage: "terminal.fill")
                 }
 
             SettingsView()
+                .environmentObject(apiClient)
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }
@@ -85,11 +109,17 @@ struct CapsulesListView: View {
                 if isLoading {
                     ProgressView()
                 } else if capsules.isEmpty {
-                    ContentUnavailableView(
-                        "No Capsules",
-                        systemImage: "cube.box",
-                        description: Text("Connect to your Mac to view capsules")
-                    )
+                    VStack(spacing: 20) {
+                        Image(systemName: "cube.box")
+                            .font(.system(size: 60))
+                            .foregroundStyle(.secondary)
+                        Text("No Capsules")
+                            .font(.title2)
+                        Text("Connect to your Mac to view capsules")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ForEach(capsules) { capsule in
                         VStack(alignment: .leading) {
@@ -117,6 +147,27 @@ struct CapsulesListView: View {
             print("Error loading capsules: \(error)")
         }
         isLoading = false
+    }
+}
+
+// Terminal Placeholder
+struct TerminalPlaceholder: View {
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                Image(systemName: "terminal.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(.secondary)
+
+                Text("Terminal")
+                    .font(.title2)
+
+                Text("Multi-tab terminal interface")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .navigationTitle("Terminal")
+        }
     }
 }
 
@@ -168,5 +219,4 @@ struct SettingsView: View {
 
 #Preview {
     MainContentView()
-        .environmentObject(BuilderOSAPIClient())
 }
