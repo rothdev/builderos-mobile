@@ -22,55 +22,43 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                // Tailscale section
-                Section {
-                    connectionStatus
-                    tunnelURLRow
+            ZStack {
+                // Terminal background
+                Color.terminalDark
+                    .ignoresSafeArea()
 
-                    if apiClient.hasAPIKey {
-                        signOutButton
+                // Subtle radial gradient overlay
+                RadialGradient(
+                    colors: [
+                        Color.terminalPink.opacity(0.08),
+                        Color.clear
+                    ],
+                    center: .top,
+                    startRadius: 0,
+                    endRadius: 500
+                )
+                .ignoresSafeArea()
+
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Cloudflare Tunnel section
+                        tunnelSection
+
+                        // API section
+                        apiSection
+
+                        // Power Control section
+                        powerControlSection
+
+                        // About section
+                        aboutSection
                     }
-                } header: {
-                    Text("Cloudflare Tunnel")
-                } footer: {
-                    Text("Secure HTTPS tunnel to BuilderOS API via Cloudflare. Works with Proton VPN on both devices.")
-                }
-
-                // API section
-                Section {
-                    apiKeyRow
-                } header: {
-                    Text("BuilderOS API")
-                } footer: {
-                    Text("API key is stored securely in iOS Keychain and never leaves your device.")
-                }
-
-                // Power Control section
-                Section {
-                    powerControlButtons
-                } header: {
-                    Text("Mac Power Control")
-                } footer: {
-                    Text("Sleep puts your Mac to sleep immediately. Wake requires Raspberry Pi intermediary device (see documentation).")
-                }
-
-                // About section
-                Section("About") {
-                    LabeledContent("Version", value: "1.0.0")
-                    LabeledContent("Build", value: "1")
-
-                    Link(destination: URL(string: "https://github.com/builderos")!) {
-                        HStack {
-                            Text("Documentation")
-                            Spacer()
-                            Image(systemName: "arrow.up.forward.square")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
+                    .padding()
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle("$ SETTINGS")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .alert("Clear API Key", isPresented: $showSignOutAlert) {
                 Button("Cancel", role: .cancel) { }
                 Button("Clear", role: .destructive) {
@@ -91,57 +79,169 @@ struct SettingsView: View {
         .enableInjection()
     }
 
+    // MARK: - Tunnel Section
+    private var tunnelSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            TerminalSectionHeader(title: "CLOUDFLARE TUNNEL")
+
+            TerminalCard {
+                VStack(spacing: 16) {
+                    connectionStatus
+
+                    Divider()
+                        .background(Color.terminalInputBorder)
+
+                    tunnelURLRow
+
+                    if apiClient.hasAPIKey {
+                        Divider()
+                            .background(Color.terminalInputBorder)
+
+                        signOutButton
+                    }
+                }
+            }
+
+            Text("Secure HTTPS tunnel to BuilderOS API via Cloudflare. Works with Proton VPN on both devices.")
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundStyle(Color.terminalDim)
+                .padding(.horizontal, 4)
+        }
+    }
+
+    // MARK: - API Section
+    private var apiSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            TerminalSectionHeader(title: "BUILDEROS API")
+
+            TerminalCard {
+                apiKeyRow
+            }
+
+            Text("API key is stored securely in iOS Keychain and never leaves your device.")
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundStyle(Color.terminalDim)
+                .padding(.horizontal, 4)
+        }
+    }
+
+    // MARK: - Power Control Section
+    private var powerControlSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            TerminalSectionHeader(title: "MAC POWER CONTROL")
+
+            TerminalCard {
+                VStack(spacing: 12) {
+                    powerControlButtons
+                }
+            }
+
+            Text("Sleep puts your Mac to sleep immediately. Wake requires Raspberry Pi intermediary device (see documentation).")
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundStyle(Color.terminalDim)
+                .padding(.horizontal, 4)
+        }
+    }
+
+    // MARK: - About Section
+    private var aboutSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            TerminalSectionHeader(title: "ABOUT")
+
+            TerminalCard {
+                VStack(spacing: 12) {
+                    HStack {
+                        Text("Version")
+                            .font(.system(size: 14, design: .monospaced))
+                            .foregroundStyle(Color.terminalCode)
+                        Spacer()
+                        Text("1.0.0")
+                            .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                            .foregroundColor(.terminalCyan)
+                    }
+
+                    Divider()
+                        .background(Color.terminalInputBorder)
+
+                    HStack {
+                        Text("Build")
+                            .font(.system(size: 14, design: .monospaced))
+                            .foregroundStyle(Color.terminalCode)
+                        Spacer()
+                        Text("1")
+                            .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                            .foregroundColor(.terminalCyan)
+                    }
+
+                    Divider()
+                        .background(Color.terminalInputBorder)
+
+                    Link(destination: URL(string: "https://github.com/builderos")!) {
+                        HStack {
+                            Text("Documentation")
+                                .font(.system(size: 14, design: .monospaced))
+                                .foregroundColor(.terminalCyan)
+                            Spacer()
+                            Image(systemName: "arrow.up.forward.square")
+                                .foregroundStyle(.terminalCode)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private var connectionStatus: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Status")
-                    .font(.labelMedium)
-                    .foregroundStyle(Color.textSecondary)
+                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+                    .foregroundStyle(Color.terminalCode)
 
-                HStack(spacing: 6) {
-                    Circle()
-                        .fill(apiClient.isConnected ? .green : .red)
-                        .frame(width: 8, height: 8)
-
-                    Text(apiClient.isConnected ? "Connected" : "Disconnected")
-                        .font(.titleMedium)
-                }
+                TerminalStatusBadge(
+                    text: apiClient.isConnected ? "CONNECTED" : "DISCONNECTED",
+                    color: apiClient.isConnected ? .terminalGreen : .terminalRed,
+                    shouldPulse: apiClient.isConnected
+                )
             }
 
             Spacer()
 
             if apiClient.isLoading {
                 ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .terminalCyan))
             }
         }
     }
 
     private var tunnelURLRow: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Tunnel URL")
-                    .font(.labelMedium)
-                    .foregroundStyle(Color.textSecondary)
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Tunnel URL")
+                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                .foregroundStyle(Color.terminalCode)
 
-                Text(apiClient.tunnelURL)
-                    .font(.monoSmall)
-                    .foregroundStyle(Color.textPrimary)
-                    .lineLimit(1)
-            }
-
-            Spacer()
+            Text(apiClient.tunnelURL)
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundStyle(Color.terminalCyan)
+                .lineLimit(2)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var signOutButton: some View {
-        Button(role: .destructive) {
+        Button {
             showSignOutAlert = true
         } label: {
             HStack {
                 Spacer()
                 Text("Clear API Key")
+                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.terminalRed)
                 Spacer()
             }
+            .padding(.vertical, 12)
+            .background(Color.terminalRed.opacity(0.1))
+            .terminalBorder(color: .terminalRed)
         }
     }
 
@@ -149,16 +249,17 @@ struct SettingsView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("API Key")
-                    .font(.labelMedium)
+                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+                    .foregroundStyle(Color.terminalCode)
 
                 if apiClient.hasAPIKey {
                     Text("Configured")
-                        .font(.labelSmall)
-                        .foregroundStyle(.green)
+                        .font(.system(size: 11, design: .monospaced))
+                        .foregroundStyle(.terminalGreen)
                 } else {
                     Text("Not configured")
-                        .font(.labelSmall)
-                        .foregroundStyle(.orange)
+                        .font(.system(size: 11, design: .monospaced))
+                        .foregroundStyle(.terminalPink)
                 }
             }
 
@@ -167,6 +268,12 @@ struct SettingsView: View {
             Button(apiClient.hasAPIKey ? "Update" : "Add") {
                 showAPIKeyInput = true
             }
+            .font(.system(size: 14, weight: .semibold, design: .monospaced))
+            .foregroundColor(.terminalCyan)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Color.terminalInputBackground)
+            .terminalBorder(cornerRadius: 8)
         }
     }
 
@@ -195,37 +302,56 @@ struct SettingsView: View {
             } label: {
                 HStack {
                     Image(systemName: "moon.fill")
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(.terminalCyan)
+                        .font(.system(size: 18))
                     Text("Sleep Mac")
+                        .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                        .foregroundColor(buttonEnabled ? .terminalText : .terminalDim)
                     Spacer()
                     if isPowerActionInProgress {
                         ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .terminalCyan))
                     } else {
                         Image(systemName: "chevron.right")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.terminalCode)
                     }
                 }
+                .padding(.vertical, 12)
             }
-            .disabled(!apiClient.isConnected || !apiClient.hasAPIKey || isPowerActionInProgress)
+            .disabled(!buttonEnabled)
+            .opacity(buttonEnabled ? 1.0 : 0.5)
+
+            Divider()
+                .background(Color.terminalInputBorder)
 
             Button {
                 wakeMac()
             } label: {
                 HStack {
                     Image(systemName: "sun.max.fill")
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.terminalPink)
+                        .font(.system(size: 18))
                     Text("Wake Mac")
+                        .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                        .foregroundColor(buttonEnabled ? .terminalText : .terminalDim)
                     Spacer()
                     if isPowerActionInProgress {
                         ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .terminalCyan))
                     } else {
                         Image(systemName: "chevron.right")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.terminalCode)
                     }
                 }
+                .padding(.vertical, 12)
             }
-            .disabled(!apiClient.isConnected || !apiClient.hasAPIKey || isPowerActionInProgress)
+            .disabled(!buttonEnabled)
+            .opacity(buttonEnabled ? 1.0 : 0.5)
         }
+    }
+
+    private var buttonEnabled: Bool {
+        apiClient.isConnected && apiClient.hasAPIKey && !isPowerActionInProgress
     }
 
     private func sleepMac() {

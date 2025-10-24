@@ -1,0 +1,80 @@
+================================================================================
+  INJECTIONIII WIRELESS HOT RELOAD - SETUP CHECKLIST
+================================================================================
+
+✅ ALREADY DONE (Fixed):
+  [x] InjectionIII package installed in Xcode project
+  [x] Views configured with @ObserveInjection and .enableInjection()
+  [x] Info.plist configured with _inject._tcp Bonjour service
+  [x] NSLocalNetworkUsageDescription updated
+
+📋 YOU NEED TO DO (In Xcode):
+
+  Step 1: Enable Wireless Debugging
+  ----------------------------------
+  [ ] Connect iPhone via USB cable
+  [ ] Open Xcode → Window → Devices and Simulators (Cmd+Shift+2)
+  [ ] Select your iPhone in left sidebar
+  [ ] ✅ Check "Connect via network" checkbox
+  [ ] Wait for globe icon 🌐 to appear next to device
+  [ ] Disconnect USB cable (device stays connected wirelessly!)
+
+  Step 2: Rebuild App (One Time)
+  -------------------------------
+  [ ] Open: /Users/Ty/BuilderOS/capsules/builderos-mobile/src/BuilderOS.xcodeproj
+  [ ] Select iPhone (with globe 🌐) from scheme selector
+  [ ] Press Cmd+B (Build)
+  [ ] Press Cmd+R (Run)
+  [ ] App installs on iPhone wirelessly
+
+  Step 3: Test Hot Reload
+  ------------------------
+  [ ] Leave app running on iPhone
+  [ ] Edit MainContentView.swift (change any text/color)
+  [ ] Save (Cmd+S)
+  [ ] Watch iPhone - changes appear in 1-2 seconds! ⚡
+
+  Step 4: Verify Success
+  ----------------------
+  [ ] Xcode console shows: "💉 Injection connected"
+  [ ] Changes appear on device in 1-2 seconds
+  [ ] No full rebuild needed
+  [ ] 30x faster iteration! 🚀
+
+================================================================================
+  TROUBLESHOOTING
+================================================================================
+
+❌ "Changes not appearing?"
+  → Check globe icon 🌐 visible in Xcode Devices
+  → Verify Mac and iPhone on same Wi-Fi network
+  → Rebuild app once: Cmd+B, Cmd+R
+  → Check Xcode console for "💉 Injection connected"
+
+❌ "Device not showing in Xcode?"
+  → Reconnect via USB temporarily
+  → Re-enable "Connect via network" in Devices window
+  → Check Mac firewall (allow Xcode incoming connections)
+
+❌ "Globe icon not appearing?"
+  → Wait 10-15 seconds after enabling wireless
+  → Both devices must be on same network
+  → Try disabling/re-enabling "Connect via network"
+
+================================================================================
+  QUICK REFERENCE
+================================================================================
+
+📖 Full Documentation:
+  • docs/INJECTION_SETUP.md - Complete setup guide
+  • docs/WIRELESS_HOT_RELOAD_FIX.md - Fix documentation
+  • INJECTION_FIX_SUMMARY.md - What was fixed
+
+🔧 Files Modified:
+  • src/Info.plist - Added _inject._tcp Bonjour service
+
+⚡ Performance:
+  • Traditional rebuild: 30-60 seconds
+  • Hot reload: 1-2 seconds (30x faster!)
+
+================================================================================

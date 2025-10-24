@@ -105,20 +105,93 @@ struct DashboardView: View {
 
 ---
 
-## Real iPhone Support
+## Real iPhone Support (Wireless Hot Reload)
 
-InjectionIII works on real devices too!
+InjectionIII works on real devices wirelessly!
 
-1. **Install InjectionIII Mac app** (optional):
-   ```bash
-   brew install --cask injectioniii
+### Required Configuration:
+
+**1. Info.plist Setup (CRITICAL for wireless):**
+
+Add InjectionIII Bonjour service to `Info.plist`:
+
+```xml
+<key>NSLocalNetworkUsageDescription</key>
+<string>BuilderOS needs local network access for hot reload during development.</string>
+<key>NSBonjourServices</key>
+<array>
+    <string>_inject._tcp</string>
+</array>
+```
+
+**✅ Already configured in this project!**
+
+**2. Enable Wireless Debugging in Xcode:**
+
+This is the CRITICAL step for wireless hot reload:
+
+1. **Connect iPhone via USB** (one time only)
+2. **Open Xcode** → Window → Devices and Simulators
+3. **Select your iPhone** in the left sidebar
+4. **✅ Check "Connect via network"** checkbox
+5. **Wait for globe icon** to appear next to device name
+6. **Disconnect USB cable** - device stays connected wirelessly!
+
+**3. Verify Wireless Connection:**
+
+- Device shows globe icon 🌐 in Xcode Devices window
+- Device appears in Xcode scheme selector with globe icon
+- Both Mac and iPhone on **same Wi-Fi network**
+
+**4. Build to iPhone wirelessly:**
+
+```bash
+# In Xcode, select your iPhone from scheme selector (with globe icon)
+# Press Cmd+R to build and run
+# App installs wirelessly!
+```
+
+**5. Test Hot Reload:**
+
+1. **Edit any View file** (e.g., MainContentView.swift)
+2. **Save (Cmd+S)**
+3. **Watch iPhone** - changes appear in 1-2 seconds!
+4. **No rebuild needed** - just save and see updates
+
+### Troubleshooting Wireless Hot Reload:
+
+**"Changes not appearing on device?"**
+
+1. **Check wireless debugging is ON:**
+   - Xcode → Devices → Your iPhone → "Connect via network" is checked
+   - Globe icon 🌐 visible next to device
+
+2. **Verify same Wi-Fi network:**
+   - Mac and iPhone must be on same network
+   - Corporate/school networks may block Bonjour discovery
+
+3. **Check Xcode console for Inject logs:**
+   ```
+   💉 Injection connected
+   💉 Loaded .../MainContentView.swift
    ```
 
-2. **Run app** (makes hot reload easier to monitor)
+4. **Restart if needed:**
+   - Disconnect/reconnect wireless debugging in Xcode Devices
+   - Rebuild app once (Cmd+B)
+   - Ensure app is running on device
 
-3. **Build to iPhone** over USB
+**"Device not showing in Xcode?"**
 
-4. **Edit code** - hot reloads on device
+- Reconnect via USB temporarily
+- Re-enable "Connect via network" in Devices window
+- Check Mac firewall settings (allow Xcode incoming connections)
+
+**"Hot reload works on simulator but not device?"**
+
+- Missing `_inject._tcp` in NSBonjourServices (already fixed in this project)
+- Wireless debugging not enabled in Xcode Devices
+- VPN blocking local network discovery (disable VPN temporarily for dev)
 
 ---
 

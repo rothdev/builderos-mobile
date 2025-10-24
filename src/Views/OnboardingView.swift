@@ -19,48 +19,101 @@ struct OnboardingView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 32) {
-                Spacer()
+            ZStack {
+                // Terminal background with gradient
+                Color.terminalDark
+                    .ignoresSafeArea()
 
-                // Logo and branding
-                Image(systemName: "cube.box.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 120, height: 120)
-                    .foregroundStyle(.blue.gradient)
+                // Subtle radial gradient overlay
+                RadialGradient(
+                    colors: [
+                        Color.terminalCyan.opacity(0.15),
+                        Color.terminalPink.opacity(0.1),
+                        Color.clear
+                    ],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: 400
+                )
+                .ignoresSafeArea()
 
-                VStack(spacing: 16) {
-                    Text("BuilderOS")
-                        .font(.displayLarge)
+                VStack(spacing: 32) {
+                    Spacer()
 
-                    Text("Connect to your Mac")
-                        .font(.titleLarge)
-                        .foregroundStyle(Color.textSecondary)
-                }
+                    // Logo with terminal aesthetic
+                    ZStack {
+                        // Glow effect
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color.terminalCyan.opacity(0.3),
+                                        Color.terminalPink.opacity(0.2),
+                                        Color.terminalRed.opacity(0.1)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 120, height: 120)
+                            .blur(radius: 20)
 
-                Spacer()
+                        // Logo container with gradient border
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.terminalDark.opacity(0.8))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .strokeBorder(
+                                            LinearGradient(
+                                                colors: [.terminalCyan, .terminalPink, .terminalRed],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 2
+                                        )
+                                )
+                                .shadow(color: Color.terminalCyan.opacity(0.3), radius: 20)
 
-                // Step content
-                stepContent
-
-                Spacer()
-
-                // Action buttons
-                VStack(spacing: 16) {
-                    actionButton
-
-                    if currentStep > 0 {
-                        Button("Back") {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                currentStep -= 1
-                            }
+                            Text("🏗️")
+                                .font(.system(size: 64))
                         }
-                        .foregroundStyle(.secondary)
+                        .frame(width: 120, height: 120)
                     }
+
+                    VStack(spacing: 16) {
+                        TerminalGradientText(text: "$ BUILDEROS", fontSize: 32)
+
+                        Text("Connect to your Mac")
+                            .font(.system(size: 18, design: .monospaced))
+                            .foregroundStyle(Color.terminalText)
+                    }
+
+                    Spacer()
+
+                    // Step content
+                    stepContent
+
+                    Spacer()
+
+                    // Action buttons
+                    VStack(spacing: 16) {
+                        actionButton
+
+                        if currentStep > 0 {
+                            Button("Back") {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    currentStep -= 1
+                                }
+                            }
+                            .font(.system(size: 16, design: .monospaced))
+                            .foregroundStyle(Color.terminalText.opacity(0.7))
+                        }
+                    }
+                    .padding(.bottom, 32)
                 }
-                .padding(.bottom, 32)
+                .padding(.horizontal, 24)
             }
-            .padding(.horizontal, 24)
             .alert("Connection Error", isPresented: $showError) {
                 Button("OK", role: .cancel) { }
             } message: {
@@ -87,18 +140,25 @@ struct OnboardingView: View {
         VStack(spacing: 16) {
             Image(systemName: "sparkles")
                 .font(.system(size: 60))
-                .foregroundStyle(.blue)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.terminalCyan, .terminalPink],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
 
             Text("Access your BuilderOS system from anywhere")
-                .font(.titleMedium)
+                .font(.system(size: 18, weight: .semibold, design: .monospaced))
                 .multilineTextAlignment(.center)
-                .foregroundStyle(Color.textPrimary)
+                .foregroundStyle(Color.terminalText)
 
             Text("Securely connect to your Mac using Cloudflare Tunnel. Fast, encrypted, and works with VPNs.")
-                .font(.bodyMedium)
+                .font(.system(size: 14, design: .monospaced))
                 .multilineTextAlignment(.center)
-                .foregroundStyle(Color.textSecondary)
+                .foregroundStyle(Color.terminalCode)
                 .frame(maxWidth: 300)
+                .lineSpacing(4)
         }
     }
 
@@ -106,47 +166,43 @@ struct OnboardingView: View {
         VStack(spacing: 20) {
             Image(systemName: "link.circle.fill")
                 .font(.system(size: 60))
-                .foregroundStyle(.blue)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.terminalCyan, .terminalPink],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
 
             Text("Enter Connection Details")
-                .font(.titleMedium)
+                .font(.system(size: 18, weight: .semibold, design: .monospaced))
+                .foregroundColor(.terminalText)
 
             VStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Cloudflare Tunnel URL")
-                        .font(.labelMedium)
-                        .foregroundStyle(Color.textSecondary)
+                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .foregroundStyle(Color.terminalCode)
 
-                    TextField("https://builderos-xyz.trycloudflare.com", text: $tunnelURL)
+                    TerminalTextField(placeholder: "https://builderos-xyz.trycloudflare.com", text: $tunnelURL)
                         .textContentType(.URL)
-                        .autocapitalization(.none)
                         .keyboardType(.URL)
-                        .font(.monoMedium)
-                        .textInputAutocapitalization(.never)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("API Key")
-                        .font(.labelMedium)
-                        .foregroundStyle(Color.textSecondary)
+                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .foregroundStyle(Color.terminalCode)
 
-                    SecureField("Enter API Key", text: $apiKey)
+                    TerminalTextField(placeholder: "Enter API Key", text: $apiKey, isSecure: true)
                         .textContentType(.password)
-                        .autocapitalization(.none)
-                        .font(.monoMedium)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
             }
             .padding(.horizontal)
 
             Text("Get these from your Mac's BuilderOS server output")
-                .font(.bodySmall)
-                .foregroundStyle(Color.textSecondary)
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundStyle(Color.terminalDim)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 280)
         }
@@ -156,69 +212,57 @@ struct OnboardingView: View {
         VStack(spacing: 16) {
             if isTestingConnection {
                 ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .terminalCyan))
                     .scaleEffect(1.5)
                     .padding()
                 Text("Testing connection...")
-                    .font(.bodyMedium)
-                    .foregroundStyle(Color.textSecondary)
+                    .font(.system(size: 15, design: .monospaced))
+                    .foregroundStyle(Color.terminalText)
             } else if apiClient.isConnected {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 60))
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.terminalGreen)
+                    .shadow(color: .terminalGreen.opacity(0.6), radius: 20)
 
                 Text("Connected!")
-                    .font(.titleMedium)
+                    .font(.system(size: 20, weight: .bold, design: .monospaced))
+                    .foregroundColor(.terminalGreen)
 
-                VStack(spacing: 8) {
-                    Text("BuilderOS Mobile")
-                        .font(.titleLarge)
-                        .fontWeight(.semibold)
+                TerminalCard {
+                    VStack(spacing: 8) {
+                        Text("BuilderOS Mobile")
+                            .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                            .foregroundColor(.terminalCyan)
 
-                    Text(tunnelURL)
-                        .font(.monoSmall)
-                        .foregroundStyle(Color.textSecondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
+                        Text(tunnelURL)
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundStyle(Color.terminalCode)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                    }
                 }
-                .padding()
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
             } else {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 60))
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(.terminalRed)
 
                 Text("Connection failed")
-                    .font(.titleMedium)
+                    .font(.system(size: 18, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.terminalRed)
 
                 Text("Check your tunnel URL and API key, and make sure your Mac's BuilderOS server is running.")
-                    .font(.bodyMedium)
+                    .font(.system(size: 13, design: .monospaced))
                     .multilineTextAlignment(.center)
-                    .foregroundStyle(Color.textSecondary)
+                    .foregroundStyle(Color.terminalCode)
                     .frame(maxWidth: 300)
+                    .lineSpacing(4)
             }
         }
     }
 
     @ViewBuilder
     private var actionButton: some View {
-        Button(action: handleAction) {
-            HStack {
-                Text(buttonTitle)
-                    .fontWeight(.semibold)
-
-                if isTestingConnection {
-                    ProgressView()
-                        .tint(.white)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(actionButtonEnabled ? LinearGradient(colors: [.blue, .blue.opacity(0.8)], startPoint: .topLeading, endPoint: .bottomTrailing) : LinearGradient(colors: [.gray], startPoint: .top, endPoint: .bottom))
-            .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-        .disabled(!actionButtonEnabled)
+        TerminalButton(title: buttonTitle, action: handleAction, isDisabled: !actionButtonEnabled)
     }
 
     private var actionButtonEnabled: Bool {

@@ -73,10 +73,11 @@
 	</dict>
 	<!-- Privacy Descriptions -->
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>BuilderOS needs local network access to communicate with your Mac via Tailscale VPN.</string>
+	<string>BuilderOS needs local network access to communicate with your Mac via Tailscale VPN and for hot reload during development.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_tailscale._tcp</string>
+		<string>_inject._tcp</string>
 	</array>
 	<!-- Background Modes -->
 	<key>UIBackgroundModes</key>

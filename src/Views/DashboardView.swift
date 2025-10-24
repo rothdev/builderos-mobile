@@ -18,24 +18,45 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Connection status
-                    connectionStatusCard
+            ZStack {
+                // Terminal background
+                Color.terminalDark
+                    .ignoresSafeArea()
 
-                    // System status
-                    if let status = systemStatus {
-                        systemStatusCard(status)
+                // Subtle radial gradient overlay
+                RadialGradient(
+                    colors: [
+                        Color.terminalCyan.opacity(0.1),
+                        Color.terminalPink.opacity(0.05),
+                        Color.clear
+                    ],
+                    center: .top,
+                    startRadius: 0,
+                    endRadius: 600
+                )
+                .ignoresSafeArea()
+
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Connection status
+                        connectionStatusCard
+
+                        // System status
+                        if let status = systemStatus {
+                            systemStatusCard(status)
+                        }
+
+                        // Capsules section
+                        capsulesSection
+
+                        Spacer(minLength: 20)
                     }
-
-                    // Capsules section
-                    capsulesSection
-
-                    Spacer(minLength: 20)
+                    .padding()
                 }
-                .padding()
             }
-            .navigationTitle("BuilderOS ⚡️ LIVE UPDATE TEST")
+            .navigationTitle("$ BUILDEROS")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .refreshable {
                 await refreshData()
             }
@@ -47,114 +68,109 @@ struct DashboardView: View {
     }
 
     private var connectionStatusCard: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Image(systemName: apiClient.isConnected ? "bolt.circle.fill" : "xmark.circle.fill")
-                    .foregroundStyle(apiClient.isConnected ? .blue : .red)
-                    .font(.titleLarge)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(apiClient.isConnected ? "Connected" : "Disconnected")
-                        .font(.titleMedium)
-
-                    if apiClient.isConnected {
-                        Text("BuilderOS Mobile")
-                            .font(.bodyMedium)
-                            .foregroundStyle(Color.textSecondary)
-                    }
-                }
-
-                Spacer()
-
-                if isRefreshing {
-                    ProgressView()
-                }
-            }
-
-            if !apiClient.tunnelURL.isEmpty {
-                Divider()
-
+        TerminalCard {
+            VStack(spacing: 12) {
                 HStack {
-                    Label(apiClient.tunnelURL, systemImage: "network")
-                        .font(.monoSmall)
-                        .foregroundStyle(Color.textSecondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
+                    Image(systemName: apiClient.isConnected ? "bolt.circle.fill" : "xmark.circle.fill")
+                        .foregroundStyle(apiClient.isConnected ? .terminalCyan : .terminalRed)
+                        .font(.system(size: 20))
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(apiClient.isConnected ? "Connected" : "Disconnected")
+                            .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                            .foregroundColor(apiClient.isConnected ? .terminalCyan : .terminalRed)
+
+                        if apiClient.isConnected {
+                            Text("BuilderOS Mobile")
+                                .font(.system(size: 13, design: .monospaced))
+                                .foregroundStyle(Color.terminalCode)
+                        }
+                    }
 
                     Spacer()
 
-                    Label("Cloudflare Tunnel", systemImage: "lock.shield.fill")
-                        .font(.labelSmall)
-                        .foregroundStyle(Color.textSecondary)
+                    if isRefreshing {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .terminalCyan))
+                    }
+                }
+
+                if !apiClient.tunnelURL.isEmpty {
+                    Divider()
+                        .background(Color.terminalInputBorder)
+
+                    HStack {
+                        Label(apiClient.tunnelURL, systemImage: "network")
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundStyle(Color.terminalCode)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+
+                        Spacer()
+
+                        Label("Cloudflare Tunnel", systemImage: "lock.shield.fill")
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundStyle(Color.terminalDim)
+                    }
                 }
             }
         }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private func systemStatusCard(_ status: SystemStatus) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("System Status")
-                    .font(.titleMedium)
+        TerminalCard {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    TerminalSectionHeader(title: "SYSTEM STATUS")
 
-                Spacer()
+                    Spacer()
 
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(colorForHealth(status.healthStatus))
-                        .frame(width: 8, height: 8)
+                    TerminalStatusBadge(
+                        text: status.healthStatus.displayName.uppercased(),
+                        color: colorForHealth(status.healthStatus),
+                        shouldPulse: status.healthStatus == .healthy
+                    )
+                }
 
-                    Text(status.healthStatus.displayName)
-                        .font(.bodyMedium)
-                        .foregroundStyle(Color.textSecondary)
+                // Stats grid
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    statItem(title: "Version", value: status.version, icon: "tag.fill")
+                    statItem(title: "Uptime", value: status.uptimeFormatted, icon: "clock.fill")
+                    statItem(title: "Capsules", value: "\(status.activeCapsulesCount)/\(status.capsulesCount)", icon: "cube.box.fill")
+                    statItem(title: "Services", value: "\(status.services.filter { $0.isRunning }.count)/\(status.services.count)", icon: "server.rack")
                 }
             }
-
-            // Stats grid
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                statItem(title: "Version", value: status.version, icon: "tag.fill")
-                statItem(title: "Uptime", value: status.uptimeFormatted, icon: "clock.fill")
-                statItem(title: "Capsules", value: "\(status.activeCapsulesCount)/\(status.capsulesCount)", icon: "cube.box.fill")
-                statItem(title: "Services", value: "\(status.services.filter { $0.isRunning }.count)/\(status.services.count)", icon: "server.rack")
-            }
         }
-        .padding()
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private func statItem(title: String, value: String, icon: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.labelSmall)
+                    .font(.system(size: 11))
                 Text(title)
-                    .font(.labelSmall)
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
             }
-            .foregroundStyle(Color.textSecondary)
+            .foregroundStyle(Color.terminalCode)
 
             Text(value)
-                .font(.titleSmall)
-                .fontWeight(.semibold)
+                .font(.system(size: 15, weight: .bold, design: .monospaced))
+                .foregroundColor(.terminalCyan)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .background(.background.opacity(0.5))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .background(Color.terminalInputBackground)
+        .terminalBorder(cornerRadius: 8)
     }
 
     private var capsulesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("🚀 NETWORK HOT RELOAD TEST!")
-                .font(.titleMedium)
-                .foregroundStyle(.purple)
+            TerminalSectionHeader(title: "CAPSULES")
                 .padding(.horizontal, 4)
 
             if isLoading {
                 ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .terminalCyan))
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding()
             } else if capsules.isEmpty {
@@ -182,11 +198,11 @@ struct DashboardView: View {
         VStack(spacing: 12) {
             Image(systemName: "cube.transparent")
                 .font(.system(size: 48))
-                .foregroundStyle(Color.textSecondary)
+                .foregroundStyle(Color.terminalCyan.opacity(0.3))
 
             Text("No capsules found")
-                .font(.titleMedium)
-                .foregroundStyle(Color.textSecondary)
+                .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                .foregroundStyle(Color.terminalCode)
         }
         .frame(maxWidth: .infinity)
         .padding(40)
@@ -194,9 +210,9 @@ struct DashboardView: View {
 
     private func colorForHealth(_ health: SystemStatus.HealthStatus) -> Color {
         switch health {
-        case .healthy: return .green
-        case .degraded: return .orange
-        case .down: return .red
+        case .healthy: return .terminalGreen
+        case .degraded: return .terminalPink
+        case .down: return .terminalRed
         }
     }
 
@@ -229,25 +245,32 @@ struct CapsuleCard: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "cube.box.fill")
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.terminalCyan, .terminalPink],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .font(.system(size: 20))
 
                 Spacer()
             }
 
             Text(capsule.name)
-                .font(.labelLarge)
-                .fontWeight(.semibold)
+                .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                .foregroundColor(.terminalCyan)
                 .lineLimit(2)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(capsule.description)
-                .font(.bodySmall)
-                .foregroundStyle(Color.textSecondary)
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundStyle(Color.terminalCode)
                 .lineLimit(2)
         }
         .padding()
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .terminalBorder()
         .enableInjection()
     }
 }

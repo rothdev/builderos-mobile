@@ -31,42 +31,54 @@ struct LocalhostPreviewView: View {
     ]
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Header section
-            connectionHeader
+        ZStack {
+            // Terminal background
+            Color.terminalDark
+                .ignoresSafeArea()
 
-            // Quick links horizontal scroll
-            quickLinksSection
+            VStack(spacing: 0) {
+                // Header section
+                connectionHeader
 
-            // Custom port input
-            customPortSection
+                // Quick links horizontal scroll
+                quickLinksSection
 
-            // WebView or empty state
-            if let url = currentURL {
-                WebView(url: url, isLoading: $isLoading)
-                    .edgesIgnoringSafeArea(.bottom)
-            } else {
-                previewEmptyState
+                // Custom port input
+                customPortSection
+
+                // WebView or empty state
+                if let url = currentURL {
+                    WebView(url: url, isLoading: $isLoading)
+                        .edgesIgnoringSafeArea(.bottom)
+                } else {
+                    previewEmptyState
+                }
             }
         }
-        .background(Color(.systemBackground))
     }
 
     // MARK: - Connection Header
     private var connectionHeader: some View {
         HStack(spacing: 12) {
             Image(systemName: "network")
-                .font(.titleSmall)
-                .foregroundColor(.blue)
+                .font(.system(size: 18))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.terminalCyan, .terminalPink],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(apiClient.isConnected ? "Connected" : "Not Connected")
-                    .font(.titleMedium)
+                    .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                    .foregroundColor(apiClient.isConnected ? .terminalCyan : .terminalRed)
 
                 if apiClient.isConnected {
                     Text("Cloudflare Tunnel")
-                        .font(.monoSmall)
-                        .foregroundColor(Color.textSecondary)
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundColor(Color.terminalCode)
                 }
             }
 
@@ -74,11 +86,18 @@ struct LocalhostPreviewView: View {
 
             if isLoading {
                 ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .terminalCyan))
                     .scaleEffect(0.8)
             }
         }
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(Color.terminalInputBackground.opacity(0.8))
+        .overlay(
+            Rectangle()
+                .fill(Color.terminalInputBorder)
+                .frame(height: 1),
+            alignment: .bottom
+        )
     }
 
     // MARK: - Quick Links
@@ -98,32 +117,39 @@ struct LocalhostPreviewView: View {
             .padding(.horizontal)
             .padding(.vertical, 12)
         }
-        .background(Color(.systemBackground))
+        .background(Color.terminalDark)
     }
 
     // MARK: - Custom Port Input
     private var customPortSection: some View {
         HStack(spacing: 12) {
-            TextField("Custom port (e.g., 3001)", text: $customPort)
+            TerminalTextField(placeholder: "Custom port (e.g., 3001)", text: $customPort)
                 .keyboardType(.numberPad)
-                .textFieldStyle(.roundedBorder)
-                .autocorrectionDisabled()
 
             Button {
                 loadCustomPort()
             } label: {
                 Text("Go")
-                    .font(.titleMedium)
+                    .font(.system(size: 16, weight: .semibold, design: .monospaced))
                     .foregroundColor(.white)
                     .frame(width: 60)
                     .padding(.vertical, 8)
-                    .background(customPort.isEmpty ? Color.gray : Color.blue)
+                    .background(
+                        customPort.isEmpty ?
+                            Color.gray :
+                            LinearGradient(
+                                colors: [.terminalCyan, .terminalPink],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                    )
                     .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .shadow(color: .terminalCyan.opacity(customPort.isEmpty ? 0 : 0.4), radius: 8)
             }
             .disabled(customPort.isEmpty)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color.terminalDark)
     }
 
     // MARK: - Empty State
@@ -133,21 +159,26 @@ struct LocalhostPreviewView: View {
 
             Image(systemName: "globe.americas")
                 .font(.system(size: 64))
-                .foregroundColor(.blue.opacity(0.3))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.terminalCyan.opacity(0.3), .terminalPink.opacity(0.2)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
 
-            Text("Preview Localhost")
-                .font(.titleLarge)
+            TerminalGradientText(text: "Preview Localhost", fontSize: 22, fontWeight: .bold)
 
             Text("Select a quick link or enter\na custom port to preview\nyour dev servers via Cloudflare Tunnel.")
-                .font(.bodyMedium)
-                .foregroundColor(Color.textSecondary)
+                .font(.system(size: 14, design: .monospaced))
+                .foregroundColor(Color.terminalCode)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
 
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemBackground))
+        .background(Color.terminalDark)
     }
 
     // MARK: - Actions
@@ -193,21 +224,30 @@ struct QuickLinkButton: View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(link.name)
-                    .font(.titleMedium)
+                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
 
                 Text(":\(link.port)")
-                    .font(.monoSmall)
-                    .opacity(isSelected ? 0.8 : 1.0)
+                    .font(.system(size: 12, design: .monospaced))
+                    .opacity(isSelected ? 0.9 : 1.0)
 
                 Text(link.description)
-                    .font(.bodySmall)
+                    .font(.system(size: 11, design: .monospaced))
                     .opacity(isSelected ? 0.7 : 1.0)
             }
-            .foregroundColor(isSelected ? .white : Color.textPrimary)
+            .foregroundColor(isSelected ? .white : Color.terminalText)
             .frame(width: 140, alignment: .leading)
             .padding(12)
-            .background(isSelected ? Color.blue : Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .background(
+                isSelected ?
+                    AnyView(LinearGradient(
+                        colors: [.terminalCyan, .terminalPink],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )) :
+                    AnyView(Color.terminalInputBackground)
+            )
+            .terminalBorder(color: isSelected ? .terminalCyan : .terminalInputBorder)
+            .shadow(color: isSelected ? .terminalCyan.opacity(0.4) : .clear, radius: 8)
         }
         .buttonStyle(.plain)
     }

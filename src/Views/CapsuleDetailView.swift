@@ -10,100 +10,114 @@ struct CapsuleDetailView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Header
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(capsule.name)
-                            .font(.titleLarge)
-                            .fontWeight(.bold)
+        ZStack {
+            // Terminal background
+            Color.terminalDark
+                .ignoresSafeArea()
 
-                        Text(capsule.path)
-                            .font(.bodySmall)
-                            .foregroundColor(Color.textSecondary)
-                            .lineLimit(1)
+            // Subtle radial gradient overlay
+            RadialGradient(
+                colors: [
+                    Color.terminalCyan.opacity(0.08),
+                    Color.clear
+                ],
+                center: .top,
+                startRadius: 0,
+                endRadius: 500
+            )
+            .ignoresSafeArea()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Header
+                    TerminalCard {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                TerminalGradientText(text: capsule.name, fontSize: 20, fontWeight: .bold)
+
+                                Text(capsule.path)
+                                    .font(.system(size: 12, design: .monospaced))
+                                    .foregroundColor(Color.terminalCode)
+                                    .lineLimit(1)
+                            }
+
+                            Spacer()
+
+                            // Status Badge
+                            TerminalStatusBadge(
+                                text: capsule.status.displayName.uppercased(),
+                                color: statusColor,
+                                shouldPulse: capsule.status == .active
+                            )
+                        }
                     }
 
-                    Spacer()
+                    // Description
+                    VStack(alignment: .leading, spacing: 8) {
+                        TerminalSectionHeader(title: "DESCRIPTION")
 
-                    // Status Badge
-                    Text(capsule.status.displayName)
-                        .font(.labelSmall)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(statusColor.opacity(0.2))
-                        .foregroundColor(statusColor)
-                        .cornerRadius(8)
-                }
+                        TerminalCard {
+                            Text(capsule.description)
+                                .font(.system(size: 14, design: .monospaced))
+                                .foregroundColor(Color.terminalText)
+                        }
+                    }
 
-                Divider()
+                    // Tags
+                    if !capsule.tags.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            TerminalSectionHeader(title: "TAGS")
 
-                // Description
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Description")
-                        .font(.titleSmall)
-                        .fontWeight(.semibold)
-
-                    Text(capsule.description)
-                        .font(.bodyMedium)
-                        .foregroundColor(Color.textSecondary)
-                }
-
-                // Tags
-                if !capsule.tags.isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Tags")
-                            .font(.titleSmall)
-                            .fontWeight(.semibold)
-
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 8) {
-                                ForEach(capsule.tags, id: \.self) { tag in
-                                    Text(tag)
-                                        .font(.labelMedium)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(Color.backgroundSecondary)
-                                        .foregroundColor(Color.textPrimary)
-                                        .cornerRadius(8)
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 8) {
+                                    ForEach(capsule.tags, id: \.self) { tag in
+                                        Text(tag)
+                                            .font(.system(size: 12, weight: .medium, design: .monospaced))
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 6)
+                                            .foregroundColor(Color.terminalCyan)
+                                            .background(Color.terminalInputBackground)
+                                            .terminalBorder(cornerRadius: 8)
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                // Metrics (simplified)
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Metrics")
-                        .font(.titleSmall)
-                        .fontWeight(.semibold)
+                    // Metrics
+                    VStack(alignment: .leading, spacing: 12) {
+                        TerminalSectionHeader(title: "METRICS")
 
-                    VStack(spacing: 8) {
-                        MetricRow(label: "Created", value: formatDate(capsule.createdAt))
-                        MetricRow(label: "Updated", value: formatDate(capsule.updatedAt))
-                        MetricRow(label: "Tags", value: "\(capsule.tags.count)")
+                        TerminalCard {
+                            VStack(spacing: 12) {
+                                MetricRow(label: "Created", value: formatDate(capsule.createdAt))
+                                Divider().background(Color.terminalInputBorder)
+                                MetricRow(label: "Updated", value: formatDate(capsule.updatedAt))
+                                Divider().background(Color.terminalInputBorder)
+                                MetricRow(label: "Tags", value: "\(capsule.tags.count)")
+                            }
+                        }
                     }
-                }
 
-                Spacer()
+                    Spacer()
+                }
+                .padding(16)
             }
-            .padding(Layout.screenPadding)
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
     }
 
     private var statusColor: Color {
         switch capsule.status {
         case .active:
-            return .statusSuccess
+            return .terminalGreen
         case .development:
-            return .statusInfo
+            return .terminalCyan
         case .testing:
-            return .statusWarning
+            return .terminalPink
         case .archived:
-            return Color.textSecondary
+            return Color.terminalDim
         }
     }
 
@@ -122,12 +136,12 @@ struct MetricRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.bodyMedium)
-                .foregroundColor(Color.textSecondary)
+                .font(.system(size: 14, weight: .medium, design: .monospaced))
+                .foregroundColor(Color.terminalCode)
             Spacer()
             Text(value)
-                .font(.bodyMedium)
-                .foregroundColor(Color.textPrimary)
+                .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                .foregroundColor(Color.terminalCyan)
         }
     }
 }
