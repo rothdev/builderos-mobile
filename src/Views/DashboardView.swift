@@ -35,7 +35,7 @@ struct DashboardView: View {
                 }
                 .padding()
             }
-            .navigationTitle("BuilderOS 🔥 HOT RELOAD TEST")
+            .navigationTitle("BuilderOS ⚡️ LIVE UPDATE TEST")
             .refreshable {
                 await refreshData()
             }
@@ -49,8 +49,8 @@ struct DashboardView: View {
     private var connectionStatusCard: some View {
         VStack(spacing: 12) {
             HStack {
-                Image(systemName: apiClient.isConnected ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    .foregroundStyle(apiClient.isConnected ? .green : .red)
+                Image(systemName: apiClient.isConnected ? "bolt.circle.fill" : "xmark.circle.fill")
+                    .foregroundStyle(apiClient.isConnected ? .blue : .red)
                     .font(.titleLarge)
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -148,8 +148,9 @@ struct DashboardView: View {
 
     private var capsulesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("🔥 Capsules - HOT RELOAD WORKS!")
+            Text("🚀 NETWORK HOT RELOAD TEST!")
                 .font(.titleMedium)
+                .foregroundStyle(.purple)
                 .padding(.horizontal, 4)
 
             if isLoading {

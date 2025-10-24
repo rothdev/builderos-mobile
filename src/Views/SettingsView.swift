@@ -175,13 +175,9 @@ struct SettingsView: View {
 
         isSaving = true
 
-        do {
-            try apiClient.setAPIKey(apiKey)
-            apiKey = ""
-            showAPIKeyInput = false
-        } catch {
-            // Show error alert
-        }
+        apiClient.setAPIKey(apiKey)
+        apiKey = ""
+        showAPIKeyInput = false
 
         isSaving = false
     }

@@ -278,7 +278,7 @@ struct TerminalChatView: View {
                 }
                 .padding(.vertical, 16)
             }
-            .onChange(of: messages.count) { _ in
+            .onChange(of: messages.count) {
                 if let lastMessage = messages.last {
                     withAnimation(.easeOut(duration: 0.3)) {
                         proxy.scrollTo(lastMessage.id, anchor: .bottom)
