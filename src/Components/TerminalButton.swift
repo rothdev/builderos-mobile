@@ -25,13 +25,13 @@ struct TerminalButton: View {
             isDisabled ?
                 LinearGradient(colors: [.gray], startPoint: .top, endPoint: .bottom) :
                 LinearGradient(
-                    colors: [.terminalCyan, .terminalPink, .terminalRed],
+                    colors: [Color.terminalCyan, Color.terminalPink, Color.terminalRed],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .terminalCyan.opacity(isDisabled ? 0 : 0.4), radius: 12)
+        .shadow(color: Color.terminalCyan.opacity(isDisabled ? 0 : 0.4), radius: 12)
         .disabled(isDisabled)
         .opacity(isDisabled ? 0.5 : 1.0)
     }

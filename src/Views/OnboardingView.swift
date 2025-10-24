@@ -221,7 +221,7 @@ struct OnboardingView: View {
             } else if apiClient.isConnected {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 60))
-                    .foregroundStyle(.terminalGreen)
+                    .foregroundStyle(Color.terminalGreen)
                     .shadow(color: .terminalGreen.opacity(0.6), radius: 20)
 
                 Text("Connected!")
@@ -244,7 +244,7 @@ struct OnboardingView: View {
             } else {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 60))
-                    .foregroundStyle(.terminalRed)
+                    .foregroundStyle(Color.terminalRed)
 
                 Text("Connection failed")
                     .font(.system(size: 18, weight: .semibold, design: .monospaced))

@@ -72,7 +72,7 @@ struct DashboardView: View {
             VStack(spacing: 12) {
                 HStack {
                     Image(systemName: apiClient.isConnected ? "bolt.circle.fill" : "xmark.circle.fill")
-                        .foregroundStyle(apiClient.isConnected ? .terminalCyan : .terminalRed)
+                        .foregroundStyle(apiClient.isConnected ? Color.terminalCyan : Color.terminalRed)
                         .font(.system(size: 20))
 
                     VStack(alignment: .leading, spacing: 4) {

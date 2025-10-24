@@ -42,6 +42,9 @@ extension Color {
         startPoint: .leading,
         endPoint: .trailing
     )
+
+    // MARK: - Terminal Colors
+    // Moved to TerminalColors.swift for better organization and design system alignment
 }
 
 // MARK: - Color Extensions

@@ -45,7 +45,7 @@ extension View {
                 RoundedRectangle(cornerRadius: 12)
                     .strokeBorder(
                         LinearGradient(
-                            colors: [.terminalCyan, .terminalPink, .terminalRed],
+                            colors: [Color.terminalCyan, Color.terminalPink, Color.terminalRed],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),

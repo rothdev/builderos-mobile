@@ -19,7 +19,7 @@ struct TerminalGradientText: View {
             .tracking(1)
             .foregroundStyle(
                 LinearGradient(
-                    colors: [.terminalCyan, .terminalPink, .terminalRed],
+                    colors: [Color.terminalCyan, Color.terminalPink, Color.terminalRed],
                     startPoint: .leading,
                     endPoint: .trailing
                 )

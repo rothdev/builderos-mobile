@@ -183,7 +183,7 @@ struct SettingsView: View {
                                 .foregroundColor(.terminalCyan)
                             Spacer()
                             Image(systemName: "arrow.up.forward.square")
-                                .foregroundStyle(.terminalCode)
+                                .foregroundStyle(Color.terminalCode)
                         }
                     }
                 }
@@ -255,11 +255,11 @@ struct SettingsView: View {
                 if apiClient.hasAPIKey {
                     Text("Configured")
                         .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(.terminalGreen)
+                        .foregroundStyle(Color.terminalGreen)
                 } else {
                     Text("Not configured")
                         .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(.terminalPink)
+                        .foregroundStyle(Color.terminalPink)
                 }
             }
 
@@ -302,7 +302,7 @@ struct SettingsView: View {
             } label: {
                 HStack {
                     Image(systemName: "moon.fill")
-                        .foregroundStyle(.terminalCyan)
+                        .foregroundStyle(Color.terminalCyan)
                         .font(.system(size: 18))
                     Text("Sleep Mac")
                         .font(.system(size: 14, weight: .semibold, design: .monospaced))
@@ -313,7 +313,7 @@ struct SettingsView: View {
                             .progressViewStyle(CircularProgressViewStyle(tint: .terminalCyan))
                     } else {
                         Image(systemName: "chevron.right")
-                            .foregroundStyle(.terminalCode)
+                            .foregroundStyle(Color.terminalCode)
                     }
                 }
                 .padding(.vertical, 12)
@@ -329,7 +329,7 @@ struct SettingsView: View {
             } label: {
                 HStack {
                     Image(systemName: "sun.max.fill")
-                        .foregroundStyle(.terminalPink)
+                        .foregroundStyle(Color.terminalPink)
                         .font(.system(size: 18))
                     Text("Wake Mac")
                         .font(.system(size: 14, weight: .semibold, design: .monospaced))
@@ -340,7 +340,7 @@ struct SettingsView: View {
                             .progressViewStyle(CircularProgressViewStyle(tint: .terminalCyan))
                     } else {
                         Image(systemName: "chevron.right")
-                            .foregroundStyle(.terminalCode)
+                            .foregroundStyle(Color.terminalCode)
                     }
                 }
                 .padding(.vertical, 12)

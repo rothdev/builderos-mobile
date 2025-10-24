@@ -135,13 +135,13 @@ struct LocalhostPreviewView: View {
                     .frame(width: 60)
                     .padding(.vertical, 8)
                     .background(
-                        customPort.isEmpty ?
-                            Color.gray :
-                            LinearGradient(
-                                colors: [.terminalCyan, .terminalPink],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
+                        LinearGradient(
+                            colors: customPort.isEmpty ?
+                                [.gray, .gray] :
+                                [.terminalCyan, .terminalPink],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .shadow(color: .terminalCyan.opacity(customPort.isEmpty ? 0 : 0.4), radius: 8)
