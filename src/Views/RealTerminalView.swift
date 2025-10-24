@@ -11,17 +11,17 @@ import Combine
 class LiveTerminalService: NSObject, ObservableObject {
     @Published var isConnected = false
     @Published var output: String = ""
-    
+
     private var webSocketTask: URLSessionWebSocketTask?
     private var urlSession: URLSession!
-    private let apiKey: String
-    private let baseURL: String
-    
+    var apiKey: String
+    var baseURL: String
+
     init(baseURL: String, apiKey: String) {
         self.baseURL = baseURL
         self.apiKey = apiKey
         super.init()
-        
+
         let configuration = URLSessionConfiguration.default
         self.urlSession = URLSession(configuration: configuration, delegate: self, delegateQueue: OperationQueue())
     }
@@ -91,18 +91,14 @@ extension LiveTerminalService: URLSessionWebSocketDelegate {}
 // MARK: - Real Terminal View
 struct RealTerminalView: View {
     @EnvironmentObject var apiClient: BuilderOSAPIClient
-    @StateObject private var terminal: LiveTerminalService
+    @StateObject private var terminal = LiveTerminalService(baseURL: "", apiKey: "")
     @State private var inputText = ""
-    
-    init() {
-        // Will be initialized properly in onAppear with apiClient values
-        _terminal = StateObject(wrappedValue: LiveTerminalService(baseURL: "", apiKey: ""))
-    }
-    
+    @State private var hasInitialized = false
+
     var body: some View {
         ZStack {
             Color(red: 0.04, green: 0.055, blue: 0.102).ignoresSafeArea()
-            
+
             VStack(spacing: 0) {
                 // Status bar
                 HStack {
@@ -116,7 +112,7 @@ struct RealTerminalView: View {
                 }
                 .padding()
                 .background(Color.black.opacity(0.3))
-                
+
                 // Terminal output
                 ScrollView {
                     Text(terminal.output)
@@ -125,13 +121,13 @@ struct RealTerminalView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                 }
-                
+
                 // Input bar
                 HStack {
                     Text(">")
                         .font(.system(size: 16, weight: .bold).monospaced())
                         .foregroundColor(.green)
-                    
+
                     TextField("", text: $inputText)
                         .font(.system(size: 14).monospaced())
                         .foregroundColor(.white)
@@ -147,10 +143,13 @@ struct RealTerminalView: View {
             }
         }
         .onAppear {
-            // Initialize with actual values from apiClient
-            let newTerminal = LiveTerminalService(baseURL: apiClient.tunnelURL, apiKey: apiClient.apiKey)
-            _terminal.wrappedValue = newTerminal
-            newTerminal.connect()
+            // Initialize connection once with apiClient values
+            if !hasInitialized {
+                terminal.baseURL = apiClient.tunnelURL
+                terminal.apiKey = apiClient.apiKey
+                terminal.connect()
+                hasInitialized = true
+            }
         }
         .onDisappear {
             terminal.disconnect()
