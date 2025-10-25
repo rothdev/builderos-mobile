@@ -2,28 +2,30 @@
 //  MultiTabTerminalView.swift
 //  BuilderOS
 //
-//  Multi-tab terminal container (iTerm2-style)
+//  Multi-tab PTY terminal container that powers the main terminal experience.
 //
 
 import SwiftUI
 import Inject
 
 struct MultiTabTerminalView: View {
-    @EnvironmentObject var apiClient: BuilderOSAPIClient
+    @Binding var selectedRootTab: Int
     @ObserveInjection var inject
-    @State private var tabs: [TerminalTab] = [TerminalTab(profile: .shell)]
+
+    @State private var tabs: [TerminalTab]
+    @State private var sessions: [UUID: PTYTerminalManager]
     @State private var selectedTabId: UUID
 
-    init() {
-        // Initialize with first tab selected
-        let initialTab = TerminalTab(profile: .shell)
+    init(selectedTab: Binding<Int>) {
+        _selectedRootTab = selectedTab
+        let initialTab = TerminalTab(profile: .claude)  // Start with Claude Code tab
         _tabs = State(initialValue: [initialTab])
+        _sessions = State(initialValue: [initialTab.id: PTYTerminalManager()])
         _selectedTabId = State(initialValue: initialTab.id)
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            // Custom tab bar at top
             TerminalTabBar(
                 tabs: $tabs,
                 selectedTabId: $selectedTabId,
@@ -32,15 +34,16 @@ struct MultiTabTerminalView: View {
                 maxTabs: 3
             )
 
-            // Tab content - each tab is its own terminal session
             TabView(selection: $selectedTabId) {
                 ForEach(tabs) { tab in
-                    WebSocketTerminalView(
-                        baseURL: apiClient.tunnelURL,
-                        apiKey: apiClient.apiKey,
-                        profile: tab.profile
-                    )
-                    .tag(tab.id)
+                    if let manager = sessions[tab.id] {
+                        PTYTerminalSessionView(
+                            manager: manager,
+                            profile: tab.profile,
+                            onHeaderTap: { selectedRootTab = 0 }
+                        )
+                        .tag(tab.id)
+                    }
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
@@ -48,22 +51,23 @@ struct MultiTabTerminalView: View {
         .enableInjection()
     }
 
-    // MARK: - Tab Management
-
     private func addTab(_ profile: TerminalProfile) {
         guard tabs.count < 3 else { return }
         let newTab = TerminalTab(profile: profile)
         tabs.append(newTab)
+        sessions[newTab.id] = PTYTerminalManager()
         selectedTabId = newTab.id
     }
 
     private func closeTab(_ tabId: UUID) {
-        guard tabs.count > 1 else { return }  // Can't close last tab
+        guard tabs.count > 1 else { return }
 
         if let index = tabs.firstIndex(where: { $0.id == tabId }) {
             tabs.remove(at: index)
+            if let manager = sessions.removeValue(forKey: tabId) {
+                manager.disconnect()
+            }
 
-            // Select adjacent tab
             if selectedTabId == tabId {
                 let newIndex = min(index, tabs.count - 1)
                 selectedTabId = tabs[newIndex].id
@@ -73,6 +77,5 @@ struct MultiTabTerminalView: View {
 }
 
 #Preview {
-    MultiTabTerminalView()
-        .environmentObject(BuilderOSAPIClient.mockWithData())
+    MultiTabTerminalView(selectedTab: .constant(1))
 }

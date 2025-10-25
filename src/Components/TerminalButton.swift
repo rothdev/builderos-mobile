@@ -7,8 +7,11 @@
 //
 
 import SwiftUI
+import Inject
 
 struct TerminalButton: View {
+    @ObserveInjection var inject
+
     let title: String
     let action: () -> Void
     var isDisabled: Bool = false
@@ -34,6 +37,7 @@ struct TerminalButton: View {
         .shadow(color: Color.terminalCyan.opacity(isDisabled ? 0 : 0.4), radius: 12)
         .disabled(isDisabled)
         .opacity(isDisabled ? 0.5 : 1.0)
+        .enableInjection()
     }
 }
 

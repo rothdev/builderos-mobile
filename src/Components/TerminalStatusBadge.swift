@@ -7,8 +7,11 @@
 //
 
 import SwiftUI
+import Inject
 
 struct TerminalStatusBadge: View {
+    @ObserveInjection var inject
+
     let text: String
     let color: Color
     var shouldPulse: Bool = true
@@ -39,6 +42,7 @@ struct TerminalStatusBadge: View {
                 pulseAnimation = true
             }
         }
+        .enableInjection()
     }
 }
 

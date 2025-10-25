@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Inject
 
 struct TerminalTabButton: View {
     let tab: TerminalTab
@@ -13,14 +14,23 @@ struct TerminalTabButton: View {
     let onTap: () -> Void
     let onClose: () -> Void
     let canClose: Bool
+    @ObserveInjection var inject
 
-    var body: some View {
+    var body: some View{
         Button(action: onTap) {
             HStack(spacing: 8) {
                 // Profile icon
-                Image(systemName: tab.profile.icon)
-                    .font(.system(size: 12))
-                    .foregroundColor(isSelected ? .white : tab.profile.color)
+                if tab.profile.isCustomIcon {
+                    Image(tab.profile.icon)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 16, height: 16)
+                        .foregroundColor(isSelected ? .white : tab.profile.color)
+                } else {
+                    Image(systemName: tab.profile.icon)
+                        .font(.system(size: 12))
+                        .foregroundColor(isSelected ? .white : tab.profile.color)
+                }
 
                 // Tab title
                 Text(tab.title)
@@ -49,6 +59,7 @@ struct TerminalTabButton: View {
             )
         }
         .buttonStyle(.plain)
+        .enableInjection()
     }
 }
 

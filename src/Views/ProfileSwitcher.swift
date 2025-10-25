@@ -6,11 +6,13 @@
 //
 
 import SwiftUI
+import Inject
 
 struct ProfileSwitcher: View {
     @Binding var selectedProfile: TerminalProfile
     let profiles: [TerminalProfile]
     let onProfileChange: (TerminalProfile) -> Void
+    @ObserveInjection var inject
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -27,6 +29,7 @@ struct ProfileSwitcher: View {
         }
         .frame(height: 52)
         .background(Color.black.opacity(0.2))
+        .enableInjection()
     }
 }
 
@@ -34,12 +37,20 @@ struct ProfileChip: View {
     let profile: TerminalProfile
     let isSelected: Bool
     let onTap: () -> Void
+    @ObserveInjection var inject
 
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 8) {
-                Image(systemName: profile.icon)
-                    .font(.system(size: 14, weight: .semibold))
+                if profile.isCustomIcon {
+                    Image(profile.icon)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 16, height: 16)
+                } else {
+                    Image(systemName: profile.icon)
+                        .font(.system(size: 14, weight: .semibold))
+                }
 
                 Text(profile.name)
                     .font(.system(size: 14, weight: .semibold))
@@ -63,6 +74,7 @@ struct ProfileChip: View {
         }
         .buttonStyle(.plain)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+        .enableInjection()
     }
 }
 

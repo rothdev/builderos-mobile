@@ -126,7 +126,7 @@ In Feather:
 2. **Onboarding appears** → Tap "Get Started"
 3. **Enter Cloudflare Tunnel URL:**
    ```
-   https://viii-gmc-facing-salary.trycloudflare.com
+   https://api.builderos.app
    ```
 4. **Enter API Token** (from Mac terminal when API server starts)
 5. **Tap "Connect"** → Dashboard loads!

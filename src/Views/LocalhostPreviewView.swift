@@ -7,6 +7,7 @@
 
 import SwiftUI
 import WebKit
+import Inject
 
 struct QuickLink: Identifiable {
     let id = UUID()
@@ -21,6 +22,7 @@ struct LocalhostPreviewView: View {
     @State private var customPort: String = ""
     @State private var isLoading = false
     @State private var selectedLinkID: UUID?
+    @ObserveInjection var inject
 
     let quickLinks = [
         QuickLink(name: "React/Next.js", port: "3000", description: "Development server"),
@@ -31,7 +33,9 @@ struct LocalhostPreviewView: View {
     ]
 
     var body: some View {
-        ZStack {
+        let _ = print("🟢 PREVIEW: LocalhostPreviewView body rendering")
+
+        return ZStack {
             // Terminal background
             Color.terminalDark
                 .ignoresSafeArea()
@@ -55,6 +59,7 @@ struct LocalhostPreviewView: View {
                 }
             }
         }
+        .enableInjection()
     }
 
     // MARK: - Connection Header
@@ -219,6 +224,7 @@ struct QuickLinkButton: View {
     let link: QuickLink
     let isSelected: Bool
     let action: () -> Void
+    @ObserveInjection var inject
 
     var body: some View {
         Button(action: action) {
@@ -250,6 +256,7 @@ struct QuickLinkButton: View {
             .shadow(color: isSelected ? .terminalCyan.opacity(0.4) : .clear, radius: 8)
         }
         .buttonStyle(.plain)
+        .enableInjection()
     }
 }
 

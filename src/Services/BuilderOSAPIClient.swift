@@ -16,8 +16,19 @@ class BuilderOSAPIClient: ObservableObject {
     @Published var hasAPIKey: Bool = false
     @Published var isConnected: Bool = false
 
-    var apiKey: String = ""
     var lastError: String?
+
+    // CRITICAL FIX: Use computed properties to defer Keychain access
+    // This prevents blocking main thread during app launch
+    var apiKey: String {
+        get {
+            return APIConfig.apiToken
+        }
+        set {
+            APIConfig.apiToken = newValue
+            hasAPIKey = !newValue.isEmpty
+        }
+    }
 
     private var baseURL: String {
         return APIConfig.baseURL
@@ -28,14 +39,22 @@ class BuilderOSAPIClient: ObservableObject {
     }
 
     init() {
-        // Load saved configuration on init
-        APIConfig.loadSavedConfiguration()
+        print("🟢 API: BuilderOSAPIClient init() starting")
+
+        // CRITICAL FIX: Defer all Keychain/UserDefaults access until after init
+        // Schedule configuration load for next run loop to avoid blocking
+        Task { @MainActor in
+            print("🟢 API: Loading saved configuration")
+            APIConfig.loadSavedConfiguration()
+            self.hasAPIKey = !APIConfig.apiToken.isEmpty
+            print("🟢 API: Configuration loaded, hasAPIKey=\(self.hasAPIKey)")
+        }
+
+        print("🟢 API: BuilderOSAPIClient init() complete")
     }
 
     func setAPIKey(_ key: String) {
-        self.apiKey = key
-        self.hasAPIKey = !key.isEmpty
-        APIConfig.apiToken = key
+        self.apiKey = key // This will set APIConfig.apiToken via the computed property setter
     }
 
     func fetchCapsules() async throws {

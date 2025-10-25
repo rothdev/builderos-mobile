@@ -2,7 +2,7 @@
 //  MainContentView.swift
 //  BuilderOS
 //
-//  Main tab-based navigation with Dashboard, Chat, Preview, and Settings
+//  Main tab-based navigation with Dashboard, Terminal, Preview, and Settings
 //
 
 import SwiftUI
@@ -11,28 +11,29 @@ import Inject
 struct MainContentView: View {
     @EnvironmentObject var apiClient: BuilderOSAPIClient
     @ObserveInjection var inject
+    @State private var selectedTab: Int = 1  // Start on Chat tab for testing
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             DashboardView()
-                .tabItem {
-                    Label("Dashboard", systemImage: "square.grid.2x2.fill")
-                }
+                .environmentObject(apiClient)
+                .tabItem { Label("Dashboard", systemImage: "square.grid.2x2.fill") }
+                .tag(0)
 
-            TerminalChatView()
-                .tabItem {
-                    Label("Terminal", systemImage: "terminal.fill")
-                }
+            // Chat Terminal - Always uses Claude Agent SDK
+            ClaudeChatView(selectedTab: $selectedTab)
+                .tabItem { Label("Chat", systemImage: "message.fill") }
+                .tag(1)
 
             LocalhostPreviewView()
-                .tabItem {
-                    Label("Preview", systemImage: "globe")
-                }
+                .environmentObject(apiClient)
+                .tabItem { Label("Preview", systemImage: "globe") }
+                .tag(2)
 
             SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape.fill")
-                }
+                .environmentObject(apiClient)
+                .tabItem { Label("Settings", systemImage: "gearshape.fill") }
+                .tag(3)
         }
         .enableInjection()
     }
@@ -42,3 +43,9 @@ struct MainContentView: View {
     MainContentView()
         .environmentObject(BuilderOSAPIClient.mockWithData())
 }
+
+#Preview {
+    MainContentView()
+        .environmentObject(BuilderOSAPIClient.mockWithData())
+}
+

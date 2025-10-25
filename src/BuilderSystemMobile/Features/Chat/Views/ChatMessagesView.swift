@@ -14,7 +14,7 @@ struct ChatMessagesView: View {
                 }
                 .padding(.vertical, 8)
             }
-            .onChange(of: chatViewModel.messages.count) { _ in
+            .onChange(of: chatViewModel.messages.count) { _, _ in
                 withAnimation(.easeOut(duration: 0.3)) {
                     proxy.scrollTo(chatViewModel.messages.last?.id, anchor: .bottom)
                 }

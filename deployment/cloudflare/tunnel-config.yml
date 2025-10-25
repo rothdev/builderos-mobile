@@ -2,4 +2,6 @@ tunnel: 9eaea311-5351-4b1c-a95f-27db38da53c5
 credentials-file: /Users/Ty/.cloudflared/9eaea311-5351-4b1c-a95f-27db38da53c5.json
 
 ingress:
-  - service: http://localhost:8080
+  - hostname: api.builderos.app
+    service: http://localhost:8080
+  - service: http_status:404

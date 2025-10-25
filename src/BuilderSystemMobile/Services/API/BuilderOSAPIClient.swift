@@ -34,6 +34,12 @@ class BuilderOSAPIClient: ObservableObject {
         if let savedURL = UserDefaults.standard.string(forKey: "cloudflare_tunnel_url") {
             tunnelURL = savedURL
         }
+
+        // Sync published apiKey with the Keychain value populated during configuration load
+        let savedKeychainValue = APIConfig.apiToken
+        if !savedKeychainValue.isEmpty && savedKeychainValue != apiKey {
+            apiKey = savedKeychainValue
+        }
         updateBaseURL()
     }
 

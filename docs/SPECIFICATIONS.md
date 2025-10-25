@@ -1,6 +1,6 @@
 # builderos-mobile Specification Documentation
 
-*Generated: 2025-10-23 21:52:08*
+*Generated: 2025-10-24 15:53:48*
 
 ## Overview
 

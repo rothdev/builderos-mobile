@@ -7,8 +7,11 @@
 //
 
 import SwiftUI
+import Inject
 
 struct TerminalSectionHeader: View {
+    @ObserveInjection var inject
+
     let title: String
 
     var body: some View {
@@ -16,6 +19,7 @@ struct TerminalSectionHeader: View {
             .font(.system(size: 15, weight: .bold, design: .monospaced))
             .foregroundColor(.terminalCyan)
             .tracking(0.5)
+            .enableInjection()
     }
 }
 

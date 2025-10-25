@@ -1,0 +1,45 @@
+╔════════════════════════════════════════════════════════════════╗
+║           BuilderOS Mobile - Terminal Quick Facts             ║
+╚════════════════════════════════════════════════════════════════╝
+
+📱 WHICH TERMINAL AM I USING RIGHT NOW?
+   → TerminalChatView (mock responses only)
+
+🚀 WHICH TERMINAL IS READY FOR WEBSOCKET?
+   → WebSocketTerminalView (real terminal, fully implemented)
+
+🏗️  WHAT'S THE ADVANCED OPTION?
+   → MultiTabTerminalView (up to 3 tabs, iTerm2-style)
+
+✅ BUILD STATUS
+   → Clean build, zero errors
+
+⚠️  CANVAS PREVIEW ISSUE
+   → Not a code problem - restart Xcode
+
+🗑️  WHAT WAS DELETED?
+   → RealTerminalView.swift (obsolete prototype)
+   → src/ios/BuilderSystemMobile/ (duplicate files)
+
+📚 DOCUMENTATION
+   → 5 comprehensive docs (2-25 min reading time)
+   → Start with: QUICK_TERMINAL_REFERENCE.md
+
+🔄 HOW TO SWITCH TO REAL TERMINAL
+   → Edit: src/Views/MainContentView.swift (line 22)
+   → Replace: TerminalChatView() 
+   → With: WebSocketTerminalView(...)
+
+🧪 TESTING RESULTS
+   → Current mock terminal: Works ✅
+   → Build verification: Success ✅
+   → Canvas previews: Valid ✅
+   → All dependencies: Present ✅
+
+🎯 NEXT STEP
+   → Implement WebSocket API endpoint: /api/terminal/ws
+   → Then deploy WebSocketTerminalView (5-line change)
+
+╔════════════════════════════════════════════════════════════════╗
+║  Status: ✅ AUDIT COMPLETE - All terminals documented         ║
+╚════════════════════════════════════════════════════════════════╝

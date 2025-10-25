@@ -56,10 +56,10 @@ struct SettingsView: View {
                     .padding()
                 }
             }
-            .navigationTitle("$ SETTINGS")
+            .navigationTitle("SETTINGS")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
-            .alert("Clear API Key", isPresented: $showSignOutAlert) {
+            .alert("Clear Settings", isPresented: $showSignOutAlert) {
                 Button("Cancel", role: .cancel) { }
                 Button("Clear", role: .destructive) {
                     signOut()
@@ -92,6 +92,30 @@ struct SettingsView: View {
                         .background(Color.terminalInputBorder)
 
                     tunnelURLRow
+
+                    // Reconnect button (when disconnected)
+                    if !apiClient.isConnected && apiClient.hasAPIKey {
+                        Divider()
+                            .background(Color.terminalInputBorder)
+
+                        Button {
+                            Task {
+                                let _ = await apiClient.healthCheck()
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "arrow.clockwise")
+                                    .foregroundStyle(Color.terminalCyan)
+                                Text("Reconnect")
+                                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                                    .foregroundColor(.terminalCyan)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Color.terminalInputBackground)
+                            .terminalBorder(cornerRadius: 8)
+                        }
+                    }
 
                     if apiClient.hasAPIKey {
                         Divider()
@@ -215,15 +239,31 @@ struct SettingsView: View {
     }
 
     private var tunnelURLRow: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Tunnel URL")
                 .font(.system(size: 13, weight: .medium, design: .monospaced))
                 .foregroundStyle(Color.terminalCode)
 
-            Text(apiClient.tunnelURL)
-                .font(.system(size: 12, design: .monospaced))
-                .foregroundStyle(Color.terminalCyan)
-                .lineLimit(2)
+            TextField("https://your-tunnel-url.trycloudflare.com", text: Binding(
+                get: { apiClient.tunnelURL },
+                set: { newValue in
+                    APIConfig.updateTunnelURL(newValue)
+                }
+            ))
+            .font(.system(size: 12, design: .monospaced))
+            .foregroundStyle(Color.terminalCyan)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+            .keyboardType(.URL)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.terminalInputBackground)
+            .terminalBorder(cornerRadius: 6)
+            .onSubmit {
+                Task {
+                    _ = await apiClient.healthCheck()
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -234,7 +274,7 @@ struct SettingsView: View {
         } label: {
             HStack {
                 Spacer()
-                Text("Clear API Key")
+                Text("Clear Settings")
                     .font(.system(size: 14, weight: .semibold, design: .monospaced))
                     .foregroundColor(.terminalRed)
                 Spacer()

@@ -30,7 +30,7 @@ struct QuickAction: Identifiable {
 
 extension QuickAction {
     static let all = [
-        QuickAction(title: "Clear", icon: "clear", command: "clear\n"),
+        QuickAction(title: "Clear", icon: "eraser.fill", command: "clear\n"),
         QuickAction(title: "Capsules", icon: "cube.box", command: "ls -la capsules/\n"),
         QuickAction(title: "Git Status", icon: "arrow.triangle.branch", command: "git status\n"),
         QuickAction(title: "Agents", icon: "person.3", command: "ls -la global/agents/\n"),

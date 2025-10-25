@@ -7,7 +7,7 @@ Native iOS mobile application providing secure remote access to BuilderOS from i
 - **Phase:** Implementation Complete - Ready for Testing
 - **Last Updated:** October 2025
 - **Implementation:** Cloudflare Tunnel architecture (zero monthly cost)
-- **Tunnel URL:** https://viii-gmc-facing-salary.trycloudflare.com
+- **Tunnel URL:** Configure on first launch (dynamic URL from cloudflared)
 
 ## Technical Overview
 - **Primary Technologies:** Swift 5.9+, SwiftUI, URLSession, Combine
@@ -58,7 +58,7 @@ Native iOS application using SwiftUI with standard URLSession networking through
 2. Cloudflare automatically routes through global CDN with DDoS protection
 3. Encrypted tunnel (TLS 1.3) → Mac (Proton VPN ✓)
 4. Cloudflared daemon on Mac forwards to localhost:8080
-5. API Client uses tunnel URL for all requests: `https://viii-gmc-facing-salary.trycloudflare.com/api/`
+5. API Client uses dynamic tunnel URL for all requests: `{TUNNEL_URL}/api/`
 6. Localhost API on Mac (not exposed to internet, accessed via tunnel)
 7. End-to-end encryption via TLS + bearer token authentication
 
@@ -76,12 +76,8 @@ Native iOS application using SwiftUI with standard URLSession networking through
 - iOS 17+ target platform
 
 **Design & Iteration:**
-- **Penpot** - Visual mockups (iOS device frames)
 - **Xcode Previews** - Component isolation (built-in)
 - **InjectionIII** - Hot reloading (~2s updates, 30x faster than rebuilds)
-- **Penpot CLI** - Design system extraction (see `/Users/Ty/BuilderOS/tools/penpot_cli.py`)
-
-> **⚠️ Deprecation Notice:** Historical documentation in this capsule references "Penpot MCP" - this has been replaced with **Penpot CLI** (`/Users/Ty/BuilderOS/tools/penpot_cli.py`) for all design operations. MCP is no longer used in BuilderOS.
 
 **Documentation (Optional):**
 - **Apple DocC** - Component documentation generation
@@ -89,11 +85,11 @@ Native iOS application using SwiftUI with standard URLSession networking through
 ### Workflow Pattern
 
 ```
-📐 UI Designer (Penpot mockups)
+📐 UI Designer (Design specifications)
         ↓
 📱 Mobile Dev (Swift implementation with InjectionIII hot reload)
         ↓
-Validation (Compare screenshots to Penpot designs)
+Validation (Xcode Previews + device testing)
 ```
 
 ### Fast Iteration with InjectionIII
@@ -118,7 +114,6 @@ Validation (Compare screenshots to Penpot designs)
 - **INJECTION_SETUP.md** - Hot reloading setup (5-10 min)
 - **DOCC_SETUP.md** - Documentation generation (optional)
 - **DESIGN_DOCUMENTATION.md** - Complete design specifications
-- **PENPOT_PROJECT_GUIDE.md** - Penpot project structure
 
 **Cost: $0/month forever** (Cloudflare Tunnel free tier, unlimited bandwidth!)
 
@@ -159,7 +154,7 @@ builderos-mobile/
 ### Mac Prerequisites
 1. Install Cloudflare Tunnel: `brew install cloudflared`
 2. Start tunnel: `cloudflared tunnel --url http://localhost:8080`
-3. Note tunnel URL from terminal output (e.g., https://viii-gmc-facing-salary.trycloudflare.com)
+3. Note tunnel URL from terminal output (configured as https://api.builderos.app)
 4. Start BuilderOS API: `cd /Users/Ty/BuilderOS/api && ./server_mode.sh`
 
 ### iOS Setup
@@ -202,7 +197,7 @@ builderos-mobile/
 
 ## API Endpoints
 
-Base URL: `https://viii-gmc-facing-salary.trycloudflare.com/api/`
+Base URL: `{TUNNEL_URL}/api/` (dynamic URL from cloudflared)
 
 **System:**
 - `GET /status` - System status (version, uptime, health)
@@ -310,4 +305,4 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDdEKg0SiREfdBMAFDb34pxCWODy6h3Qir5AIz+gxq6
 ```
 
 ## Keywords
-iOS, mobile, iPhone, iPad, Swift, SwiftUI, Rathole, Oracle Cloud, tunnel, BuilderOS, companion app, capsule management, system monitoring, mobile dashboard, native app, Noise Protocol, encrypted, zero cost, VPN compatible, Proton VPN
+iOS, mobile, iPhone, iPad, Swift, SwiftUI, Cloudflare Tunnel, BuilderOS, companion app, capsule management, system monitoring, mobile dashboard, native app, encrypted, zero cost, VPN compatible, Proton VPN

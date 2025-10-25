@@ -36,7 +36,7 @@ Add documentation comments to components:
 ///
 /// ```swift
 /// ConnectionStatusCard(
-///     tunnelURL: "https://viii-gmc-facing-salary.trycloudflare.com",
+///     tunnelURL: "https://api.builderos.app",
 ///     latency: 12,
 ///     isConnected: true
 /// )

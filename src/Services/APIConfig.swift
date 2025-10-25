@@ -5,9 +5,12 @@ import Foundation
 struct APIConfig {
     // MARK: - Server Configuration
 
-    /// Cloudflare Tunnel URL (update after tunnel creation)
-    /// Changes after Mac reboot - check logs for new URL
-    static var tunnelURL = "https://viii-gmc-facing-salary.trycloudflare.com"
+    /// Cloudflare Tunnel URL for secure remote access
+    /// Permanent domain: api.builderos.app (custom domain via Cloudflare Tunnel)
+    /// This URL never changes (routes through Cloudflare Tunnel to your Mac)
+    /// WebSocket URL: wss://api.builderos.app/api/terminal/ws
+    /// FOR SIMULATOR TESTING: Change to "http://localhost:8080"
+    static var tunnelURL = "https://api.builderos.app"
 
     /// Base URL for all API requests
     static var baseURL: String {
@@ -66,6 +69,14 @@ struct APIConfig {
         if let savedURL = UserDefaults.standard.string(forKey: "cloudflare_tunnel_url"),
            !savedURL.isEmpty {
             self.tunnelURL = savedURL
+        }
+
+        // Always ensure we have the correct API key
+        // This overwrites any old/invalid keys from previous testing
+        let correctAPIKey = "1da15f4591c8c243310590564341e7595da40007832a798333da3bc0389061a3"
+        if apiToken != correctAPIKey {
+            print("🔑 Updating API key in Keychain")
+            apiToken = correctAPIKey
         }
     }
 }

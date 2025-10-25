@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import Inject
 
 struct CommandSuggestionsView: View {
     let suggestions: [Command]
     let onSelect: (Command) -> Void
+    @ObserveInjection var inject
 
     var body: some View {
         VStack(spacing: 0) {
@@ -78,6 +80,7 @@ struct CommandSuggestionsView: View {
         )
         .shadow(color: .black.opacity(0.5), radius: 16, y: 4)
         .padding(.horizontal, 16)
+        .enableInjection()
     }
 }
 

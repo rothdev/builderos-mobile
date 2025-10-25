@@ -5,7 +5,8 @@ import Combine
 class ChatViewModel: ObservableObject {
     @Published var messages: [ChatMessage] = []
     @Published var isConnected = false
-    
+    @Published var messageText = ""
+
     private let sshService: SSHServiceProtocol
     private var cancellables = Set<AnyCancellable>()
     

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Inject
 
 struct TerminalTabBar: View {
     @Binding var tabs: [TerminalTab]
@@ -13,8 +14,9 @@ struct TerminalTabBar: View {
     let onAddTab: (TerminalProfile) -> Void
     let onCloseTab: (UUID) -> Void
     let maxTabs: Int
+    @ObserveInjection var inject
 
-    var body: some View {
+    var body: some View{
         HStack(spacing: 0) {
             // Tab buttons
             ForEach(tabs) { tab in
@@ -51,6 +53,7 @@ struct TerminalTabBar: View {
         }
         .background(Color.black.opacity(0.4))
         .frame(height: 36)
+        .enableInjection()
     }
 }
 

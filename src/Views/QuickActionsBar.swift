@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import Inject
 
 struct QuickActionsBar: View {
     let actions: [QuickAction]
     let onAction: (QuickAction) -> Void
+    @ObserveInjection var inject
 
-    var body: some View {
+    var body: some View{
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
                 ForEach(actions) { action in
@@ -38,14 +40,16 @@ struct QuickActionsBar: View {
                 .frame(height: 1),
             alignment: .top
         )
+        .enableInjection()
     }
 }
 
 struct QuickActionButton: View {
     let action: QuickAction
     let onTap: () -> Void
+    @ObserveInjection var inject
 
-    var body: some View {
+    var body: some View{
         Button(action: onTap) {
             VStack(spacing: 6) {
                 Image(systemName: action.icon)
@@ -71,6 +75,7 @@ struct QuickActionButton: View {
             )
         }
         .buttonStyle(.plain)
+        .enableInjection()
     }
 }
 

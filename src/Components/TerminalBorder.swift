@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Inject
 
 struct TerminalBorderModifier: ViewModifier {
     var cornerRadius: CGFloat = 12

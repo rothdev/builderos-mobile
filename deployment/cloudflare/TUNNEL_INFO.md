@@ -3,7 +3,7 @@
 ## Current Configuration
 
 **Tunnel Type:** Free Quick Tunnel (trycloudflare.com)
-**Current URL:** `https://viii-gmc-facing-salary.trycloudflare.com`
+**Current URL:** `https://api.builderos.app`
 **Status:** ✅ Running via LaunchAgent
 **Cost:** $0/month forever
 

@@ -65,56 +65,92 @@ struct VoiceInputView: View {
     }
     
     private var voiceInputSection: some View {
-        HStack(spacing: 16) {
-            // Voice button with visual feedback
-            Button(action: handleVoiceButtonTap) {
-                ZStack {
-                    Circle()
-                        .fill(voiceButtonBackgroundColor)
-                        .frame(width: 60, height: 60)
-                    
-                    Image(systemName: voiceButtonIcon)
+        VStack(spacing: 0) {
+            // Text input field
+            HStack(spacing: 12) {
+                TextField("Type a message...", text: $chatViewModel.messageText)
+                    .textFieldStyle(.plain)
+                    .font(.builderBody)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(20)
+                    .submitLabel(.send)
+                    .onSubmit {
+                        if !chatViewModel.messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            chatViewModel.sendMessage(chatViewModel.messageText, hasVoiceAttachment: false)
+                            chatViewModel.messageText = ""
+                        }
+                    }
+
+                // Send button
+                Button(action: {
+                    if !chatViewModel.messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        chatViewModel.sendMessage(chatViewModel.messageText, hasVoiceAttachment: false)
+                        chatViewModel.messageText = ""
+                    }
+                }) {
+                    Image(systemName: "arrow.up.circle.fill")
                         .font(.title2)
-                        .foregroundColor(.white)
-                    
-                    if voiceManager.isRecording {
+                        .foregroundColor(chatViewModel.messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .gray : .builderPrimary)
+                }
+                .disabled(chatViewModel.messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+
+            // Voice and quick actions row
+            HStack(spacing: 16) {
+                // Voice button with visual feedback
+                Button(action: handleVoiceButtonTap) {
+                    ZStack {
                         Circle()
-                            .stroke(Color.red, lineWidth: 3)
-                            .frame(width: 70, height: 70)
-                            .scaleEffect(voiceManager.recordingPulse ? 1.1 : 1.0)
-                            .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: voiceManager.recordingPulse)
+                            .fill(voiceButtonBackgroundColor)
+                            .frame(width: 44, height: 44)
+
+                        Image(systemName: voiceButtonIcon)
+                            .font(.body)
+                            .foregroundColor(.white)
+
+                        if voiceManager.isRecording {
+                            Circle()
+                                .stroke(Color.red, lineWidth: 2)
+                                .frame(width: 50, height: 50)
+                                .scaleEffect(voiceManager.recordingPulse ? 1.1 : 1.0)
+                                .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: voiceManager.recordingPulse)
+                        }
                     }
                 }
+                .disabled(voiceManager.isProcessing || !voiceManager.hasPermission)
+                .accessibilityLabel(voiceManager.isRecording ? "Stop recording" : "Start voice input")
+                .accessibilityHint("Records your voice and converts to text")
+
+                // Quick action button
+                Button(action: { showingQuickActions = true }) {
+                    Image(systemName: "command")
+                        .font(.body)
+                        .foregroundColor(.builderPrimary)
+                        .frame(width: 44, height: 44)
+                        .background(Color(.systemGray5))
+                        .cornerRadius(22)
+                }
+                .accessibilityLabel("Quick commands")
+                .accessibilityHint("Show Builder System quick actions")
+
+                Spacer()
+
+                // Recording status
+                if voiceManager.isRecording {
+                    recordingIndicator
+                } else if voiceManager.isProcessing {
+                    processingIndicator
+                } else if !voiceManager.hasPermission {
+                    permissionIndicator
+                }
             }
-            .disabled(voiceManager.isProcessing || !voiceManager.hasPermission)
-            .accessibilityLabel(voiceManager.isRecording ? "Stop recording" : "Start voice input")
-            .accessibilityHint("Records your voice and converts to text")
-            
-            // Quick action button
-            Button(action: { showingQuickActions = true }) {
-                Image(systemName: "command")
-                    .font(.title2)
-                    .foregroundColor(.builderPrimary)
-                    .frame(width: 44, height: 44)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(22)
-            }
-            .accessibilityLabel("Quick commands")
-            .accessibilityHint("Show Builder System quick actions")
-            
-            Spacer()
-            
-            // Recording status
-            if voiceManager.isRecording {
-                recordingIndicator
-            } else if voiceManager.isProcessing {
-                processingIndicator
-            } else if !voiceManager.hasPermission {
-                permissionIndicator
-            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
         .background(Color.adaptiveBackground)
         .sheet(isPresented: $showingQuickActions) {
             QuickActionsView()

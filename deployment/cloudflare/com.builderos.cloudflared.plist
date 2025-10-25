@@ -16,7 +16,7 @@
         <string>/opt/homebrew/bin/cloudflared</string>
         <string>tunnel</string>
         <string>--config</string>
-        <string>/Users/Ty/BuilderOS/capsules/builder-system-mobile/deployment/cloudflare/tunnel-config.yml</string>
+        <string>/Users/Ty/BuilderOS/capsules/builderos-mobile/deployment/cloudflare/tunnel-config.yml</string>
         <string>run</string>
         <string>builderos-mobile</string>
     </array>
@@ -36,10 +36,10 @@
 
     <!-- Logging -->
     <key>StandardOutPath</key>
-    <string>/Users/Ty/BuilderOS/capsules/builder-system-mobile/deployment/cloudflare/cloudflared.log</string>
+    <string>/Users/Ty/BuilderOS/capsules/builderos-mobile/deployment/cloudflare/cloudflared.log</string>
 
     <key>StandardErrorPath</key>
-    <string>/Users/Ty/BuilderOS/capsules/builder-system-mobile/deployment/cloudflare/cloudflared.error.log</string>
+    <string>/Users/Ty/BuilderOS/capsules/builderos-mobile/deployment/cloudflare/cloudflared.error.log</string>
 
     <!-- Environment variables -->
     <key>EnvironmentVariables</key>
@@ -58,6 +58,6 @@
 
     <!-- Working directory -->
     <key>WorkingDirectory</key>
-    <string>/Users/Ty/BuilderOS/capsules/builder-system-mobile/deployment/cloudflare</string>
+    <string>/Users/Ty/BuilderOS/capsules/builderos-mobile/deployment/cloudflare</string>
 </dict>
 </plist>

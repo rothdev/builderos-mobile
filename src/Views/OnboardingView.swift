@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Inject
 
 struct OnboardingView: View {
     @EnvironmentObject var apiClient: BuilderOSAPIClient
@@ -16,6 +17,7 @@ struct OnboardingView: View {
     @State private var isTestingConnection = false
     @State private var showError = false
     @State private var errorMessage = ""
+    @ObserveInjection var inject
 
     var body: some View {
         NavigationStack {
@@ -82,7 +84,7 @@ struct OnboardingView: View {
                     }
 
                     VStack(spacing: 16) {
-                        TerminalGradientText(text: "$ BUILDEROS", fontSize: 32)
+                        TerminalGradientText(text: "BUILDEROS", fontSize: 32)
 
                         Text("Connect to your Mac")
                             .font(.system(size: 18, design: .monospaced))
@@ -120,6 +122,7 @@ struct OnboardingView: View {
                 Text(errorMessage)
             }
         }
+        .enableInjection()
     }
 
     @ViewBuilder

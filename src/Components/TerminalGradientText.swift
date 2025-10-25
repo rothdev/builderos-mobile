@@ -7,8 +7,11 @@
 //
 
 import SwiftUI
+import Inject
 
 struct TerminalGradientText: View {
+    @ObserveInjection var inject
+
     let text: String
     var fontSize: CGFloat = 22
     var fontWeight: Font.Weight = .black
@@ -24,12 +27,13 @@ struct TerminalGradientText: View {
                     endPoint: .trailing
                 )
             )
+            .enableInjection()
     }
 }
 
 #Preview {
     VStack(spacing: 20) {
-        TerminalGradientText(text: "$ BUILDEROS")
+        TerminalGradientText(text: "BUILDEROS")
 
         TerminalGradientText(text: "Welcome Back", fontSize: 32, fontWeight: .bold)
 

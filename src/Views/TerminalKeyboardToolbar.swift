@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import Inject
 
 struct TerminalKeyboardToolbar: View {
     let onKeyPress: (TerminalKey) -> Void
+    @ObserveInjection var inject
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -31,6 +33,7 @@ struct TerminalKeyboardToolbar: View {
         }
         .frame(height: 44)
         .background(Color.black.opacity(0.3))
+        .enableInjection()
     }
 }
 

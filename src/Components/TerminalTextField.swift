@@ -7,8 +7,11 @@
 //
 
 import SwiftUI
+import Inject
 
 struct TerminalTextField: View {
+    @ObserveInjection var inject
+
     let placeholder: String
     @Binding var text: String
     var isSecure: Bool = false
@@ -34,6 +37,7 @@ struct TerminalTextField: View {
                         .strokeBorder(Color.terminalInputBorder, lineWidth: 1)
                 )
         )
+        .enableInjection()
     }
 }
 

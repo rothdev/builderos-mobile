@@ -13,16 +13,33 @@ struct BuilderOSApp: App {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 
     init() {
+        print("🟢 APP: BuilderOSApp init() starting")
+
+        // Load saved configuration (tunnel URL + API key)
+        APIConfig.loadSavedConfiguration()
+        print("🟢 APP: Loaded API configuration")
+
         #if DEBUG
-        // Configure InjectionIII to connect to Mac's IP for hot reload
-        UserDefaults.standard.set("192.168.0.101", forKey: "InjectionHost")
-        // Load InjectionIII bundle for hot reload on real devices
-        Bundle(path: "/Applications/InjectionIII.app/Contents/Resources/iOSInjection.bundle")?.load()
+        // DEVELOPMENT: Skip onboarding for faster testing
+        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+        print("🟢 APP: Development mode - onboarding skipped")
         #endif
+
+        print("🟢 APP: BuilderOSApp init() complete")
     }
 
     var body: some Scene {
-        WindowGroup {
+        let _ = print("🟢 APP: Building WindowGroup, hasCompletedOnboarding=\(hasCompletedOnboarding)")
+
+        return WindowGroup {
+            #if DEBUG
+            // DEVELOPMENT: Always show main content in debug builds
+            MainContentView()
+                .environmentObject(apiClient)
+                .onAppear {
+                    print("🟢 APP: DEBUG mode - showing MainContentView directly")
+                }
+            #else
             if hasCompletedOnboarding {
                 MainContentView()
                     .environmentObject(apiClient)
@@ -30,6 +47,7 @@ struct BuilderOSApp: App {
                 OnboardingView()
                     .environmentObject(apiClient)
             }
+            #endif
         }
     }
 }

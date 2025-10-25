@@ -11,21 +11,6 @@
       "args": [
         "/Users/Ty/BuilderOS/global/apple-doc-mcp/src/web/site/apple-doc-mcp/dist/index.js"
       ]
-    },
-    "penpot": {
-      "command": "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3",
-      "args": [
-        "-m",
-        "penpot_mcp.server.mcp_server"
-      ],
-      "env": {
-        "PENPOT_API_URL": "http://localhost:3449/api",
-        "PENPOT_USERNAME": "admin@localhost.local",
-        "PENPOT_PASSWORD": "123123",
-        "ENABLE_HTTP_SERVER": "true",
-        "RESOURCES_AS_TOOLS": "false",
-        "DEBUG": "false"
-      }
     }
   }
 }

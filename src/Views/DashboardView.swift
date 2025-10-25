@@ -17,7 +17,9 @@ struct DashboardView: View {
     @State private var capsules: [Capsule] = []
 
     var body: some View {
-        NavigationStack {
+        let _ = print("🟢 DASH: DashboardView body rendering, isLoading=\(isLoading), capsules.count=\(capsules.count)")
+
+        return NavigationStack {
             ZStack {
                 // Terminal background
                 Color.terminalDark
@@ -54,7 +56,7 @@ struct DashboardView: View {
                     .padding()
                 }
             }
-            .navigationTitle("$ BUILDEROS")
+            .navigationTitle("BUILDEROS")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
             .refreshable {
@@ -111,6 +113,32 @@ struct DashboardView: View {
                         Label("Cloudflare Tunnel", systemImage: "lock.shield.fill")
                             .font(.system(size: 11, design: .monospaced))
                             .foregroundStyle(Color.terminalDim)
+                    }
+                }
+
+                // Reconnect button
+                if !apiClient.isConnected {
+                    Divider()
+                        .background(Color.terminalInputBorder)
+
+                    Button {
+                        Task {
+                            isRefreshing = true
+                            let _ = await apiClient.healthCheck()
+                            isRefreshing = false
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "arrow.clockwise")
+                                .foregroundStyle(Color.terminalCyan)
+                            Text("Reconnect")
+                                .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                                .foregroundColor(.terminalCyan)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Color.terminalInputBackground)
+                        .terminalBorder(cornerRadius: 8)
                     }
                 }
             }

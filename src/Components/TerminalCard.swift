@@ -7,8 +7,11 @@
 //
 
 import SwiftUI
+import Inject
 
 struct TerminalCard<Content: View>: View {
+    @ObserveInjection var inject
+
     let content: Content
 
     init(@ViewBuilder content: () -> Content) {
@@ -24,6 +27,7 @@ struct TerminalCard<Content: View>: View {
                 RoundedRectangle(cornerRadius: 12)
                     .strokeBorder(Color.terminalInputBorder, lineWidth: 1)
             )
+            .enableInjection()
     }
 }
 

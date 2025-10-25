@@ -4,10 +4,12 @@
 //
 
 import SwiftUI
+import Inject
 
 struct CapsuleDetailView: View {
     let capsule: Capsule
     @Environment(\.dismiss) private var dismiss
+    @ObserveInjection var inject
 
     var body: some View {
         ZStack {
@@ -106,6 +108,7 @@ struct CapsuleDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+        .enableInjection()
     }
 
     private var statusColor: Color {
@@ -132,6 +135,7 @@ struct CapsuleDetailView: View {
 struct MetricRow: View {
     let label: String
     let value: String
+    @ObserveInjection var inject
 
     var body: some View {
         HStack {
@@ -143,5 +147,6 @@ struct MetricRow: View {
                 .font(.system(size: 14, weight: .semibold, design: .monospaced))
                 .foregroundColor(Color.terminalCyan)
         }
+        .enableInjection()
     }
 }
