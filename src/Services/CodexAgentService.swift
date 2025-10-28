@@ -125,7 +125,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
         await MainActor.run { connectionStatus = "Connecting..." }
 
         var request = URLRequest(url: wsURL)
-        request.timeoutInterval = 30
+        request.timeoutInterval = 120  // Increase timeout for long Codex CLI responses (can take 60+ seconds)
 
         let socket = WebSocket(request: request)
         socket.delegate = self

@@ -248,6 +248,10 @@ struct DashboardView: View {
         isLoading = true
         isRefreshing = true
 
+        // First check connection health
+        let _ = await apiClient.healthCheck()
+
+        // Then fetch data
         do {
             try? await apiClient.fetchSystemStatus()
             systemStatus = apiClient.systemStatus

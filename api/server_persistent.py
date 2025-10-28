@@ -146,12 +146,18 @@ async def handle_claude_session(
 
     except Exception as e:
         logger.error(f"❌ Error during BridgeHub call: {e}", exc_info=True)
-        error_msg = {
-            "type": "error",
-            "content": f"Error: {str(e)}",
-            "timestamp": datetime.now().isoformat()
-        }
-        await ws.send_json(error_msg)
+
+        # Only send error if WebSocket is still open
+        if not ws.closed:
+            error_msg = {
+                "type": "error",
+                "content": f"Error: {str(e)}",
+                "timestamp": datetime.now().isoformat()
+            }
+            try:
+                await ws.send_json(error_msg)
+            except Exception as send_error:
+                logger.error(f"❌ Failed to send error message: {send_error}")
         return
 
     # Add assistant response to history
@@ -218,13 +224,23 @@ async def handle_codex_session(
             session_id=session_id,
             conversation_history=conversation_history
         ):
+            # Check if WebSocket is still open before sending
+            if ws.closed:
+                logger.warning("⚠️ WebSocket closed during Codex response streaming")
+                break
+
             # Stream chunk to iOS
             chunk_msg = {
                 "type": "message",
                 "content": chunk,
                 "timestamp": datetime.now().isoformat()
             }
-            await ws.send_json(chunk_msg)
+
+            try:
+                await ws.send_json(chunk_msg)
+            except Exception as send_error:
+                logger.error(f"❌ Failed to send chunk: {send_error}")
+                break
 
             full_response += chunk
             chunk_count += 1
@@ -234,12 +250,18 @@ async def handle_codex_session(
 
     except Exception as e:
         logger.error(f"❌ Error during BridgeHub call: {e}", exc_info=True)
-        error_msg = {
-            "type": "error",
-            "content": f"Error: {str(e)}",
-            "timestamp": datetime.now().isoformat()
-        }
-        await ws.send_json(error_msg)
+
+        # Only send error if WebSocket is still open
+        if not ws.closed:
+            error_msg = {
+                "type": "error",
+                "content": f"Error: {str(e)}",
+                "timestamp": datetime.now().isoformat()
+            }
+            try:
+                await ws.send_json(error_msg)
+            except Exception as send_error:
+                logger.error(f"❌ Failed to send error message: {send_error}")
         return
 
     # Add assistant response to history
