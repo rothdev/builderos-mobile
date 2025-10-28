@@ -20,6 +20,7 @@ struct SettingsView: View {
     @State private var showPowerAlert = false
     @State private var powerAlertMessage = ""
     @State private var isPowerActionInProgress = false
+    @State private var connectionState: Bool = false  // Local copy to force UI updates
 
     var body: some View {
         let _ = print("🟢 SETTINGS: SettingsView body rendering, apiClient.isConnected=\(apiClient.isConnected), hasAPIKey=\(apiClient.hasAPIKey)")
@@ -102,13 +103,14 @@ struct SettingsView: View {
                     tunnelURLRow
 
                     // Reconnect button (when disconnected)
-                    if !apiClient.isConnected && apiClient.hasAPIKey {
+                    if !connectionState && apiClient.hasAPIKey {
                         Divider()
                             .background(Color.terminalInputBorder)
 
                         Button {
                             Task {
-                                let _ = await apiClient.healthCheck()
+                                let success = await apiClient.healthCheck()
+                                connectionState = success
                             }
                         } label: {
                             HStack {
@@ -338,9 +340,9 @@ struct SettingsView: View {
                     .foregroundStyle(Color.terminalCode)
 
                 TerminalStatusBadge(
-                    text: apiClient.isConnected ? "CONNECTED" : "DISCONNECTED",
-                    color: apiClient.isConnected ? .terminalGreen : .terminalRed,
-                    shouldPulse: apiClient.isConnected
+                    text: connectionState ? "CONNECTED" : "DISCONNECTED",
+                    color: connectionState ? .terminalGreen : .terminalRed,
+                    shouldPulse: connectionState
                 )
             }
 
@@ -376,7 +378,15 @@ struct SettingsView: View {
             .terminalBorder(cornerRadius: 6)
             .onSubmit {
                 Task {
-                    _ = await apiClient.healthCheck()
+                    let success = await apiClient.healthCheck()
+                    connectionState = success
+                }
+            }
+            .onAppear {
+                // Sync connection state when view appears
+                Task {
+                    let success = await apiClient.healthCheck()
+                    connectionState = success
                 }
             }
         }
@@ -506,7 +516,7 @@ struct SettingsView: View {
     }
 
     private var buttonEnabled: Bool {
-        apiClient.isConnected && apiClient.hasAPIKey && !isPowerActionInProgress
+        connectionState && apiClient.hasAPIKey && !isPowerActionInProgress
     }
 
     private func sleepMac() {

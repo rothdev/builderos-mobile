@@ -15,6 +15,7 @@ import UIKit
 class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate {
     private var webSocket: WebSocket?
     private var authenticationComplete = false
+    private var authenticationReceived = false
     private var currentResponseText: String = ""
 
     private var heartbeatTimer: Timer?
@@ -150,11 +151,41 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
             throw CodexAgentError.authenticationFailed
         }
 
-        await MainActor.run { webSocket?.write(string: apiKey) }
+        await MainActor.run {
+            authenticationReceived = false
+            webSocket?.write(string: apiKey)
+        }
         print("📤 API key sent to Codex WebSocket")
 
+        // Wait for "authenticated" text response (max 5 seconds)
+        attempts = 0
+        print("⏳ Waiting for Codex authentication confirmation...")
+        while await MainActor.run(body: { !authenticationReceived }) && attempts < 50 {
+            try await Task.sleep(nanoseconds: 100_000_000)
+            attempts += 1
+        }
+
+        let finalAuthReceived = await MainActor.run { authenticationReceived }
+        guard finalAuthReceived else {
+            print("❌ Codex authentication timeout (no 'authenticated' message)")
+            throw CodexAgentError.authenticationFailed
+        }
+        print("✅ Codex authentication confirmed by server")
+
+        // Send session configuration with working directory
+        let sessionConfig: [String: Any] = [
+            "working_directory": "/Users/Ty/BuilderOS"
+        ]
+        let configData = try JSONSerialization.data(withJSONObject: sessionConfig)
+        let configString = String(data: configData, encoding: .utf8)!
+        print("📤 Sending Codex session config: \(configString)")
+        await MainActor.run { webSocket?.write(string: configString) }
+        print("✅ Codex session config sent (working_directory: /Users/Ty/BuilderOS)")
+
+        // Wait for "ready" JSON message (max 5 seconds)
         await MainActor.run { authenticationComplete = false }
         attempts = 0
+        print("⏳ Waiting for Codex 'ready' message...")
         while await MainActor.run(body: { !authenticationComplete }) && attempts < 50 {
             try await Task.sleep(nanoseconds: 100_000_000)
             attempts += 1
@@ -162,12 +193,12 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
 
         let finalAuthComplete = await MainActor.run { authenticationComplete }
         guard finalAuthComplete else {
-            print("❌ Codex authentication timeout")
+            print("❌ Codex ready timeout")
             throw CodexAgentError.authenticationFailed
         }
 
         await MainActor.run { connectionStatus = "Connected" }
-        print("✅ Codex authenticated successfully")
+        print("✅ Codex session ready")
         await startHeartbeat()
         await cancelReconnect()
     }
@@ -433,6 +464,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
             connectionStatus = "Error: Invalid API key"
             isLoading = false
             authenticationComplete = false
+            authenticationReceived = false
             return
         } else if text.hasPrefix("error:") {
             print("❌ Codex server returned error: \(text)")
@@ -440,12 +472,13 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
             connectionStatus = "Error: \(errorMessage)"
             isLoading = false
             authenticationComplete = false
+            authenticationReceived = false
             return
         }
 
-        if !authenticationComplete && text == "authenticated" {
+        if text == "authenticated" {
             print("✅ Codex authentication acknowledged")
-            authenticationComplete = true
+            authenticationReceived = true
             return
         }
 

@@ -28,6 +28,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
     private var webSocket: WebSocket?
     private var currentResponseText: String = ""
     private var authenticationComplete = false
+    private var authenticationReceived = false
     private let persistenceManager = ChatPersistenceManager()
     private var heartbeatTimer: Timer?
     private var reconnectionTask: Task<Void, Never>?
@@ -189,8 +190,36 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
         }
 
         print("📤 Sending API key (first 8 chars: \(String(apiKey.prefix(8)))...)...")
-        await MainActor.run { webSocket?.write(string: apiKey) }
+        await MainActor.run {
+            authenticationReceived = false
+            webSocket?.write(string: apiKey)
+        }
         print("✅ API key sent to WebSocket")
+
+        // Wait for "authenticated" text response (max 5 seconds)
+        attempts = 0
+        print("⏳ Waiting for authentication confirmation...")
+        while await MainActor.run(body: { !authenticationReceived }) && attempts < 50 {
+            try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            attempts += 1
+        }
+
+        let finalAuthReceived = await MainActor.run { authenticationReceived }
+        guard finalAuthReceived else {
+            print("❌ Authentication timeout (no 'authenticated' message received)")
+            throw ClaudeAgentError.authenticationFailed
+        }
+        print("✅ Authentication confirmed by server")
+
+        // Send session configuration with working directory
+        let sessionConfig: [String: Any] = [
+            "working_directory": "/Users/Ty/BuilderOS"
+        ]
+        let configData = try JSONSerialization.data(withJSONObject: sessionConfig)
+        let configString = String(data: configData, encoding: .utf8)!
+        print("📤 Sending session config: \(configString)")
+        await MainActor.run { webSocket?.write(string: configString) }
+        print("✅ Session config sent (working_directory: /Users/Ty/BuilderOS)")
 
         // Wait for "ready" message (max 15 seconds - server needs time to initialize Claude SDK)
         await MainActor.run { authenticationComplete = false }
@@ -552,6 +581,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
             connectionStatus = "Error: Invalid API key"
             isLoading = false
             authenticationComplete = false
+            authenticationReceived = false
             return
         } else if text.hasPrefix("error:") {
             print("❌ Server returned error: \(text)")
@@ -559,13 +589,14 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
             connectionStatus = "Error: \(errorMessage)"
             isLoading = false
             authenticationComplete = false
+            authenticationReceived = false
             return
         }
 
         // First message after API key should be "authenticated"
-        if !authenticationComplete && text == "authenticated" {
-            print("✅ Authentication successful! Waiting for server initialization...")
-            // Don't set authenticationComplete yet - wait for "ready" JSON message
+        if text == "authenticated" {
+            print("✅ Authentication successful! Received 'authenticated' confirmation")
+            authenticationReceived = true
             return
         }
 

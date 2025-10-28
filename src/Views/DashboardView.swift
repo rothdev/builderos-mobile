@@ -15,6 +15,7 @@ struct DashboardView: View {
     @State private var isRefreshing = false
     @State private var isLoading = false
     @State private var capsules: [Capsule] = []
+    @State private var connectionState: Bool = false  // Local copy to force UI updates
 
     var body: some View {
         let _ = print("🟢 DASH: DashboardView body rendering, isLoading=\(isLoading), capsules.count=\(capsules.count), apiClient.isConnected=\(apiClient.isConnected)")
@@ -73,16 +74,16 @@ struct DashboardView: View {
         TerminalCard {
             VStack(spacing: 12) {
                 HStack {
-                    Image(systemName: apiClient.isConnected ? "bolt.circle.fill" : "xmark.circle.fill")
-                        .foregroundStyle(apiClient.isConnected ? Color.terminalCyan : Color.terminalRed)
+                    Image(systemName: connectionState ? "bolt.circle.fill" : "xmark.circle.fill")
+                        .foregroundStyle(connectionState ? Color.terminalCyan : Color.terminalRed)
                         .font(.system(size: 20))
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(apiClient.isConnected ? "Connected" : "Disconnected")
+                        Text(connectionState ? "Connected" : "Disconnected")
                             .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                            .foregroundColor(apiClient.isConnected ? .terminalCyan : .terminalRed)
+                            .foregroundColor(connectionState ? .terminalCyan : .terminalRed)
 
-                        if apiClient.isConnected {
+                        if connectionState {
                             Text("BuilderOS Mobile")
                                 .font(.system(size: 13, design: .monospaced))
                                 .foregroundStyle(Color.terminalCode)
@@ -117,14 +118,15 @@ struct DashboardView: View {
                 }
 
                 // Reconnect button
-                if !apiClient.isConnected {
+                if !connectionState {
                     Divider()
                         .background(Color.terminalInputBorder)
 
                     Button {
                         Task {
                             isRefreshing = true
-                            let _ = await apiClient.healthCheck()
+                            let success = await apiClient.healthCheck()
+                            connectionState = success
                             isRefreshing = false
                         }
                     } label: {
@@ -252,7 +254,8 @@ struct DashboardView: View {
         // First check connection health
         print("🔵 DASH: Calling healthCheck...")
         let healthResult = await apiClient.healthCheck()
-        print("🔵 DASH: healthCheck returned: \(healthResult), apiClient.isConnected = \(apiClient.isConnected)")
+        connectionState = healthResult  // Update local state to force UI refresh
+        print("🔵 DASH: healthCheck returned: \(healthResult), apiClient.isConnected = \(apiClient.isConnected), connectionState = \(connectionState)")
 
         // Then fetch data
         do {
