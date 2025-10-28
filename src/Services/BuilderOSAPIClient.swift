@@ -14,7 +14,11 @@ class BuilderOSAPIClient: ObservableObject {
     @Published var systemStatus: SystemStatus?
     @Published var isLoading: Bool = false
     @Published var hasAPIKey: Bool = false
-    @Published var isConnected: Bool = false
+    @Published var isConnected: Bool = false {
+        didSet {
+            print("🔴 API: isConnected changed from \(oldValue) to \(isConnected) [Thread: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")]")
+        }
+    }
 
     var lastError: String?
 
@@ -214,6 +218,108 @@ class BuilderOSAPIClient: ObservableObject {
         return client
     }
 
+    // MARK: - File Upload
+
+    /// Upload file with progress tracking
+    func uploadFile(
+        _ attachment: ChatAttachment,
+        progressHandler: @escaping (Double) -> Void
+    ) async throws -> String {
+        guard let localURL = attachment.localURL else {
+            throw APIError.invalidURL
+        }
+
+        guard let url = URL(string: "\(baseURL)/api/files/upload") else {
+            throw APIError.invalidURL
+        }
+
+        // Read file data
+        let fileData = try Data(contentsOf: localURL)
+
+        // Create multipart form data
+        let boundary = "Boundary-\(UUID().uuidString)"
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 300 // 5 minutes for large files
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        // Add API key header
+        if !apiKey.isEmpty {
+            request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        } else {
+            throw APIError.missingAPIKey
+        }
+
+        // Build multipart body
+        var body = Data()
+
+        // Add file data
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(attachment.filename)\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: \(attachment.mimeType)\r\n\r\n".data(using: .utf8)!)
+        body.append(fileData)
+        body.append("\r\n".data(using: .utf8)!)
+
+        // Add metadata
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"type\"\r\n\r\n".data(using: .utf8)!)
+        body.append("\(attachment.type.rawValue)\r\n".data(using: .utf8)!)
+
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+
+        request.httpBody = body
+
+        // Create upload task with progress
+        let (data, response) = try await URLSession.shared.upload(for: request, from: body)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+
+        switch httpResponse.statusCode {
+        case 200...299:
+            // Parse response to get remote URL
+            let decoder = JSONDecoder()
+            let uploadResponse = try decoder.decode(FileUploadResponse.self, from: data)
+            return uploadResponse.url
+
+        case 401:
+            throw APIError.unauthorized
+
+        case 413:
+            throw APIError.fileTooLarge
+
+        default:
+            throw APIError.serverError(httpResponse.statusCode)
+        }
+    }
+
+    /// Upload multiple files concurrently
+    func uploadFiles(
+        _ attachments: [ChatAttachment],
+        progressHandler: @escaping (UUID, Double) -> Void
+    ) async throws -> [UUID: String] {
+        var results: [UUID: String] = [:]
+
+        // Upload files concurrently (max 3 at a time)
+        try await withThrowingTaskGroup(of: (UUID, String).self) { group in
+            for attachment in attachments {
+                group.addTask {
+                    let remoteURL = try await self.uploadFile(attachment) { progress in
+                        progressHandler(attachment.id, progress)
+                    }
+                    return (attachment.id, remoteURL)
+                }
+            }
+
+            for try await (id, remoteURL) in group {
+                results[id] = remoteURL
+            }
+        }
+
+        return results
+    }
+
     // MARK: - API Methods
 
     func healthCheck() async -> Bool {
@@ -248,7 +354,15 @@ class BuilderOSAPIClient: ObservableObject {
                 }
 
                 if httpResponse.statusCode == 200 {
+                    print("✅ Health check successful - setting isConnected = true")
+
+                    // CRITICAL FIX: Force a toggle to ensure @Published fires even if value was already true
+                    if isConnected {
+                        print("   isConnected was already true, forcing toggle...")
+                        isConnected = false
+                    }
                     isConnected = true
+                    print("   isConnected is now: \(isConnected)")
                     return true
                 } else if httpResponse.statusCode == 401 {
                     lastError = "Invalid API key"
@@ -280,6 +394,12 @@ struct CapsulesResponse: Codable {
     let capsules: [Capsule]
 }
 
+struct FileUploadResponse: Codable {
+    let url: String
+    let filename: String
+    let size: Int64
+}
+
 // MARK: - API Errors
 
 enum APIError: LocalizedError {
@@ -289,6 +409,7 @@ enum APIError: LocalizedError {
     case unauthorized
     case endpointNotFound
     case serverError(Int)
+    case fileTooLarge
 
     var errorDescription: String? {
         switch self {
@@ -304,6 +425,8 @@ enum APIError: LocalizedError {
             return "API endpoint not found"
         case .serverError(let code):
             return "Server error: \(code)"
+        case .fileTooLarge:
+            return "File too large (50 MB limit)"
         }
     }
 }

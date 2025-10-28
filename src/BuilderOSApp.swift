@@ -17,6 +17,10 @@ struct BuilderOSApp: App {
     init() {
         print("🟢 APP: BuilderOSApp init() starting")
 
+        // Set window background to prevent blue flash on launch
+        // CRITICAL: Must be done in init() before any views render
+        configureWindowBackground()
+
         // Load saved configuration (tunnel URL + API key)
         APIConfig.loadSavedConfiguration()
         print("🟢 APP: Loaded API configuration")
@@ -32,6 +36,17 @@ struct BuilderOSApp: App {
         #endif
 
         print("🟢 APP: BuilderOSApp init() complete")
+    }
+
+    /// Configure window background color to match terminalDark
+    /// Prevents blue flash on app launch by setting background before views render
+    private func configureWindowBackground() {
+        // Terminal dark color: RGB(10, 14, 26)
+        let terminalDarkUIColor = UIColor(red: 10/255, green: 14/255, blue: 26/255, alpha: 1.0)
+
+        // Set default window background for all scenes
+        UIWindow.appearance().backgroundColor = terminalDarkUIColor
+        print("🟢 APP: Window background configured to terminalDark")
     }
 
     var body: some Scene {

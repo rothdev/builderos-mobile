@@ -46,12 +46,26 @@ struct ConversationTabBar: View {
                             Button {
                                 onAddTab(.claude)
                             } label: {
-                                Label("New Jarvis Chat", systemImage: "star.fill")
+                                Label {
+                                    Text("New Claude Chat")
+                                } icon: {
+                                    Image("claude-logo")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 16, height: 16)
+                                }
                             }
                             Button {
                                 onAddTab(.codex)
                             } label: {
-                                Label("New Codex Chat", systemImage: "sparkles")
+                                Label {
+                                    Text("New Codex Chat")
+                                } icon: {
+                                    Image("openai-logo")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 16, height: 16)
+                                }
                             }
                         } label: {
                             Image(systemName: "plus")

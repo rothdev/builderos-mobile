@@ -8,12 +8,14 @@ struct ClaudeChatMessage: Identifiable, Equatable, Codable {
     let text: String
     let isUser: Bool
     let timestamp: Date
+    var attachments: [ChatAttachment]
 
-    init(id: UUID = UUID(), text: String, isUser: Bool, timestamp: Date = Date()) {
+    init(id: UUID = UUID(), text: String, isUser: Bool, timestamp: Date = Date(), attachments: [ChatAttachment] = []) {
         self.id = id
         self.text = text
         self.isUser = isUser
         self.timestamp = timestamp
+        self.attachments = attachments
     }
 
     static func == (lhs: ClaudeChatMessage, rhs: ClaudeChatMessage) -> Bool {
@@ -117,13 +119,14 @@ class ChatAgentServiceBase: ObservableObject {
 
 // MARK: - Persistent Service Manager
 
-/// Singleton manager that maintains service instances across view lifecycle changes
+/// Singleton manager that maintains multiple service instances per session
 @MainActor
 class ChatServiceManager: ObservableObject {
     static let shared = ChatServiceManager()
 
-    @Published private(set) var claudeService: ClaudeAgentService?
-    @Published private(set) var codexService: CodexAgentService?
+    // Store multiple instances keyed by sessionId
+    @Published private(set) var claudeServices: [String: ClaudeAgentService] = [:]
+    @Published private(set) var codexServices: [String: CodexAgentService] = [:]
 
     private var observers: Set<AnyCancellable> = []
 
@@ -131,15 +134,15 @@ class ChatServiceManager: ObservableObject {
         print("🏗️ ChatServiceManager initialized (singleton)")
     }
 
-    func getOrCreateClaudeService() -> ClaudeAgentService {
-        if let existing = claudeService {
-            print("♻️ Reusing existing Claude service")
+    func getOrCreateClaudeService(sessionId: String) -> ClaudeAgentService {
+        if let existing = claudeServices[sessionId] {
+            print("♻️ Reusing existing Claude service for session: \(sessionId)")
             return existing
         }
 
-        print("🆕 Creating new Claude service")
-        let service = ClaudeAgentService()
-        claudeService = service
+        print("🆕 Creating new Claude service for session: \(sessionId)")
+        let service = ClaudeAgentService(sessionId: sessionId)
+        claudeServices[sessionId] = service
 
         // Observe changes for SwiftUI updates
         service.objectWillChange
@@ -151,15 +154,15 @@ class ChatServiceManager: ObservableObject {
         return service
     }
 
-    func getOrCreateCodexService() -> CodexAgentService {
-        if let existing = codexService {
-            print("♻️ Reusing existing Codex service")
+    func getOrCreateCodexService(sessionId: String) -> CodexAgentService {
+        if let existing = codexServices[sessionId] {
+            print("♻️ Reusing existing Codex service for session: \(sessionId)")
             return existing
         }
 
-        print("🆕 Creating new Codex service")
-        let service = CodexAgentService()
-        codexService = service
+        print("🆕 Creating new Codex service for session: \(sessionId)")
+        let service = CodexAgentService(sessionId: sessionId)
+        codexServices[sessionId] = service
 
         // Observe changes for SwiftUI updates
         service.objectWillChange
@@ -169,11 +172,33 @@ class ChatServiceManager: ObservableObject {
             .store(in: &observers)
 
         return service
+    }
+
+    func removeClaudeService(sessionId: String) {
+        if let service = claudeServices[sessionId] {
+            print("🗑️ Removing Claude service for session: \(sessionId)")
+            service.disconnect()
+            claudeServices.removeValue(forKey: sessionId)
+        }
+    }
+
+    func removeCodexService(sessionId: String) {
+        if let service = codexServices[sessionId] {
+            print("🗑️ Removing Codex service for session: \(sessionId)")
+            service.disconnect()
+            codexServices.removeValue(forKey: sessionId)
+        }
     }
 
     func disconnectAll() {
         print("🔌 Disconnecting all services")
-        claudeService?.disconnect()
-        codexService?.disconnect()
+        for service in claudeServices.values {
+            service.disconnect()
+        }
+        for service in codexServices.values {
+            service.disconnect()
+        }
+        claudeServices.removeAll()
+        codexServices.removeAll()
     }
 }

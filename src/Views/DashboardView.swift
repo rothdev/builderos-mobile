@@ -17,7 +17,7 @@ struct DashboardView: View {
     @State private var capsules: [Capsule] = []
 
     var body: some View {
-        let _ = print("🟢 DASH: DashboardView body rendering, isLoading=\(isLoading), capsules.count=\(capsules.count)")
+        let _ = print("🟢 DASH: DashboardView body rendering, isLoading=\(isLoading), capsules.count=\(capsules.count), apiClient.isConnected=\(apiClient.isConnected)")
 
         return NavigationStack {
             ZStack {
@@ -245,11 +245,14 @@ struct DashboardView: View {
     }
 
     private func loadInitialData() async {
+        print("🔵 DASH: loadInitialData() starting")
         isLoading = true
         isRefreshing = true
 
         // First check connection health
-        let _ = await apiClient.healthCheck()
+        print("🔵 DASH: Calling healthCheck...")
+        let healthResult = await apiClient.healthCheck()
+        print("🔵 DASH: healthCheck returned: \(healthResult), apiClient.isConnected = \(apiClient.isConnected)")
 
         // Then fetch data
         do {
@@ -261,6 +264,7 @@ struct DashboardView: View {
 
         isLoading = false
         isRefreshing = false
+        print("🔵 DASH: loadInitialData() complete, final isConnected = \(apiClient.isConnected)")
     }
 
     private func refreshData() async {

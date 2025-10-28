@@ -44,7 +44,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
 
     // MARK: - Initialization
 
-    override init() {
+    init(sessionId: String) {
         // Generate persistent device ID (survives app reinstalls via identifierForVendor)
         if let vendorId = UIDevice.current.identifierForVendor?.uuidString {
             self.deviceId = vendorId
@@ -59,20 +59,14 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
             }
         }
 
-        // Generate or load persistent session ID
-        if let savedSessionId = UserDefaults.standard.string(forKey: "claude_session_id") {
-            self.sessionId = savedSessionId
-        } else {
-            let newSessionId = "\(self.deviceId)-jarvis"
-            UserDefaults.standard.set(newSessionId, forKey: "claude_session_id")
-            self.sessionId = newSessionId
-        }
+        // Use provided session ID (unique per chat)
+        self.sessionId = sessionId
 
         super.init()
 
-        // Load saved messages from persistence
-        messages = persistenceManager.messages
-        print("📂 Loaded \(messages.count) messages from persistence")
+        // Load saved messages from persistence (using sessionId as key)
+        messages = persistenceManager.loadMessages(for: sessionId)
+        print("📂 Loaded \(messages.count) messages from persistence for session: \(sessionId)")
         print("📋 Claude session ID: \(self.sessionId)")
         print("📱 Device ID: \(self.deviceId)")
     }
@@ -227,10 +221,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
 
     /// Disconnect from Claude Agent
     override func disconnect() {
-        print("🔴🔴🔴 DISCONNECT CALLED - THIS SHOULD NOT HAPPEN DURING TAB SWITCHES 🔴🔴🔴")
-        print("   Full call stack:")
-        Thread.callStackSymbols.forEach { print("     \($0)") }
-        print("   Current state: isConnected=\(isConnected), isUserInitiatedDisconnect=\(isUserInitiatedDisconnect)")
+        print("🔴 Disconnecting Claude Agent session: \(sessionId)")
 
         isUserInitiatedDisconnect = true
         super.disconnect()  // Mark shouldMaintainConnection = false
@@ -249,7 +240,41 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
         authenticationComplete = false
         connectionStatus = "Disconnected"
 
+        // Send backend API request to close session
+        Task {
+            await closeBackendSession()
+        }
+
         print("👋 Disconnected from Claude Agent")
+    }
+
+    /// Close the backend CLI session via API
+    private func closeBackendSession() async {
+        let baseURL = APIConfig.baseURL
+        let closeURL = "\(baseURL)/api/claude/session/\(sessionId)/close"
+
+        guard let url = URL(string: closeURL) else {
+            print("❌ Invalid close session URL: \(closeURL)")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue(APIConfig.apiToken, forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = 10
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                if httpResponse.statusCode == 200 {
+                    print("✅ Backend session closed: \(sessionId)")
+                } else {
+                    print("⚠️ Backend session close returned status \(httpResponse.statusCode)")
+                }
+            }
+        } catch {
+            print("⚠️ Failed to close backend session (will timeout naturally): \(error.localizedDescription)")
+        }
     }
 
     // MARK: - Message Handling
@@ -269,7 +294,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
         // Add user message to UI and persist
         let userMessage = ClaudeChatMessage(text: text, isUser: true)
         messages.append(userMessage)
-        persistenceManager.saveMessage(userMessage)
+        persistenceManager.saveMessage(userMessage, sessionId: self.sessionId)
 
         // Send to WebSocket with session persistence fields
         let messageJSON: [String: Any] = [
@@ -579,7 +604,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
             // Message complete - persist final message and reset loading state
             print("✅ Message complete")
             if let lastMessage = messages.last, !lastMessage.isUser {
-                persistenceManager.saveMessage(lastMessage)
+                persistenceManager.saveMessage(lastMessage, sessionId: self.sessionId)
             }
             isLoading = false
             currentResponseText = ""
@@ -610,7 +635,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
     override func clearMessages() {
         super.clearMessages()
         currentResponseText = ""
-        persistenceManager.clearMessages()
+        persistenceManager.clearMessages(for: self.sessionId)
     }
 }
 

@@ -22,7 +22,9 @@ struct SettingsView: View {
     @State private var isPowerActionInProgress = false
 
     var body: some View {
-        NavigationStack {
+        let _ = print("🟢 SETTINGS: SettingsView body rendering, apiClient.isConnected=\(apiClient.isConnected), hasAPIKey=\(apiClient.hasAPIKey)")
+
+        return NavigationStack {
             ZStack {
                 // Terminal background
                 Color.terminalDark

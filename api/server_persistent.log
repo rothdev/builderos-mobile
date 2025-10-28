@@ -6142,3 +6142,19 @@ aiohttp.client_exceptions.ClientConnectionResetError: Cannot write to closing tr
 2025-10-28 15:23:02,492 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:14:22:57 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
 2025-10-28 15:23:02,507 - __main__ - INFO - 👋 Codex WebSocket disconnected
 2025-10-28 15:23:02,507 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:14:22:57 -0700] "GET /api/codex/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 15:41:01,609 - __main__ - INFO - 🔵 Codex WebSocket connection established
+2025-10-28 15:41:01,616 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 15:41:01,768 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 15:41:01,776 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 15:41:13,252 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:14:41:13 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 15:41:16,428 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:14:41:16 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 15:41:20,083 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:14:41:20 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 15:42:56,934 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:14:42:56 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 15:43:03,752 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:14:43:03 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 15:46:41,399 - __main__ - INFO - 👋 Codex WebSocket disconnected
+2025-10-28 15:46:41,403 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:14:41:01 -0700] "GET /api/codex/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 15:46:41,421 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 15:46:41,421 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:14:41:01 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "-"
+2025-10-28 15:48:15,485 - __main__ - INFO - 👋 Claude WebSocket disconnected
+======== Running on http://0.0.0.0:8080 ========
+(Press CTRL+C to quit)

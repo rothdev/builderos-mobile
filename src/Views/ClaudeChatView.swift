@@ -13,6 +13,9 @@ struct ClaudeChatView: View {
     // Persistent service manager (survives tab changes)
     @StateObject private var serviceManager = ChatServiceManager.shared
 
+    // Attachment service
+    @StateObject private var attachmentService = AttachmentService()
+
     // Tab state
     @State private var tabs: [ConversationTab] = [ConversationTab(provider: .claude)]
     @State private var selectedTabId: UUID
@@ -91,6 +94,11 @@ struct ClaudeChatView: View {
                 // Message history
                 if activeService != nil {
                     messageListView
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            // Dismiss keyboard when tapping chat area
+                            isInputFocused = false
+                        }
                 } else {
                     // No service available (shouldn't happen)
                     Text("No conversation selected")
@@ -106,6 +114,11 @@ struct ClaudeChatView: View {
 
                 Divider()
                     .background(Color.terminalInputBorder)
+
+                // File preview chips (if any attachments selected)
+                if !attachmentService.selectedAttachments.isEmpty {
+                    filePreviewSection
+                }
 
                 // Input area
                 inputView
@@ -200,6 +213,17 @@ struct ClaudeChatView: View {
                         }
                     }
                 }
+                .onAppear {
+                    // Scroll to bottom when view appears (returning to chat tab)
+                    if let lastMessage = service.messages.last {
+                        // Small delay to ensure layout is complete
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            withAnimation {
+                                proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                            }
+                        }
+                    }
+                }
             }
         )
     }
@@ -209,12 +233,6 @@ struct ClaudeChatView: View {
     private var quickActionsView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                QuickActionChip(
-                    icon: "info.circle.fill",
-                    text: "Status",
-                    action: { sendQuickAction("What's the status of BuilderOS?") }
-                )
-
                 QuickActionChip(
                     icon: "wrench.and.screwdriver.fill",
                     text: "Tools",
@@ -245,10 +263,33 @@ struct ClaudeChatView: View {
         .background(Color.terminalDark.opacity(0.5))
     }
 
+    // MARK: - File Preview Section
+
+    private var filePreviewSection: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(attachmentService.selectedAttachments) { attachment in
+                    FilePreviewChip(attachment: attachment) {
+                        attachmentService.removeAttachment(attachment)
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
+        .padding(.vertical, 8)
+        .background(Color.terminalDark.opacity(0.5))
+    }
+
     // MARK: - Input Area
 
     private var inputView: some View {
         HStack(spacing: 12) {
+            // Attachment button
+            AttachmentButton(
+                onPhotoTap: { presentPhotoPicker() },
+                onDocumentTap: { presentDocumentPicker() }
+            )
+
             // Text input
             TextField(activeProvider.inputPlaceholder, text: $inputText, axis: .vertical)
                 .textFieldStyle(.plain)
@@ -300,20 +341,20 @@ struct ClaudeChatView: View {
 
     private func createServiceForTab(_ tab: ConversationTab) {
         // Check if service already exists
-        if let existingService = serviceInstances[tab.id] {
+        if serviceInstances[tab.id] != nil {
             print("⚠️ Service already exists for tab \(tab.provider.displayName), reusing it")
             return
         }
 
-        print("📝 Getting persistent service for tab \(tab.provider.displayName)")
+        print("📝 Creating persistent service for tab \(tab.provider.displayName) with session: \(tab.sessionId)")
 
-        // Get persistent service from singleton manager
+        // Get persistent service from singleton manager (using unique sessionId per tab)
         let service: ChatAgentServiceBase
         switch tab.provider {
         case .claude:
-            service = serviceManager.getOrCreateClaudeService()
+            service = serviceManager.getOrCreateClaudeService(sessionId: tab.sessionId)
         case .codex:
-            service = serviceManager.getOrCreateCodexService()
+            service = serviceManager.getOrCreateCodexService(sessionId: tab.sessionId)
         }
 
         serviceInstances[tab.id] = service
@@ -353,14 +394,28 @@ struct ClaudeChatView: View {
     private func removeTab(_ tabId: UUID) {
         guard tabs.count > 1 else { return }
 
-        // Remove tab
+        // Find the tab to get its sessionId and provider
+        guard let tab = tabs.first(where: { $0.id == tabId }) else { return }
+
+        print("🗑️ Removing tab: \(tab.provider.displayName) with session: \(tab.sessionId)")
+
+        // Remove service from manager (this disconnects and cleans up)
+        switch tab.provider {
+        case .claude:
+            serviceManager.removeClaudeService(sessionId: tab.sessionId)
+        case .codex:
+            serviceManager.removeCodexService(sessionId: tab.sessionId)
+        }
+
+        // Remove tab from UI
         if let index = tabs.firstIndex(where: { $0.id == tabId }) {
             tabs.remove(at: index)
         }
 
-        // Remove service reference (but DON'T disconnect - service is shared)
+        // Remove service reference
         serviceInstances.removeValue(forKey: tabId)
 
+        // Cancel observer
         if let cancellable = serviceObservers[tabId] {
             cancellable.cancel()
             serviceObservers.removeValue(forKey: tabId)
@@ -376,14 +431,25 @@ struct ClaudeChatView: View {
         guard canSend, let service = activeService else { return }
 
         let messageText = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let attachmentsToSend = attachmentService.selectedAttachments
         inputText = ""
         isInputFocused = false
 
         Task {
             do {
+                // Upload attachments if any
+                if !attachmentsToSend.isEmpty {
+                    try await attachmentService.uploadAllAttachments()
+                }
+
+                // Send message with attachments
                 try await service.sendMessage(messageText)
+
+                // Clear attachments after successful send
+                attachmentService.clearAllAttachments()
             } catch {
                 print("❌ Failed to send message: \(error)")
+                // Keep attachments on error so user can retry
             }
         }
     }
@@ -404,6 +470,28 @@ struct ClaudeChatView: View {
     // private func startVoiceInput() {
     //     // Voice input implementation
     // }
+
+    // MARK: - Attachment Picker Methods
+
+    private func presentPhotoPicker() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootViewController = windowScene.windows.first?.rootViewController else {
+            print("⚠️ Could not find root view controller")
+            return
+        }
+
+        attachmentService.presentPhotoPicker(from: rootViewController)
+    }
+
+    private func presentDocumentPicker() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootViewController = windowScene.windows.first?.rootViewController else {
+            print("⚠️ Could not find root view controller")
+            return
+        }
+
+        attachmentService.presentDocumentPicker(from: rootViewController)
+    }
 }
 
 // MARK: - Message Bubble
@@ -421,6 +509,7 @@ struct MessageBubbleView: View {
                 Text(message.text)
                     .font(.system(size: 13, design: .monospaced))
                     .foregroundColor(message.isUser ? .terminalText : .terminalText)
+                    .textSelection(.enabled)
                     .padding(12)
                     .background(
                         message.isUser

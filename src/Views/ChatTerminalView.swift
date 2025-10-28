@@ -192,7 +192,6 @@ struct ChatTerminalView: View {
             HStack(spacing: 8) {
                 quickActionButton("ls -la", systemImage: "list.bullet")
                 quickActionButton("pwd", systemImage: "folder")
-                quickActionButton("git status", systemImage: "arrow.triangle.branch")
                 quickActionButton("clear", systemImage: "trash")
             }
             .padding(.horizontal)

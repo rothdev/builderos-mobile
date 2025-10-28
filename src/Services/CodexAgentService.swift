@@ -30,7 +30,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
     private let sessionId: String
     private let deviceId: String
 
-    override init() {
+    init(sessionId: String) {
         // Generate persistent device ID (shared with ClaudeAgentService)
         if let vendorId = UIDevice.current.identifierForVendor?.uuidString {
             self.deviceId = vendorId
@@ -45,14 +45,8 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
             }
         }
 
-        // Generate or load persistent session ID
-        if let savedSessionId = UserDefaults.standard.string(forKey: "codex_session_id") {
-            self.sessionId = savedSessionId
-        } else {
-            let newSessionId = "\(self.deviceId)-codex"
-            UserDefaults.standard.set(newSessionId, forKey: "codex_session_id")
-            self.sessionId = newSessionId
-        }
+        // Use provided session ID (unique per chat)
+        self.sessionId = sessionId
 
         super.init()
 
@@ -179,10 +173,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
     }
 
     override func disconnect() {
-        print("🔴🔴🔴 CODEX DISCONNECT CALLED - THIS SHOULD NOT HAPPEN DURING TAB SWITCHES 🔴🔴🔴")
-        print("   Full call stack:")
-        Thread.callStackSymbols.forEach { print("     \($0)") }
-        print("   Current state: isConnected=\(isConnected), isUserInitiatedDisconnect=\(isUserInitiatedDisconnect)")
+        print("🔴 Disconnecting Codex session: \(sessionId)")
 
         isUserInitiatedDisconnect = true
         super.disconnect()  // Mark shouldMaintainConnection = false
@@ -201,7 +192,41 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
         authenticationComplete = false
         connectionStatus = "Disconnected"
 
+        // Send backend API request to close session
+        Task {
+            await closeBackendSession()
+        }
+
         print("👋 Disconnected from Codex")
+    }
+
+    /// Close the backend CLI session via API
+    private func closeBackendSession() async {
+        let baseURL = APIConfig.baseURL
+        let closeURL = "\(baseURL)/api/codex/session/\(sessionId)/close"
+
+        guard let url = URL(string: closeURL) else {
+            print("❌ Invalid close session URL: \(closeURL)")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue(APIConfig.apiToken, forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = 10
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                if httpResponse.statusCode == 200 {
+                    print("✅ Backend session closed: \(sessionId)")
+                } else {
+                    print("⚠️ Backend session close returned status \(httpResponse.statusCode)")
+                }
+            }
+        } catch {
+            print("⚠️ Failed to close backend session (will timeout naturally): \(error.localizedDescription)")
+        }
     }
 
     // MARK: - Message Handling
