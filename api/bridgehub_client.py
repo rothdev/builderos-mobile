@@ -27,7 +27,14 @@ class BridgeHubClient:
         system_context: str = ""
     ) -> AsyncIterator[str]:
         """
-        Call BridgeHub to execute Jarvis session
+        Call BridgeHub to execute Jarvis session via CLAUDE CODE
+        Routes to Claude Code (not Codex) for full BuilderOS access
+
+        Direction: codex_to_claude → spawns Claude Code CLI
+        - Full file system access (no sandbox)
+        - Full BuilderOS context and tools
+        - Same environment as desktop Claude Code sessions
+
         Yields response chunks as they arrive
 
         Args:
@@ -40,7 +47,7 @@ class BridgeHubClient:
             Response chunks as strings
         """
 
-        logger.info(f"📞 Calling BridgeHub for Jarvis session '{session_id}'")
+        logger.info(f"📞 Calling BridgeHub for Jarvis session '{session_id}' → Claude Code")
         logger.debug(f"   Message: {message[:60]}...")
         logger.debug(f"   History: {len(conversation_history)} messages")
 
@@ -75,6 +82,7 @@ class BridgeHubClient:
             "payload": {
                 "message": message,
                 "intent": "mobile_session_query",
+                "direction": "codex_to_claude",  # Jarvis uses Claude Code, not Codex
                 "context": context_items,
                 "metadata": {
                     "source": "builderos_mobile",
@@ -94,7 +102,14 @@ class BridgeHubClient:
         conversation_history: List[Dict]
     ) -> AsyncIterator[str]:
         """
-        Call BridgeHub to execute Codex session
+        Call BridgeHub to execute Codex session via CODEX CLI
+        Routes to Codex CLI for code-focused assistance
+
+        Direction: claude_to_codex → spawns Codex CLI
+        - Sandbox mode: danger-full-access (full write permissions)
+        - Approval mode: never (autonomous execution)
+        - Focused on code generation and technical tasks
+
         Yields response chunks as they arrive
 
         Args:
@@ -106,7 +121,7 @@ class BridgeHubClient:
             Response chunks as strings
         """
 
-        logger.info(f"📞 Calling BridgeHub for Codex session '{session_id}'")
+        logger.info(f"📞 Calling BridgeHub for Codex session '{session_id}' → Codex CLI")
         logger.debug(f"   Message: {message[:60]}...")
         logger.debug(f"   History: {len(conversation_history)} messages")
 
@@ -129,6 +144,7 @@ class BridgeHubClient:
             "payload": {
                 "message": message,
                 "intent": "mobile_codex_query",
+                "direction": "claude_to_codex",  # Codex uses Codex CLI with danger-full-access
                 "context": context_items,
                 "metadata": {
                     "source": "builderos_mobile",
