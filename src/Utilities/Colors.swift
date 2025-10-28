@@ -26,10 +26,6 @@ extension Color {
     static let backgroundSecondary = Color(.secondarySystemBackground)
     static let backgroundTertiary = Color(.tertiarySystemBackground)
 
-    // MARK: - Tailscale Brand Colors
-    static let tailscalePrimary = Color(red: 0.18, green: 0.20, blue: 0.24) // #2E3338
-    static let tailscaleAccent = Color(red: 0.35, green: 0.56, blue: 1.00) // #598FFF
-
     // MARK: - Custom Gradient
     static let primaryGradient = LinearGradient(
         colors: [.blue, .blue.opacity(0.7)],

@@ -7,17 +7,51 @@
 
 import SwiftUI
 import Inject
+import Combine
 
 struct ClaudeChatView: View {
-    @StateObject private var service = ClaudeAgentService()
+    // Persistent service manager (survives tab changes)
+    @StateObject private var serviceManager = ChatServiceManager.shared
+
+    // Tab state
+    @State private var tabs: [ConversationTab] = [ConversationTab(provider: .claude)]
+    @State private var selectedTabId: UUID
+    @State private var serviceInstances: [UUID: ChatAgentServiceBase] = [:]
+    @State private var serviceObservers: [UUID: AnyCancellable] = [:]
+    @State private var serviceVersion: Int = 0
+
     @ObserveInjection var inject
     @Binding var selectedTab: Int
 
     @State private var inputText: String = ""
-    @State private var showingQuickActions = false
+    @State private var tabToClose: UUID?
+    @State private var showingCloseConfirmation = false
     @FocusState private var isInputFocused: Bool
 
+    // Initialize with first tab selected
+    init(selectedTab: Binding<Int>) {
+        self._selectedTab = selectedTab
+        let initialTab = ConversationTab(provider: .claude)
+        self._tabs = State(initialValue: [initialTab])
+        self._selectedTabId = State(initialValue: initialTab.id)
+    }
+
+    // Current active tab and service
+    private var activeTab: ConversationTab? {
+        tabs.first { $0.id == selectedTabId }
+    }
+
+    private var activeService: ChatAgentServiceBase? {
+        guard let tabId = activeTab?.id else { return nil }
+        return serviceInstances[tabId]
+    }
+
+    private var activeProvider: ConversationTab.ChatProvider {
+        activeTab?.provider ?? .claude
+    }
+
     var body: some View {
+        let _ = serviceVersion // force view refresh when services emit changes
         ZStack {
             // Terminal dark background
             Color.terminalDark
@@ -37,8 +71,32 @@ struct ClaudeChatView: View {
             .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Message history (now gets full screen real estate)
-                messageListView
+                // Tab bar at top with connection status
+                ConversationTabBar(
+                    tabs: $tabs,
+                    selectedTabId: $selectedTabId,
+                    isConnected: activeService?.isConnected ?? false,
+                    accentColor: activeProvider.accentColor,
+                    onAddTab: { provider in
+                        addNewTab(provider: provider)
+                    },
+                    onCloseTab: { tabId in
+                        // Show confirmation before closing
+                        tabToClose = tabId
+                        showingCloseConfirmation = true
+                    },
+                    maxTabs: 5
+                )
+
+                // Message history
+                if activeService != nil {
+                    messageListView
+                } else {
+                    // No service available (shouldn't happen)
+                    Text("No conversation selected")
+                        .foregroundColor(.terminalDim)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
 
                 Divider()
                     .background(Color.terminalInputBorder)
@@ -53,98 +111,97 @@ struct ClaudeChatView: View {
                 inputView
             }
 
-            // Floating back button (top-left)
-            VStack {
-                HStack {
-                    backButton
-                        .padding(.top, 8)
-                        .padding(.leading, 16)
-                    Spacer()
-                }
-                Spacer()
-            }
-
-            // Floating connection status indicator (top-right)
-            VStack {
-                HStack {
-                    Spacer()
-                    connectionStatusIndicator
-                        .padding(.top, 8)
-                        .padding(.trailing, 16)
-                }
-                Spacer()
-            }
         }
+        .gesture(
+            DragGesture(minimumDistance: 50, coordinateSpace: .local)
+                .onEnded { gesture in
+                    // Detect left-to-right swipe with some vertical tolerance
+                    if gesture.translation.width > 100 && abs(gesture.translation.height) < 80 {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            selectedTab = 0  // Navigate to Dashboard
+                        }
+                    }
+                }
+        )
         .onAppear {
-            connectToClaudeAgent()
+            print("🟢🟢🟢 ClaudeChatView.onAppear CALLED 🟢🟢🟢")
+            print("   Current tab: \(activeProvider.displayName)")
+            print("   Service instance: \(String(describing: activeService))")
+            print("   Service connected: \(activeService?.isConnected ?? false)")
+
+            // Initialize first tab's service
+            if let firstTab = tabs.first {
+                createServiceForTab(firstTab)
+            }
         }
         .onDisappear {
-            service.disconnect()
+            print("🔴🔴🔴 ClaudeChatView.onDisappear CALLED 🔴🔴🔴")
+            print("   Current tab: \(activeProvider.displayName)")
+            print("   Service instance: \(String(describing: activeService))")
+            print("   Service connected: \(activeService?.isConnected ?? false)")
+            print("   NOTE: NOT disconnecting - connections persist across tab switches")
+        }
+        .onChange(of: selectedTabId) {
+            // Connect to service when tab changes
+            if let service = serviceInstances[selectedTabId], !service.isConnected {
+                Task {
+                    try? await service.connect()
+                }
+            }
+        }
+        // NOTE: Removed .onDisappear disconnect logic
+        // User directive: "there should be no timeout"
+        // Connections should persist even when view is hidden
+        // Only disconnect when user explicitly closes a tab
+        .alert("Delete Conversation?", isPresented: $showingCloseConfirmation) {
+            Button("Cancel", role: .cancel) {
+                tabToClose = nil
+            }
+            Button("Delete", role: .destructive) {
+                if let tabId = tabToClose {
+                    removeTab(tabId)
+                }
+                tabToClose = nil
+            }
+        } message: {
+            Text("This will permanently delete all messages in this conversation.")
         }
         .enableInjection()
     }
 
-    // MARK: - Floating Back Button
-
-    private var backButton: some View {
-        Button(action: {
-            selectedTab = 0  // Navigate to Dashboard tab
-        }) {
-            Image(systemName: "chevron.left")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundColor(.white)
-                .frame(width: 44, height: 44)
-                .background(
-                    Circle()
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
-                )
-        }
-    }
-
-    // MARK: - Connection Status Indicator
-
-    private var connectionStatusIndicator: some View {
-        Button(action: {
-            if !service.isConnected {
-                connectToClaudeAgent()
-            }
-        }) {
-            Image(systemName: "bolt.fill")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundColor(service.isConnected ? .statusSuccess : .statusError)
-                .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
-        }
-        .disabled(service.isConnected) // Only tappable when disconnected
-    }
 
     // MARK: - Message List
 
     private var messageListView: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 12) {
-                    ForEach(service.messages) { message in
-                        MessageBubbleView(message: message)
-                            .id(message.id)
-                    }
-
-                    // Loading indicator
-                    if service.isLoading {
-                        LoadingIndicatorView()
-                    }
-                }
-                .padding()
-            }
-            .onChange(of: service.messages.count) {
-                // Auto-scroll to latest message
-                if let lastMessage = service.messages.last {
-                    withAnimation {
-                        proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                    }
-                }
-            }
+        guard let service = activeService else {
+            return AnyView(Text("No service available").foregroundColor(.terminalDim))
         }
+
+        let providerName = activeProvider.displayName
+        return AnyView(
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 12) {
+                        ForEach(service.messages) { message in
+                            MessageBubbleView(message: message)
+                                .id(message.id)
+                        }
+
+                        if service.isLoading {
+                            LoadingIndicatorView(providerName: providerName, accentColor: activeProvider.accentColor)
+                        }
+                    }
+                    .padding()
+                }
+                .onChange(of: service.messages.count) {
+                    if let lastMessage = service.messages.last {
+                        withAnimation {
+                            proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                        }
+                    }
+                }
+            }
+        )
     }
 
     // MARK: - Quick Actions
@@ -193,7 +250,7 @@ struct ClaudeChatView: View {
     private var inputView: some View {
         HStack(spacing: 12) {
             // Text input
-            TextField("Message Claude...", text: $inputText, axis: .vertical)
+            TextField(activeProvider.inputPlaceholder, text: $inputText, axis: .vertical)
                 .textFieldStyle(.plain)
                 .font(.system(size: 13, design: .monospaced))
                 .foregroundColor(.terminalText)
@@ -205,7 +262,7 @@ struct ClaudeChatView: View {
                 .onSubmit {
                     sendMessage()
                 }
-                .tint(.terminalCyan)
+                .tint(activeProvider.accentColor)
 
             // Voice button (disabled for now - VoiceManager needs to be added to target)
             // TODO: Re-enable when VoiceManager is added to BuilderOS target
@@ -219,11 +276,11 @@ struct ClaudeChatView: View {
             // }
 
             // Send button
-            Button(action: sendMessage) {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.title2)
-                    .foregroundColor(canSend ? .terminalCyan : .terminalDim)
-            }
+           Button(action: sendMessage) {
+               Image(systemName: "arrow.up.circle.fill")
+                   .font(.title2)
+                    .foregroundColor(canSend ? activeProvider.accentColor : .terminalDim)
+           }
             .disabled(!canSend)
         }
         .padding()
@@ -233,22 +290,50 @@ struct ClaudeChatView: View {
     // MARK: - Computed Properties
 
     private var canSend: Bool {
-        service.isConnected && !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !service.isLoading
+        guard let service = activeService else { return false }
+        return service.isConnected &&
+        !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !service.isLoading
     }
 
     // MARK: - Actions
 
-    private func connectToClaudeAgent() {
+    private func createServiceForTab(_ tab: ConversationTab) {
+        // Check if service already exists
+        if let existingService = serviceInstances[tab.id] {
+            print("⚠️ Service already exists for tab \(tab.provider.displayName), reusing it")
+            return
+        }
+
+        print("📝 Getting persistent service for tab \(tab.provider.displayName)")
+
+        // Get persistent service from singleton manager
+        let service: ChatAgentServiceBase
+        switch tab.provider {
+        case .claude:
+            service = serviceManager.getOrCreateClaudeService()
+        case .codex:
+            service = serviceManager.getOrCreateCodexService()
+        }
+
+        serviceInstances[tab.id] = service
+
+        // Observe changes so SwiftUI refreshes connection state and messages
+        serviceObservers[tab.id]?.cancel()
+        serviceObservers[tab.id] = service.objectWillChange
+            .receive(on: DispatchQueue.main)
+            .sink { [self] _ in
+                self.serviceVersion += 1
+            }
+
+        // Auto-connect
         Task {
             do {
-                print("🔵 Starting connection attempt...")
+                print("🔵 Starting connection for \(tab.provider.displayName)...")
                 try await service.connect()
-                print("✅ Connection successful!")
+                print("✅ \(tab.provider.displayName) connection successful!")
             } catch {
-                print("❌ Failed to connect to Claude Agent: \(error)")
-                print("❌ Error details: \(String(describing: error))")
-
-                // Update UI to show error
+                print("❌ Failed to connect to \(tab.provider.displayName): \(error)")
                 await MainActor.run {
                     service.connectionStatus = "Error: \(error.localizedDescription)"
                 }
@@ -256,8 +341,39 @@ struct ClaudeChatView: View {
         }
     }
 
+    private func addNewTab(provider: ConversationTab.ChatProvider) {
+        guard tabs.count < 5 else { return }
+
+        let newTab = ConversationTab(provider: provider)
+        tabs.append(newTab)
+        createServiceForTab(newTab)
+        selectedTabId = newTab.id
+    }
+
+    private func removeTab(_ tabId: UUID) {
+        guard tabs.count > 1 else { return }
+
+        // Remove tab
+        if let index = tabs.firstIndex(where: { $0.id == tabId }) {
+            tabs.remove(at: index)
+        }
+
+        // Remove service reference (but DON'T disconnect - service is shared)
+        serviceInstances.removeValue(forKey: tabId)
+
+        if let cancellable = serviceObservers[tabId] {
+            cancellable.cancel()
+            serviceObservers.removeValue(forKey: tabId)
+        }
+
+        // Select another tab if current was closed
+        if selectedTabId == tabId {
+            selectedTabId = tabs.first?.id ?? UUID()
+        }
+    }
+
     private func sendMessage() {
-        guard canSend else { return }
+        guard canSend, let service = activeService else { return }
 
         let messageText = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         inputText = ""
@@ -273,6 +389,8 @@ struct ClaudeChatView: View {
     }
 
     private func sendQuickAction(_ message: String) {
+        guard let service = activeService else { return }
+
         Task {
             do {
                 try await service.sendMessage(message)
@@ -340,13 +458,15 @@ struct MessageBubbleView: View {
 // MARK: - Loading Indicator
 
 struct LoadingIndicatorView: View {
+    let providerName: String
+    let accentColor: Color
     @State private var animating = false
 
     var body: some View {
         HStack(spacing: 8) {
             ForEach(0..<3) { index in
                 Circle()
-                    .fill(Color.terminalCyan)
+                    .fill(accentColor)
                     .frame(width: 8, height: 8)
                     .scaleEffect(animating ? 1.0 : 0.5)
                     .animation(
@@ -356,7 +476,7 @@ struct LoadingIndicatorView: View {
                         value: animating
                     )
             }
-            Text("Claude is thinking...")
+            Text("\(providerName) is thinking...")
                 .font(.system(size: 13, design: .monospaced))
                 .foregroundColor(.terminalDim)
         }

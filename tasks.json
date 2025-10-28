@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "capsule": "builderos-mobile",
+    "last_updated": "2025-10-27T20:57:33.781750Z",
+    "task_count": 0,
+    "active_count": 0,
+    "completed_count": 0
+  },
+  "tasks": [],
+  "archived_tasks": [],
+  "queue": {
+    "enabled": true,
+    "auto_assign": false,
+    "priority_threshold": "medium"
+  }
+}

@@ -10,24 +10,7 @@ import Foundation
 import Combine
 import os.log
 import Starscream
-
-/// Chat message model for Claude Agent conversations
-struct ClaudeChatMessage: Identifiable, Equatable {
-    let id = UUID()
-    let text: String
-    let isUser: Bool
-    let timestamp: Date
-
-    init(text: String, isUser: Bool, timestamp: Date = Date()) {
-        self.text = text
-        self.isUser = isUser
-        self.timestamp = timestamp
-    }
-
-    static func == (lhs: ClaudeChatMessage, rhs: ClaudeChatMessage) -> Bool {
-        lhs.id == rhs.id
-    }
-}
+import UIKit
 
 /// Response from Claude Agent WebSocket
 struct ClaudeResponse: Codable {
@@ -38,72 +21,168 @@ struct ClaudeResponse: Codable {
 
 /// Service for managing Claude Agent SDK WebSocket connections using Starscream
 @MainActor
-class ClaudeAgentService: ObservableObject, WebSocketDelegate {
-    // MARK: - Published Properties
-
-    @Published var messages: [ClaudeChatMessage] = []
-    @Published var isConnected = false
-    @Published var isLoading = false
-    @Published var connectionStatus: String = "Disconnected"
+class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate {
 
     // MARK: - Private Properties
 
     private var webSocket: WebSocket?
     private var currentResponseText: String = ""
     private var authenticationComplete = false
+    private let persistenceManager = ChatPersistenceManager()
+    private var heartbeatTimer: Timer?
+    private var reconnectionTask: Task<Void, Never>?
+    private var connectionTask: Task<Void, Error>?  // NEW: Store connection task to prevent cancellation
+    private var isUserInitiatedDisconnect = false
+    private var isConnecting = false
+
+    private let heartbeatInterval: TimeInterval = 25
+    private let reconnectDelay: TimeInterval = 2.0
+
+    // Session persistence fields
+    private let sessionId: String
+    private let deviceId: String
 
     // MARK: - Initialization
 
-    init() {
-        // Load any saved messages from disk (future enhancement)
+    override init() {
+        // Generate persistent device ID (survives app reinstalls via identifierForVendor)
+        if let vendorId = UIDevice.current.identifierForVendor?.uuidString {
+            self.deviceId = vendorId
+        } else {
+            // Fallback to stored UUID if identifierForVendor unavailable
+            if let storedDeviceId = UserDefaults.standard.string(forKey: "builderos_device_id") {
+                self.deviceId = storedDeviceId
+            } else {
+                let newDeviceId = UUID().uuidString
+                UserDefaults.standard.set(newDeviceId, forKey: "builderos_device_id")
+                self.deviceId = newDeviceId
+            }
+        }
+
+        // Generate or load persistent session ID
+        if let savedSessionId = UserDefaults.standard.string(forKey: "claude_session_id") {
+            self.sessionId = savedSessionId
+        } else {
+            let newSessionId = "\(self.deviceId)-jarvis"
+            UserDefaults.standard.set(newSessionId, forKey: "claude_session_id")
+            self.sessionId = newSessionId
+        }
+
+        super.init()
+
+        // Load saved messages from persistence
+        messages = persistenceManager.messages
+        print("📂 Loaded \(messages.count) messages from persistence")
+        print("📋 Claude session ID: \(self.sessionId)")
+        print("📱 Device ID: \(self.deviceId)")
+    }
+
+    deinit {
+        // Cancel tasks synchronously on deinit
+        Task { @MainActor in
+            heartbeatTimer?.invalidate()
+            heartbeatTimer = nil
+            reconnectionTask?.cancel()
+            reconnectionTask = nil
+        }
+        connectionTask?.cancel()
     }
 
     // MARK: - Connection Management
 
     /// Connect to Claude Agent WebSocket endpoint
-    func connect() async throws {
-        guard !isConnected else {
+    override func connect() async throws {
+        // Create detached task to prevent view lifecycle cancellation
+        connectionTask = Task.detached { [weak self] in
+            guard let self else { throw ClaudeAgentError.connectionFailed }
+            try await self.connectInternal(cancelExistingTask: true)
+        }
+        try await connectionTask?.value
+    }
+
+    private func connectInternal(cancelExistingTask: Bool) async throws {
+        let currentlyConnected = await MainActor.run { isConnected }
+        guard !currentlyConnected else {
             print("⚠️ Already connected to Claude Agent")
             return
         }
 
+        let currentlyConnecting = await MainActor.run { isConnecting }
+        guard !currentlyConnecting else {
+            print("⏳ Connection attempt already in progress")
+            return
+        }
+
+        if cancelExistingTask {
+            await cancelReconnect()
+        }
+
+        await MainActor.run {
+            isUserInitiatedDisconnect = false
+            isConnecting = true
+        }
+        defer {
+            Task { @MainActor in
+                isConnecting = false
+            }
+        }
+
+        await stopHeartbeat()
+
         // Build WebSocket URL
         let baseURL = APIConfig.baseURL
+        print("📋 DEBUG: APIConfig.baseURL = \(baseURL)")
+
         let wsBase = baseURL
             .replacingOccurrences(of: "https://", with: "wss://")
             .replacingOccurrences(of: "http://", with: "ws://")
-        guard let wsURL = URL(string: wsBase + "/api/claude/ws") else {
+        print("📋 DEBUG: WebSocket base = \(wsBase)")
+
+        let fullWSURL = wsBase + "/api/claude/ws"
+        print("📋 DEBUG: Full WebSocket URL = \(fullWSURL)")
+
+        guard let wsURL = URL(string: fullWSURL) else {
+            print("❌ ERROR: Invalid WebSocket URL: \(fullWSURL)")
             throw ClaudeAgentError.invalidURL
         }
 
         os_log("🔌 Connecting to Claude Agent at: %{public}@", log: .default, type: .info, wsURL.absoluteString)
         print("🔌 Connecting to Claude Agent at: \(wsURL)")
-        connectionStatus = "Connecting..."
+        await MainActor.run { connectionStatus = "Connecting..." }
 
         // Create Starscream WebSocket
         var request = URLRequest(url: wsURL)
-        request.timeoutInterval = 10
+        request.timeoutInterval = 30  // Increased from 10 to 30 seconds for Claude Agent SDK initialization
 
-        webSocket = WebSocket(request: request)
-        webSocket?.delegate = self
+        let socket = WebSocket(request: request)
+        socket.delegate = self
+        socket.respondToPingWithPong = true
+        await MainActor.run { webSocket = socket }
 
         print("📋 WebSocket created with Starscream")
-        webSocket?.connect()
+        socket.connect()
         print("▶️ WebSocket connecting...")
 
         // Wait for connection (max 5 seconds)
         var attempts = 0
-        while !isConnected && attempts < 50 {
+        print("⏳ Waiting for WebSocket connection (max 5 seconds)...")
+        while await MainActor.run(body: { !isConnected }) && attempts < 50 {
             try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
             attempts += 1
+            if attempts % 10 == 0 {
+                let connected = await MainActor.run { isConnected }
+                print("⏳ Still waiting... (\(Double(attempts) * 0.1)s elapsed, isConnected=\(connected))")
+            }
         }
 
-        guard isConnected else {
-            print("❌ WebSocket failed to connect after 5 seconds")
+        let finalConnected = await MainActor.run { isConnected }
+        guard finalConnected else {
+            print("❌ WebSocket failed to connect after 5 seconds (attempts: \(attempts))")
+            print("❌ Final state: isConnected = \(finalConnected)")
             throw ClaudeAgentError.connectionFailed
         }
 
-        print("✅ WebSocket connected!")
+        print("✅ WebSocket connected! (took \(Double(attempts) * 0.1)s)")
 
         // Send API key
         let apiKey = APIConfig.apiToken
@@ -111,35 +190,59 @@ class ClaudeAgentService: ObservableObject, WebSocketDelegate {
 
         guard !apiKey.isEmpty else {
             print("❌ API key is empty!")
-            connectionStatus = "Error: No API key"
+            await MainActor.run { connectionStatus = "Error: No API key" }
             throw ClaudeAgentError.authenticationFailed
         }
 
         print("📤 Sending API key (first 8 chars: \(String(apiKey.prefix(8)))...)...")
-        webSocket?.write(string: apiKey)
+        await MainActor.run { webSocket?.write(string: apiKey) }
         print("✅ API key sent to WebSocket")
 
-        // Wait for authentication response (max 5 seconds)
-        authenticationComplete = false
+        // Wait for "ready" message (max 15 seconds - server needs time to initialize Claude SDK)
+        await MainActor.run { authenticationComplete = false }
         attempts = 0
-        while !authenticationComplete && attempts < 50 {
+        print("⏳ Waiting for 'ready' message from server (max 15 seconds)...")
+        while await MainActor.run(body: { !authenticationComplete }) && attempts < 150 {
             try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
             attempts += 1
+            if attempts % 20 == 0 {
+                let authComplete = await MainActor.run { authenticationComplete }
+                print("⏳ Still waiting for ready... (\(Double(attempts) * 0.1)s elapsed, authenticationComplete=\(authComplete))")
+            }
         }
 
-        guard authenticationComplete else {
-            print("❌ Authentication timeout")
+        let finalAuthComplete = await MainActor.run { authenticationComplete }
+        guard finalAuthComplete else {
+            print("❌ Server initialization timeout (waited 15 seconds for 'ready' message)")
+            print("❌ authenticationComplete = \(finalAuthComplete)")
+            print("❌ Connection likely closed during initialization")
             throw ClaudeAgentError.authenticationFailed
         }
 
-        print("✅ Successfully connected and authenticated!")
-        connectionStatus = "Connected"
+        print("✅ Successfully connected and authenticated! (took \(Double(attempts) * 0.1)s)")
+        await MainActor.run { connectionStatus = "Connected" }
+        await startHeartbeat()
+        await cancelReconnect()
     }
 
     /// Disconnect from Claude Agent
-    func disconnect() {
-        guard isConnected else { return }
+    override func disconnect() {
+        print("🔴🔴🔴 DISCONNECT CALLED - THIS SHOULD NOT HAPPEN DURING TAB SWITCHES 🔴🔴🔴")
+        print("   Full call stack:")
+        Thread.callStackSymbols.forEach { print("     \($0)") }
+        print("   Current state: isConnected=\(isConnected), isUserInitiatedDisconnect=\(isUserInitiatedDisconnect)")
 
+        isUserInitiatedDisconnect = true
+        super.disconnect()  // Mark shouldMaintainConnection = false
+
+        Task { @MainActor in
+            reconnectionTask?.cancel()
+            reconnectionTask = nil
+            heartbeatTimer?.invalidate()
+            heartbeatTimer = nil
+        }
+
+        print("   Disconnecting WebSocket...")
         webSocket?.disconnect()
         webSocket = nil
         isConnected = false
@@ -152,7 +255,7 @@ class ClaudeAgentService: ObservableObject, WebSocketDelegate {
     // MARK: - Message Handling
 
     /// Send message to Claude Agent
-    func sendMessage(_ text: String) async throws {
+    override func sendMessage(_ text: String) async throws {
         guard isConnected else {
             throw ClaudeAgentError.notConnected
         }
@@ -163,26 +266,105 @@ class ClaudeAgentService: ObservableObject, WebSocketDelegate {
 
         print("📤 Sending message: \(text.prefix(50))...")
 
-        // Add user message to UI
+        // Add user message to UI and persist
         let userMessage = ClaudeChatMessage(text: text, isUser: true)
         messages.append(userMessage)
+        persistenceManager.saveMessage(userMessage)
 
-        // Send to WebSocket
-        let messageJSON = ["content": text]
-        let data = try JSONEncoder().encode(messageJSON)
+        // Send to WebSocket with session persistence fields
+        let messageJSON: [String: Any] = [
+            "content": text,
+            "session_id": self.sessionId,
+            "device_id": self.deviceId,
+            "chat_type": "jarvis"
+        ]
+        let data = try JSONSerialization.data(withJSONObject: messageJSON)
         let jsonString = String(data: data, encoding: .utf8)!
 
         // DEBUG: Log exact JSON being sent
         print("📤 JSON length: \(jsonString.count)")
-        print("📤 JSON bytes: \(jsonString.utf8.map { $0 })")
-        print("📤 JSON string: \(jsonString)")
-        print("📤 JSON repr: \(String(reflecting: jsonString))")
+        print("📤 JSON with session fields: \(jsonString)")
 
         webSocket?.write(string: jsonString)
 
         // Set loading state
         isLoading = true
         currentResponseText = ""
+    }
+
+    // MARK: - Connection Keepalive & Recovery
+
+    private func startHeartbeat() async {
+        await stopHeartbeat()
+
+        guard heartbeatInterval > 0 else { return }
+
+        await MainActor.run {
+            heartbeatTimer = Timer.scheduledTimer(withTimeInterval: heartbeatInterval, repeats: true) { [weak self] _ in
+                guard let self else { return }
+                if self.isConnected, let socket = self.webSocket {
+                    print("🏓 Sending heartbeat ping to Claude Agent")
+                    socket.write(ping: Data())
+                }
+            }
+
+            heartbeatTimer?.tolerance = 2
+            if let timer = heartbeatTimer {
+                RunLoop.main.add(timer, forMode: .common)
+            }
+        }
+    }
+
+    private func stopHeartbeat() async {
+        await MainActor.run {
+            heartbeatTimer?.invalidate()
+            heartbeatTimer = nil
+        }
+    }
+
+    private func scheduleReconnect(reason: String) {
+        if isUserInitiatedDisconnect {
+            print("🔌 Reconnect skipped (user initiated disconnect)")
+            isUserInitiatedDisconnect = false
+            return
+        }
+
+        guard !isConnecting, !isConnected else {
+            print("🔌 Reconnect skipped (already connecting or connected)")
+            return
+        }
+
+        if reconnectionTask != nil {
+            print("🔁 Reconnect already scheduled")
+            return
+        }
+
+        print("🔁 Scheduling reconnect in \(reconnectDelay)s (reason: \(reason))")
+        reconnectionTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            defer { self.reconnectionTask = nil }
+
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: UInt64(self.reconnectDelay * 1_000_000_000))
+                if Task.isCancelled {
+                    return
+                }
+
+                do {
+                    try await self.connectInternal(cancelExistingTask: false)
+                    return
+                } catch {
+                    print("⚠️ Claude auto-reconnect failed: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    private func cancelReconnect() async {
+        await MainActor.run {
+            reconnectionTask?.cancel()
+            reconnectionTask = nil
+        }
     }
 
     // MARK: - WebSocketDelegate Methods
@@ -192,17 +374,28 @@ class ClaudeAgentService: ObservableObject, WebSocketDelegate {
         case .connected(let headers):
             print("✅ Starscream: WebSocket connected")
             print("📋 Headers: \(headers)")
+            print("📋 Client description: \(client)")
             Task { @MainActor in
+                print("📋 Setting isConnected = true")
                 self.isConnected = true
+                await self.cancelReconnect()
             }
 
         case .disconnected(let reason, let code):
-            print("👋 Starscream: WebSocket disconnected - Code: \(code), Reason: \(reason)")
+            print("👋 Starscream: WebSocket disconnected")
+            print("   Code: \(code)")
+            print("   Reason: \(reason)")
+            print("   Previous state: isConnected=\(self.isConnected), authComplete=\(self.authenticationComplete)")
             Task { @MainActor in
+                print("📋 Setting isConnected = false due to disconnection")
                 self.isConnected = false
                 self.authenticationComplete = false
-                self.connectionStatus = "Disconnected"
+                self.connectionStatus = "Disconnected: \(reason)"
                 self.isLoading = false
+                await self.stopHeartbeat()
+                self.webSocket?.delegate = nil
+                self.webSocket = nil
+                self.scheduleReconnect(reason: "Server reported disconnect (\(reason))")
             }
 
         case .text(let text):
@@ -225,25 +418,50 @@ class ClaudeAgentService: ObservableObject, WebSocketDelegate {
 
         case .reconnectSuggested(let shouldReconnect):
             print("🔄 Starscream: Reconnect suggested: \(shouldReconnect)")
+            if shouldReconnect {
+                Task { @MainActor in
+                    self.scheduleReconnect(reason: "Starscream suggested reconnect")
+                }
+            }
 
         case .cancelled:
             print("❌ Starscream: Connection cancelled")
+            print("   Previous state: isConnected=\(self.isConnected), authComplete=\(self.authenticationComplete)")
             Task { @MainActor in
+                print("📋 Setting isConnected = false due to cancellation")
                 self.isConnected = false
                 self.authenticationComplete = false
+                await self.stopHeartbeat()
+                self.webSocket?.delegate = nil
+                self.webSocket = nil
+                self.scheduleReconnect(reason: "Connection cancelled")
             }
 
         case .error(let error):
-            print("❌ Starscream: Error: \(String(describing: error))")
+            print("❌ Starscream: Error occurred")
+            print("   Error: \(String(describing: error))")
+            if let err = error {
+                print("   Localized: \(err.localizedDescription)")
+            }
+            print("   Previous state: isConnected=\(self.isConnected), authComplete=\(self.authenticationComplete)")
             Task { @MainActor in
                 self.connectionStatus = "Error: \(error?.localizedDescription ?? "Unknown")"
+                await self.stopHeartbeat()
+                self.webSocket?.delegate = nil
+                self.webSocket = nil
+                self.scheduleReconnect(reason: "Error: \(error?.localizedDescription ?? "unknown")")
             }
 
         case .peerClosed:
             print("👋 Starscream: Peer closed connection")
+            print("   Previous state: isConnected=\(self.isConnected), authComplete=\(self.authenticationComplete)")
             Task { @MainActor in
                 self.isConnected = false
                 self.authenticationComplete = false
+                await self.stopHeartbeat()
+                self.webSocket?.delegate = nil
+                self.webSocket = nil
+                self.scheduleReconnect(reason: "Peer closed connection")
             }
         }
     }
@@ -321,8 +539,8 @@ class ClaudeAgentService: ObservableObject, WebSocketDelegate {
 
         // First message after API key should be "authenticated"
         if !authenticationComplete && text == "authenticated" {
-            print("✅ Authentication successful!")
-            authenticationComplete = true
+            print("✅ Authentication successful! Waiting for server initialization...")
+            // Don't set authenticationComplete yet - wait for "ready" JSON message
             return
         }
 
@@ -358,8 +576,11 @@ class ClaudeAgentService: ObservableObject, WebSocketDelegate {
             // Keep loading until "complete" message
 
         case "complete":
-            // Message complete - reset loading state
+            // Message complete - persist final message and reset loading state
             print("✅ Message complete")
+            if let lastMessage = messages.last, !lastMessage.isUser {
+                persistenceManager.saveMessage(lastMessage)
+            }
             isLoading = false
             currentResponseText = ""
 
@@ -385,10 +606,11 @@ class ClaudeAgentService: ObservableObject, WebSocketDelegate {
 
     // MARK: - Utility Methods
 
-    /// Clear all messages
-    func clearMessages() {
-        messages.removeAll()
+    /// Clear all messages from memory and persistent storage
+    override func clearMessages() {
+        super.clearMessages()
         currentResponseText = ""
+        persistenceManager.clearMessages()
     }
 }
 

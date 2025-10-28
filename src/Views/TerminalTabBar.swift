@@ -37,7 +37,7 @@ struct TerminalTabBar: View {
                     Button("New Shell Tab") {
                         onAddTab(.shell)
                     }
-                    Button("New Claude Tab") {
+                    Button("New Jarvis Tab") {
                         onAddTab(.claude)
                     }
                     Button("New Codex Tab") {

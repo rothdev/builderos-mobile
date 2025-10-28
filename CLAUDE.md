@@ -1,308 +1,105 @@
-# BuilderOS Mobile - iOS Builder System Companion
+# builder-system-mobile
+
+<!--
+AUTO-GENERATED FROM YAML SPECIFICATIONS
+Generated: 2025-10-27T13:27:06.604546
+Do not edit directly. Update specs/current.yaml instead.
+Regenerate with: python3 tools/generate_claude_md.py <capsule>
+-->
 
 ## Purpose
-Native iOS mobile application providing secure remote access to BuilderOS from iPhone and iPad using **Cloudflare Tunnel**. Works seamlessly with Proton VPN active on both devices - no VPN conflicts!
+Native iOS mobile application providing mobile access to BuilderOS capabilities,
+including capsule management, agent coordination, system monitoring, and on-the-go
+Builder System operations from iPhone and iPad devices.
+
 
 ## Current Status
-- **Phase:** Implementation Complete - Ready for Testing
-- **Last Updated:** October 2025
-- **Implementation:** Cloudflare Tunnel architecture (zero monthly cost)
-- **Tunnel URL:** Configure on first launch (dynamic URL from cloudflared)
+- **Phase:** development
+- **Version:** 0.1.0
 
 ## Technical Overview
-- **Primary Technologies:** Swift 5.9+, SwiftUI, URLSession, Combine
-- **Dependencies:** iOS 17+, Xcode 15.0+
-- **Integration Points:** Cloudflare Tunnel, BuilderOS API, Keychain storage
-- **Network:** HTTPS through Cloudflare Tunnel (automatic TLS encryption)
+**Stack:**
+- Swift 5.9+
+- SwiftUI
+- iOS SDK 17+
+- Xcode 15+
+- URLSession (networking)
+- CoreData (local storage)
+
+**Dependencies:**
+
+*External:*
+- iOS 17+ runtime
+- BuilderOS backend APIs
+- Push notification services (APNs)
+- iCloud (optional sync)
+
+*Internal (BuilderOS):*
+- BuilderOS agent coordination APIs
+- Builder Memory MCP integration
+- Capsule status APIs
+- System monitoring APIs
 
 ## Key Features
-1. **Zero Monthly Cost** - Cloudflare Tunnel free tier (unlimited bandwidth!)
-2. **VPN Compatible** - Works WITH Proton VPN active on both iOS and Mac (no conflicts!)
-3. **Automatic HTTPS** - Cloudflare handles TLS encryption automatically
-4. **Real-time Status** - Monitor capsules, system health, and running services
-5. **Native iOS Design** - SwiftUI with iOS 17+ design language, Light/Dark mode
-6. **Auto-Reconnect** - Automatic retry logic with exponential backoff for mobile networks
-7. **Keychain Security** - API tokens stored securely in iOS Keychain
-8. **Localhost Tunnel** - Access dev servers on Mac through Cloudflare tunnel
-9. **Chat/Terminal Interface** - Send commands to Builder System remotely
-10. **4-Tab Navigation** - Dashboard, Chat, Preview, and Settings in intuitive tab interface
-11. **Simple Setup** - Just paste tunnel URL + API token, no VPN configuration needed
+1. Mobile capsule dashboard
+2. Capsule status monitoring
+3. Agent task initiation
+4. System health checks
+5. Push notifications
+6. Offline documentation access
+7. Builder Memory queries
+8. Quick actions and shortcuts
+9. System performance metrics
+10. Task history and logs
+11. iOS Shortcuts integration
+12. Widget support (planned)
+13. Siri integration (planned)
 
 ## Architecture Notes
-Native iOS application using SwiftUI with standard URLSession networking through Cloudflare Tunnel. MVVM architecture with reactive state management via Combine framework. No VPN SDK required - works alongside Proton VPN!
+**Components:**
+- **dashboard_view:** Overview of active capsules and system status
+- **capsule_manager:** Browse, view, and manage capsule lifecycle
+- **agent_coordinator:** Initiate and monitor agent task execution
+- **system_monitor:** Real-time health metrics and performance tracking
+- **notification_handler:** Push notifications for system alerts and task completion
+- **data_sync_engine:** Bidirectional sync with BuilderOS backend
+- **offline_cache:** Local storage for documentation and offline access
 
-**Core Services:**
-- **APIConfig:** Centralized Cloudflare Tunnel URL and network configuration
-- **KeychainManager:** Secure token storage using iOS Keychain
-- **BuilderOSAPIClient:** REST API client with automatic retry logic (3 attempts, exponential backoff)
-- **SSHService:** SSH connection management for command execution (future feature)
-- **VoiceManager:** Speech recognition for voice input in chat interface
+## Quality Standards
+**Performance Targets:**
+- Fast app launch (<2 seconds)
+- Responsive UI (60fps)
+- Efficient network usage
+- Low battery impact
 
-**Views:**
-- **OnboardingView:** First-time setup with tunnel URL and API token entry
-- **MainContentView:** Tab-based navigation container (Dashboard, Chat, Preview, Settings)
-- **DashboardView:** System status, connection info, capsule grid with pull-to-refresh
-- **ChatView:** Terminal/chat interface with command execution, voice input, quick actions
-- **LocalhostPreviewView:** WebView for viewing localhost dev servers via tunnel
-- **SettingsView:** Tunnel URL management, API key, connection status
-- **CapsuleDetailView:** Detailed capsule metrics, tags, and metadata
+## Data & Storage
+**Storage:**
+- **src/ios/BuilderSystemMobile/:** Swift source files
+- **BuilderSystemMobile.xcodeproj/:** Xcode project
+- **ops/:** Operations scripts
+- **runs/:** Execution logs
 
-**Design System:**
-- **Colors.swift:** Semantic colors with Light/Dark mode support
-- **Typography.swift:** SF Pro font system, text style presets, monospaced code fonts
-- **Spacing.swift:** 8pt grid, animation constants, layout definitions
-- **Theme.swift:** Chat-specific colors, button styles, message bubble aesthetics
+**Retention Policies:**
+  **cache:** 30 days
+  **logs:** 14 days
+  **offline_docs:** until updated
 
-**Network Flow:**
-1. iPhone App (Proton VPN ✓) → HTTPS → Cloudflare Tunnel URL
-2. Cloudflare automatically routes through global CDN with DDoS protection
-3. Encrypted tunnel (TLS 1.3) → Mac (Proton VPN ✓)
-4. Cloudflared daemon on Mac forwards to localhost:8080
-5. API Client uses dynamic tunnel URL for all requests: `{TUNNEL_URL}/api/`
-6. Localhost API on Mac (not exposed to internet, accessed via tunnel)
-7. End-to-end encryption via TLS + bearer token authentication
-
-**Cost: $0/month forever** (Cloudflare Tunnel free tier, unlimited bandwidth!)
-
-## Development Workflow
-
-**Official Stack:** See `docs/MOBILE_WORKFLOW.md` for complete workflow guide
-
-### ✅ Essential Tools
-
-**Native iOS Development:**
-- Swift 5.9+ with SwiftUI
-- Xcode 15+ (IDE)
-- iOS 17+ target platform
-
-**Design & Iteration:**
-- **Xcode Previews** - Component isolation (built-in)
-- **InjectionIII** - Hot reloading (~2s updates, 30x faster than rebuilds)
-
-**Documentation (Optional):**
-- **Apple DocC** - Component documentation generation
-
-### Workflow Pattern
-
-```
-📐 UI Designer (Design specifications)
-        ↓
-📱 Mobile Dev (Swift implementation with InjectionIII hot reload)
-        ↓
-Validation (Xcode Previews + device testing)
-```
-
-### Fast Iteration with InjectionIII
-
-**Traditional:** Edit → Build → Run = 30-60 seconds per change
-**With InjectionIII:** Edit → Save = 1-2 seconds per change (30x faster!)
-
-**Setup:**
-1. Add Inject package: `https://github.com/krzysztofzablocki/Inject`
-2. Update Views: Add `@ObserveInjection var inject` and `.enableInjection()`
-3. See: `docs/INJECTION_SETUP.md`
-
-**Views with InjectionIII enabled:**
-- ✅ MainContentView.swift
-- ✅ CapsuleListView.swift
-- ✅ TerminalTabView.swift
-- ✅ ChatView.swift (placeholder)
-
-### Documentation Resources
-
-- **MOBILE_WORKFLOW.md** - Complete development workflow
-- **INJECTION_SETUP.md** - Hot reloading setup (5-10 min)
-- **DOCC_SETUP.md** - Documentation generation (optional)
-- **DESIGN_DOCUMENTATION.md** - Complete design specifications
-
-**Cost: $0/month forever** (Cloudflare Tunnel free tier, unlimited bandwidth!)
-
-**Directory Structure:**
-```
-builderos-mobile/
-├── src/
-│   ├── BuilderOSApp.swift                     # Main app entry point
-│   ├── Models/                                 # Data models
-│   │   ├── Capsule.swift                       # BuilderOS capsule
-│   │   └── SystemStatus.swift                  # System health & metrics
-│   ├── Services/                               # Business logic
-│   │   ├── APIConfig.swift                     # Oracle IP & configuration
-│   │   ├── KeychainManager.swift               # Secure token storage
-│   │   └── BuilderOSAPIClient.swift            # API client with retry logic
-│   ├── Views/                                  # SwiftUI screens
-│   │   ├── OnboardingView.swift                # First-time setup
-│   │   ├── DashboardView.swift                 # Main dashboard
-│   │   ├── SettingsView.swift                  # Settings & config
-│   │   └── CapsuleDetailView.swift             # Capsule details
-│   ├── Utilities/                              # Design system
-│   │   ├── Colors.swift                        # Color definitions
-│   │   ├── Typography.swift                    # Typography styles
-│   │   └── Spacing.swift                       # Layout constants
-│   ├── Info.plist                              # App configuration
-│   └── BuilderOS.xcodeproj/                    # Xcode project (linked files)
-├── docs/
-│   ├── SETUP_GUIDE.md                          # Complete setup walkthrough
-│   └── API_INTEGRATION.md                      # API integration details
-├── Podfile                                      # CocoaPods dependencies
-├── Package.swift                                # SPM (future)
-├── BuilderOS.entitlements                       # iOS capabilities
-└── README.md                                    # Project overview
-```
-
-## Setup & Usage
-
-### Mac Prerequisites
-1. Install Cloudflare Tunnel: `brew install cloudflared`
-2. Start tunnel: `cloudflared tunnel --url http://localhost:8080`
-3. Note tunnel URL from terminal output (configured as https://api.builderos.app)
-4. Start BuilderOS API: `cd /Users/Ty/BuilderOS/api && ./server_mode.sh`
-
-### iOS Setup
-1. Open Xcode project: `open src/BuilderOS.xcodeproj`
-2. Configure code signing in Xcode
-3. Update tunnel URL in `Services/APIConfig.swift` (line 10)
-4. Build and run on iPhone (Cmd+R)
-
-### First Launch
-1. **Onboarding:** Tap "Get Started"
-2. **Tunnel URL:** Paste Cloudflare tunnel URL from Mac terminal
-3. **API Key:** Enter bearer token from Mac terminal output
-4. **Connect:** App tests connection and loads dashboard
-
-### Everyday Use
-- **Auto-Connect:** App uses saved tunnel URL to connect instantly
-- **Dashboard:** View system status, capsule list with status badges
-- **Chat/Terminal:** Send commands to Builder System, use voice input, quick actions
-- **Localhost Preview:** View React, n8n, or any dev server running on Mac
-- **Capsule Details:** Tap any capsule for metrics and info
-- **Settings:** Update tunnel URL when Mac restarts, manage API key
-- **Pull-to-Refresh:** Update data anytime
-
-## Security & Maintenance
-
-### Security
-- ✅ End-to-end encryption via Cloudflare Tunnel (TLS 1.3)
-- ✅ Bearer token authentication
-- ✅ API tokens stored in iOS Keychain
-- ✅ Localhost API (not exposed to internet, only via tunnel)
-- ✅ HTTPS with automatic TLS (Cloudflare handles certificates)
-
-### Maintenance
-- **Dependencies:** None (native URLSession only)
-- **Tunnel URL Updates:** Update APIConfig.swift when Mac restarts (URL changes)
-- **Health Checks:** Connection status, API latency, tunnel uptime
-- **Performance:** Launch time <400ms, 60fps animations
-- **Compatibility:** Test on new iOS versions
-- **TestFlight:** Beta distribution before App Store release
-
-## API Endpoints
-
-Base URL: `{TUNNEL_URL}/api/` (dynamic URL from cloudflared)
-
-**System:**
-- `GET /status` - System status (version, uptime, health)
-- `GET /health` - Tunnel health check
-- `POST /system/sleep` - Put Mac to sleep immediately (future feature)
-
-**Capsules:**
-- `GET /capsules` - List all capsules
-- `GET /capsules/{id}` - Capsule details
-- `GET /capsules/{id}/metrics` - Capsule metrics (files, LOC, disk usage)
-
-**Authentication:** All requests include `Authorization: Bearer {token}` header
-
-## Roadmap
-- **Phase 1 (Complete):** ✅ Cloudflare Tunnel integration, system monitoring, terminal chat UI
-- **Phase 2 (Q1 2026):** Push notifications, capsule actions, log viewer, n8n triggers
-- **Phase 3 (Q2 2026):** iPad layout, Apple Watch app, Siri shortcuts, widgets, Jarvis/Codex chat integration
-
-## Troubleshooting
-
-**"Mac not found"**
-- Mac offline or not on Tailscale: `tailscale status`
-- Pull to refresh in Settings
-
-**"Connection failed"**
-- API server not running: `cd /Users/Ty/BuilderOS/api && ./server_mode.sh`
-- Test manually: `curl http://localhost:8080/api/health`
-
-**"Invalid API key"**
-- Restart API server to generate new key
-- Update in Settings → API Key
-
-## Documentation
-
-- **README.md** - Project overview and features
-- **docs/RATHOLE_SETUP_GUIDE.md** - Complete deployment walkthrough (18 pages)
-- **deployment/QUICKSTART.md** - Quick reference (60-minute setup)
-- **deployment/CREDENTIALS.md** - Secure tokens and configuration
-- **IMPLEMENTATION_COMPLETE.md** - Implementation summary
-- **docs/API_INTEGRATION.md** - API integration details
-
-## Deployment Files
-
-**Location:** `deployment/`
-
-**Server (Oracle Cloud):**
-- `rathole/server/server.toml` - Rathole server configuration
-- `rathole/server/deploy.sh` - Automated server deployment
-
-**Client (Mac):**
-- `rathole/client/client.toml.template` - Client configuration template
-- `rathole/client/install.sh` - Automated Mac installation
-- `rathole/client/com.rathole.client.plist` - LaunchDaemon for auto-start
+## Maintenance
+**Schedule:** as_needed
 
 **Monitoring:**
-- `scripts/check_tunnel_health.sh` - Auto-healing health monitor (cron every 5 min)
-- `scripts/verify_mac_setup.sh` - Pre-deployment Mac verification
+- App performance and crashes
+- API connectivity and latency
+- Sync status and conflicts
+- Battery and memory usage
+- iOS version compatibility
 
-**Credentials:**
-- API Token: See `deployment/CREDENTIALS.md` (chmod 600)
-- SSH Token: See `deployment/CREDENTIALS.md` (chmod 600)
+**Automated Tasks:**
+- Automated build via Xcode Cloud (planned)
+- TestFlight distribution
+- Cache cleanup on app launch
+- Background sync when available
 
-## Deployment Checklist
-
-**Time: 60-90 minutes total**
-
-### Phase 1: Oracle Cloud (30 min)
-- [ ] Create Oracle Cloud account (https://oracle.com/cloud/free)
-- [ ] Launch ARM VM (Ubuntu 22.04, 1 OCPU, 6GB RAM)
-- [ ] Configure firewall (ports 2333, 8080, 2222)
-- [ ] Note Oracle public IP address
-
-### Phase 2: Deploy Server (10 min)
-- [ ] Copy files: `scp server.toml deploy.sh ubuntu@ORACLE_IP:~/`
-- [ ] SSH and deploy: `ssh ubuntu@ORACLE_IP "./deploy.sh"`
-- [ ] Verify: `systemctl status rathole-server`
-
-### Phase 3: Mac Client (5 min)
-- [ ] Verify Mac setup: `./deployment/scripts/verify_mac_setup.sh`
-- [ ] Install client: `cd deployment/rathole/client && ./install.sh ORACLE_IP`
-- [ ] Verify: `sudo launchctl list | grep rathole`
-
-### Phase 4: iOS App (30 min)
-- [ ] Open Xcode project: `src/BuilderOS.xcodeproj`
-- [ ] Remove Tailscale package dependency (if present)
-- [ ] Add `Services/APIConfig.swift` to project
-- [ ] Add `Services/KeychainManager.swift` to project
-- [ ] Delete `Services/TailscaleConnectionManager.swift`
-- [ ] Update `APIConfig.swift` with Oracle IP
-- [ ] Build & test
-
-### Phase 5: Test (15 min)
-- [ ] Test tunnel: `curl http://ORACLE_IP:8080/health`
-- [ ] Launch iOS app
-- [ ] Enter API token from `deployment/CREDENTIALS.md`
-- [ ] Verify app connects and loads capsules
-- [ ] Test on WiFi and cellular
-- [ ] Verify Proton VPN active on both devices
-
-## SSH Public Key
-
-**For Oracle Cloud VM creation:**
-```
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDdEKg0SiREfdBMAFDb34pxCWODy6h3Qir5AIz+gxq6NRF2hi4kwwX4Oh1li40FeFT7IbLSKDRe61qI6n4EkZ5YPbLG5GAXcxEYH/jHZREXHWWtoH0vH8RUK4+9fDGlIuBbycZsCWtHUouSY4A2BMjVcr0DSN0hmjR6Yvzn/G1uzNTQdudnPqscQjVohNB+PmFQZn19qOQKnrxNOGgOFj1Zbn4y0ix2aFNtEFm1ucy8ijoETGKGZ0APu++ChagwBHZ7TAQiHN29unkcQmNxDsM2qZB8KtdF5Qt9fmXeXSNFgVOeaOcDY/FPYyzI8zn8ykrh9Cso5tdpDytnL5oQXDfSahiw7RL/DyKQ80rnF2053tgM8fjQS3xtVzK61Ik65jzv5T7yHcAIvgavXPLW/riG/tgO+Rd0BNof8sO0XqG/l29Ekl697NbBQ36ZGB/DvyZt7uThOumLBldifJawhp/P/pC1uqoN7gIFVBxQlIQrThHpEZnwXwbj6RsM/yVWwF4JybdtC2LTEcGp5ku9hMdR3KN/GYGbXkE2616oNSTxgABqo08YcGZPzofXtSsU+cQ+x7PklBD3+AytUa6uY1Q55dJnWu676j9QJib3bZK6SdzRvNK0JqFEMO0TIxivxY5Kt5GXQakLLnBRFVRuE+wJCCN1geS2HRXOgN6NHYR8nQ== ty@builderos-mac
-```
-
-## Keywords
-iOS, mobile, iPhone, iPad, Swift, SwiftUI, Cloudflare Tunnel, BuilderOS, companion app, capsule management, system monitoring, mobile dashboard, native app, encrypted, zero cost, VPN compatible, Proton VPN
+---
+*This file is auto-generated from `specs/current.yaml`*
+*Last generated:* 2025-10-27 13:27:06

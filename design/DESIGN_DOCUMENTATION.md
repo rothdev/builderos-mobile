@@ -26,7 +26,7 @@
 **Brand Colors:**
 - **Primary:** `#007AFF` (iOS system blue) — Main actions, links, highlights
 - **Secondary:** `#5856D6` (iOS system purple) — Secondary actions, accents
-- **Tailscale Accent:** `#598FFF` — VPN status, connection indicators
+- **Accent:** `#598FFF` — VPN status, connection indicators
 
 **Status Colors:**
 - **Success:** `#34C759` (iOS green) — Active capsules, connected status
@@ -129,7 +129,7 @@ All designs are available as interactive HTML previews:
    - Code block rendering
 
 4. **Settings Screen:** `/design/settings-screen.html`
-   - Tailscale connection status
+   - Cloudflare Tunnel connection status
    - Device list with IP addresses
    - API key management
    - Power controls (sleep/wake Mac)
@@ -166,7 +166,7 @@ All designs are pixel-perfect for iPhone 15 Pro (393x852 pt screen).
 **Layout:**
 - Pull-to-refresh gesture at top
 - Header: "Dashboard" title + subtitle
-- Connection status card (Tailscale info, IP, uptime)
+- Connection status card (Connection info, IP, uptime)
 - 2x2 stats grid (Total Capsules, Active, Testing, API Latency)
 - Section header: "Active Capsules" with "See All" link
 - Capsule grid (2 columns, variable rows)
@@ -185,8 +185,8 @@ All designs are pixel-perfect for iPhone 15 Pro (393x852 pt screen).
 - Tab bar switches between screens
 
 **Empty State:**
-- Show when disconnected from Tailscale
-- Message: "Not Connected" + "Connect to Tailscale to view capsules"
+- Show when disconnected from server
+- Message: "Not Connected" + "Connect to Server to view capsules"
 - Button: "Go to Settings"
 
 ### 2. Chat/Terminal Screen
@@ -227,17 +227,17 @@ All designs are pixel-perfect for iPhone 15 Pro (393x852 pt screen).
 
 ### 3. Settings Screen
 
-**Purpose:** App configuration, Tailscale management, API setup, power controls.
+**Purpose:** App configuration, Cloudflare Tunnel management, API setup, power controls.
 
 **Layout (Grouped List Style):**
 
 **Section 1: Connection**
-- Tailscale Status (status badge: Connected/Disconnected)
+- Connection Status (status badge: Connected/Disconnected)
 - Auto-Connect toggle (on/off)
 
-**Section 2: Tailscale Devices**
+**Section 2: Remote Devices**
 - List of all devices on network (Mac, iPhone, Raspberry Pi, etc.)
-- Each device shows: name, type badge, Tailscale IP
+- Each device shows: name, type badge, Tunnel URL
 - "Refresh Devices" button at bottom
 
 **Section 3: BuilderOS API**
@@ -273,7 +273,7 @@ All designs are pixel-perfect for iPhone 15 Pro (393x852 pt screen).
 - Subtitle: "Secure remote access to your Mac development environment from anywhere"
 - Button: "Get Started"
 
-**Step 2: Tailscale OAuth**
+**Step 2: API Token Setup**
 - Header icon + title + description
 - OAuth provider buttons (GitHub, Google, Microsoft, Email)
 - Tapping button → Opens OAuth web flow in SafariViewController
@@ -282,9 +282,9 @@ All designs are pixel-perfect for iPhone 15 Pro (393x852 pt screen).
 **Step 3: Auto-Discovery**
 - Loading animation (pulsing rings around icon)
 - Title: "Discovering Devices"
-- Description: "Looking for your Mac on the Tailscale network..."
+- Description: "Looking for your Mac on the Cloudflare network..."
 - Progress checklist:
-  - ✓ Connected to Tailscale (green check)
+  - ✓ Connected to Server (green check)
   - ⏳ Scanning for devices... (loading spinner)
   - ○ Connecting to Mac (pending)
 - Timeout after 30s → Manual IP entry option
@@ -293,7 +293,7 @@ All designs are pixel-perfect for iPhone 15 Pro (393x852 pt screen).
 - Header icon + title + description
 - Form fields:
   - Mac Device (read-only, discovered name)
-  - Tailscale IP (read-only, discovered IP)
+  - Tunnel URL (read-only, discovered IP)
   - API Key (password field, user input)
 - Hint: Command to run on Mac to start API server
 - "Continue" button (validates API key)
@@ -301,7 +301,7 @@ All designs are pixel-perfect for iPhone 15 Pro (393x852 pt screen).
 **Step 5: Success**
 - Large green checkmark icon
 - Title: "You're All Set!"
-- Description: "Your iPhone is now securely connected to your Mac via Tailscale..."
+- Description: "Your iPhone is now securely connected to your Mac via Cloudflare Tunnel..."
 - Button: "Go to Dashboard" → Main app
 
 **Error Handling:**
@@ -489,7 +489,7 @@ All designs are pixel-perfect for iPhone 15 Pro (393x852 pt screen).
 **Connected (Green):**
 - Background: `rgba(52, 199, 89, 0.1)`
 - Dot: 12px circle, green (#34C759)
-- Text: "Connected" + Tailscale IP (monospaced)
+- Text: "Connected" + Tunnel URL (monospaced)
 
 **Connecting (Orange):**
 - Background: `rgba(255, 149, 0, 0.1)`
@@ -639,7 +639,7 @@ Use SF Symbols for actual implementation (shown as emoji for mockup clarity).
 ### VoiceOver Support
 
 **All interactive elements must have labels:**
-- Buttons: Descriptive label (e.g., "Connect to Tailscale", not just "Connect")
+- Buttons: Descriptive label (e.g., "Connect to Server", not just "Connect")
 - Icons: Text label (e.g., "Status: Connected" for green dot)
 - Images: Alt text (e.g., "Capsule icon" for app logo)
 - Form fields: Label + hint + value
@@ -807,7 +807,7 @@ if UIAccessibility.isReduceMotionEnabled {
 - [ ] Tab bar switches between screens
 - [ ] Onboarding flow completes successfully
 - [ ] API key stored securely in Keychain
-- [ ] Tailscale connection establishes correctly
+- [ ] Cloudflare Tunnel connection establishes correctly
 
 ### Design Decisions & Rationale
 
@@ -869,7 +869,7 @@ if UIAccessibility.isReduceMotionEnabled {
 **Siri Shortcuts:**
 - "Check BuilderOS status"
 - "Run daily audit"
-- "Connect to Tailscale"
+- "Connect to Server"
 
 **Push Notifications:**
 - Capsule status changes (Active → Error)

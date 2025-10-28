@@ -53,6 +53,10 @@
     <string>Builder System Mobile uses the microphone to record voice commands that are converted to text for sending to your Builder System server.</string>
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>Builder System Mobile uses speech recognition to convert your voice commands to text for easier interaction with your Builder System.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Builder System Mobile needs access to your photo library to attach images to chat messages and commands.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Builder System Mobile needs permission to save images to your photo library.</string>
 
     <!-- Background Modes for SSH connections -->
     <key>UIBackgroundModes</key>

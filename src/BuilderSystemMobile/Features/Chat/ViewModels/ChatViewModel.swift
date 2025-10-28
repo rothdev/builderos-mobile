@@ -6,35 +6,51 @@ class ChatViewModel: ObservableObject {
     @Published var messages: [ChatMessage] = []
     @Published var isConnected = false
     @Published var messageText = ""
+    @Published var attachments: [FileAttachment] = []
 
     private let sshService: SSHServiceProtocol
+    private let uploadService: FileUploadService
     private var cancellables = Set<AnyCancellable>()
     
-    init(sshService: SSHServiceProtocol = SSHService()) {
+    init(sshService: SSHServiceProtocol = SSHService(), uploadService: FileUploadService = FileUploadService()) {
         self.sshService = sshService
-        
+        self.uploadService = uploadService
+
         // Monitor connection state
         sshService.connectionStatePublisher
             .map { $0.isConnected }
             .assign(to: \.isConnected, on: self)
             .store(in: &cancellables)
-        
+
         // Add welcome message
         addWelcomeMessage()
     }
     
     func sendMessage(_ text: String, hasVoiceAttachment: Bool = false) {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        
+
+        let attachmentCount = attachments.count
+
         // Add user message
         let userMessage = ChatMessage(
             content: text,
             isUser: true,
             type: .command,
-            hasVoiceAttachment: hasVoiceAttachment
+            hasVoiceAttachment: hasVoiceAttachment,
+            fileAttachmentCount: attachmentCount
         )
         messages.append(userMessage)
-        
+
+        // Upload attachments if any
+        if !attachments.isEmpty {
+            Task {
+                await uploadAttachments()
+            }
+        }
+
+        // Clear attachments
+        attachments.removeAll()
+
         // Execute command if connected
         if isConnected {
             executeCommand(text)
@@ -115,5 +131,26 @@ class ChatViewModel: ObservableObject {
     func disconnect() {
         sshService.disconnect()
         addSystemMessage("Disconnected from Builder System", type: .status)
+    }
+
+    // MARK: - File Attachment Methods
+
+    func addAttachment(_ attachment: FileAttachment) {
+        attachments.append(attachment)
+    }
+
+    func removeAttachment(id: UUID) {
+        attachments.removeAll { $0.id == id }
+    }
+
+    func uploadAttachments() async {
+        guard !attachments.isEmpty else { return }
+
+        do {
+            let results = try await uploadService.uploadFiles(attachments, to: "/api/upload")
+            addSystemMessage("Uploaded \(attachments.count) file(s) successfully", type: .success)
+        } catch {
+            addSystemMessage("Failed to upload files: \(error.localizedDescription)", type: .error)
+        }
     }
 }

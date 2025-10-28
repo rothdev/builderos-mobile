@@ -8,12 +8,14 @@ struct ChatMessage: Identifiable, Codable {
     let timestamp: Date
     let type: MessageType
     let hasVoiceAttachment: Bool
-    
-    init(content: String, isUser: Bool, type: MessageType = .text, hasVoiceAttachment: Bool = false) {
+    let fileAttachmentCount: Int
+
+    init(content: String, isUser: Bool, type: MessageType = .text, hasVoiceAttachment: Bool = false, fileAttachmentCount: Int = 0) {
         self.content = content
         self.isUser = isUser
         self.type = type
         self.hasVoiceAttachment = hasVoiceAttachment
+        self.fileAttachmentCount = fileAttachmentCount
         self.timestamp = Date()
     }
     

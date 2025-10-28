@@ -6,14 +6,37 @@ struct VoiceInputView: View {
     @State private var showingTextPreview = false
     @State private var previewText = ""
     @State private var showingQuickActions = false
+    @State private var showingPhotoPicker = false
+    @State private var showingDocumentPicker = false
+    @State private var showingAttachmentOptions = false
     
     var body: some View {
         VStack(spacing: 0) {
+            // File attachments section
+            if !chatViewModel.attachments.isEmpty {
+                attachmentsSection
+            }
+
             if showingTextPreview {
                 textPreviewSection
             }
-            
+
             voiceInputSection
+        }
+        .sheet(isPresented: $showingPhotoPicker) {
+            PhotoPickerView(selectedPhotos: $chatViewModel.attachments)
+        }
+        .sheet(isPresented: $showingDocumentPicker) {
+            DocumentPickerView(selectedDocuments: $chatViewModel.attachments)
+        }
+        .confirmationDialog("Add Attachment", isPresented: $showingAttachmentOptions) {
+            Button("Photos") {
+                showingPhotoPicker = true
+            }
+            Button("Documents") {
+                showingDocumentPicker = true
+            }
+            Button("Cancel", role: .cancel) {}
         }
     }
     
@@ -64,10 +87,34 @@ struct VoiceInputView: View {
         ))
     }
     
+    private var attachmentsSection: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(chatViewModel.attachments) { attachment in
+                    FileAttachmentChip(attachment: attachment) {
+                        chatViewModel.removeAttachment(id: attachment.id)
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+        }
+        .background(Color(.systemGray6).opacity(0.5))
+    }
+
     private var voiceInputSection: some View {
         VStack(spacing: 0) {
             // Text input field
             HStack(spacing: 12) {
+                // Attachment button
+                Button(action: {
+                    showingAttachmentOptions = true
+                }) {
+                    Image(systemName: chatViewModel.attachments.isEmpty ? "paperclip" : "paperclip.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(chatViewModel.attachments.isEmpty ? .gray : .builderPrimary)
+                }
+
                 TextField("Type a message...", text: $chatViewModel.messageText)
                     .textFieldStyle(.plain)
                     .font(.builderBody)

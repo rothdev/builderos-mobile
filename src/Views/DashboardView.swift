@@ -285,13 +285,13 @@ struct CapsuleCard: View {
                 Spacer()
             }
 
-            Text(capsule.name)
+            Text(capsule.title)
                 .font(.system(size: 14, weight: .semibold, design: .monospaced))
                 .foregroundColor(.terminalCyan)
                 .lineLimit(2)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text(capsule.description)
+            Text(capsule.purpose)
                 .font(.system(size: 12, design: .monospaced))
                 .foregroundStyle(Color.terminalCode)
                 .lineLimit(2)

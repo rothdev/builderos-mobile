@@ -19,7 +19,7 @@
 ```
 Primary Blue:     #007AFF
 Secondary Purple: #5856D6
-Tailscale Accent: #598FFF
+Accent: #598FFF
 ```
 
 ### Status Colors

@@ -17,6 +17,8 @@
         <string>tunnel</string>
         <string>--config</string>
         <string>/Users/Ty/BuilderOS/capsules/builderos-mobile/deployment/cloudflare/tunnel-config.yml</string>
+        <string>--protocol</string>
+        <string>http2</string>
         <string>run</string>
         <string>builderos-mobile</string>
     </array>

@@ -179,17 +179,6 @@ struct ConnectionStatusCard: View {
                 }
             }
 
-            if let status = systemStatus,
-               let tailscaleIP = status.network.tailscale_ip {
-                HStack {
-                    Image(systemName: "network")
-                        .foregroundColor(.blue)
-                    Text(tailscaleIP)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                }
-            }
         }
         .padding()
         .background(Color(.secondarySystemBackground))

@@ -1,2 +1,9 @@
 url: http://localhost:8080
 no-autoupdate: true
+protocol: http2
+
+originRequest:
+  connectTimeout: 10s
+  tcpKeepAlive: 600s
+  keepAliveTimeout: 600s
+  httpHostHeader: api.builderos.app

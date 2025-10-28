@@ -58,12 +58,82 @@ class BuilderOSAPIClient: ObservableObject {
     }
 
     func fetchCapsules() async throws {
-        // Stub: Would fetch from API
         isLoading = true
+        lastError = nil
+
         defer { isLoading = false }
 
-        // Mock data
-        capsules = []
+        guard let url = URL(string: "\(baseURL)/api/capsules") else {
+            lastError = "Invalid URL"
+            isConnected = false
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.timeoutInterval = APIConfig.requestTimeout
+
+        // Add API key header
+        if !apiKey.isEmpty {
+            request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        } else {
+            lastError = "Missing API key"
+            throw APIError.missingAPIKey
+        }
+
+        // Retry logic with exponential backoff
+        for attempt in 0..<APIConfig.maxRetries {
+            do {
+                let (data, response) = try await URLSession.shared.data(for: request)
+
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    lastError = "Invalid response"
+                    continue
+                }
+
+                switch httpResponse.statusCode {
+                case 200:
+                    // Parse JSON response
+                    let decoder = JSONDecoder()
+                    let apiResponse = try decoder.decode(CapsulesResponse.self, from: data)
+
+                    capsules = apiResponse.capsules
+                    isConnected = true
+                    print("✅ Fetched \(capsules.count) capsules")
+                    return
+
+                case 401:
+                    lastError = "Invalid API key"
+                    isConnected = false
+                    throw APIError.unauthorized
+
+                case 404:
+                    lastError = "Endpoint not found"
+                    isConnected = false
+                    throw APIError.endpointNotFound
+
+                default:
+                    lastError = "Server error: \(httpResponse.statusCode)"
+                    if attempt == APIConfig.maxRetries - 1 {
+                        throw APIError.serverError(httpResponse.statusCode)
+                    }
+                }
+            } catch let error as APIError {
+                // Re-throw API errors immediately (no retry)
+                throw error
+            } catch {
+                lastError = error.localizedDescription
+
+                // Wait before retrying (exponential backoff)
+                if attempt < APIConfig.maxRetries - 1 {
+                    let backoff = APIConfig.retryBackoff * pow(2.0, Double(attempt))
+                    try? await Task.sleep(nanoseconds: UInt64(backoff * 1_000_000_000))
+                } else {
+                    isConnected = false
+                    throw error
+                }
+            }
+        }
     }
 
     func fetchSystemStatus() async throws {
@@ -76,8 +146,37 @@ class BuilderOSAPIClient: ObservableObject {
     }
 
     func sleepMac() async throws {
-        // Stub: Would call API
-        print("Sleep Mac API call (stub)")
+        guard let url = URL(string: "\(baseURL)/api/system/sleep") else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = APIConfig.requestTimeout
+
+        // Add API key header
+        if !apiKey.isEmpty {
+            request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        } else {
+            throw APIError.missingAPIKey
+        }
+
+        let (_, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+
+        switch httpResponse.statusCode {
+        case 200...299:
+            print("✅ Mac sleep initiated successfully")
+        case 401:
+            throw APIError.unauthorized
+        case 404:
+            throw APIError.endpointNotFound
+        default:
+            throw APIError.serverError(httpResponse.statusCode)
+        }
     }
 
     func wakeMac() async throws {
@@ -171,5 +270,40 @@ class BuilderOSAPIClient: ObservableObject {
 
         isConnected = false
         return false
+    }
+}
+
+// MARK: - API Response Models
+
+struct CapsulesResponse: Codable {
+    let count: Int
+    let capsules: [Capsule]
+}
+
+// MARK: - API Errors
+
+enum APIError: LocalizedError {
+    case invalidURL
+    case missingAPIKey
+    case invalidResponse
+    case unauthorized
+    case endpointNotFound
+    case serverError(Int)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL:
+            return "Invalid API URL"
+        case .missingAPIKey:
+            return "API key is required"
+        case .invalidResponse:
+            return "Invalid server response"
+        case .unauthorized:
+            return "Unauthorized: Invalid API key"
+        case .endpointNotFound:
+            return "API endpoint not found"
+        case .serverError(let code):
+            return "Server error: \(code)"
+        }
     }
 }

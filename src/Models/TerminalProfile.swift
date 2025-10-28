@@ -56,11 +56,11 @@ extension TerminalProfile {
 
     static let claude = TerminalProfile(
         id: "claude",
-        name: "Claude Code",
+        name: "Jarvis",
         icon: "claude-logo",
         isCustomIcon: true,
         color: Color(red: 1.0, green: 0.42, blue: 0.616), // #FF6B9D - Pink/red matching UI theme
-        initialCommand: "cd /Users/Ty/BuilderOS && printf '\\n\\033[1;35m  Claude Code\\033[0m v2.0.27\\n  \\033[0;90mSonnet 4.5 · Claude Max\\033[0m\\n  \\033[1;33m/Users/Ty/BuilderOS\\033[0m\\n\\n' && claude",
+        initialCommand: "cd /Users/Ty/BuilderOS && printf '\\n\\033[1;35m  Jarvis\\033[0m v2.0.27\\n  \\033[0;90mSonnet 4.5 · Claude Max\\033[0m\\n  \\033[1;33m/Users/Ty/BuilderOS\\033[0m\\n\\n' && claude",
         workingDirectory: "/Users/Ty/BuilderOS"
     )
 
@@ -74,5 +74,5 @@ extension TerminalProfile {
         workingDirectory: "/Users/Ty/BuilderOS"
     )
 
-    static let all: [TerminalProfile] = [claude, codex, shell]  // Claude Code is default
+    static let all: [TerminalProfile] = [claude, codex, shell]  // Jarvis is default
 }

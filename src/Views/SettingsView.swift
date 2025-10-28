@@ -2,7 +2,7 @@
 //  SettingsView.swift
 //  BuilderOS
 //
-//  Settings screen with Tailscale and API configuration
+//  Settings screen with Cloudflare Tunnel and API configuration
 //
 
 import SwiftUI
@@ -10,6 +10,7 @@ import Inject
 
 struct SettingsView: View {
     @EnvironmentObject var apiClient: BuilderOSAPIClient
+    @EnvironmentObject var notificationManager: NotificationManager
     @ObserveInjection var inject
 
     @State private var apiKey: String = ""
@@ -46,6 +47,11 @@ struct SettingsView: View {
 
                         // API section
                         apiSection
+
+                        // Notifications section (DEBUG mode)
+                        #if DEBUG
+                        notificationsSection
+                        #endif
 
                         // Power Control section
                         powerControlSection
@@ -164,6 +170,113 @@ struct SettingsView: View {
                 .font(.system(size: 12, design: .monospaced))
                 .foregroundStyle(Color.terminalDim)
                 .padding(.horizontal, 4)
+        }
+    }
+
+    // MARK: - Notifications Section (DEBUG)
+    private var notificationsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            TerminalSectionHeader(title: "NOTIFICATIONS (TESTING)")
+
+            TerminalCard {
+                VStack(spacing: 12) {
+                    // Permission status
+                    HStack {
+                        Text("Status")
+                            .font(.system(size: 14, design: .monospaced))
+                            .foregroundStyle(Color.terminalCode)
+                        Spacer()
+                        Text(notificationManager.isAuthorized ? "AUTHORIZED" : "NOT AUTHORIZED")
+                            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                            .foregroundColor(notificationManager.isAuthorized ? .terminalGreen : .terminalPink)
+                    }
+
+                    if let deviceToken = notificationManager.deviceToken {
+                        Divider()
+                            .background(Color.terminalInputBorder)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Device Token")
+                                .font(.system(size: 14, design: .monospaced))
+                                .foregroundStyle(Color.terminalCode)
+                            Text(String(deviceToken.prefix(20)) + "...")
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundStyle(Color.terminalDim)
+                        }
+                    }
+
+                    if notificationManager.isAuthorized {
+                        Divider()
+                            .background(Color.terminalInputBorder)
+
+                        // Test notification buttons
+                        VStack(spacing: 8) {
+                            testNotificationButton(
+                                title: "Build Complete ✅",
+                                action: { await notificationManager.sendBuildCompleteNotification() }
+                            )
+
+                            testNotificationButton(
+                                title: "Tests Passed ✅",
+                                action: { await notificationManager.sendTestsPassedNotification() }
+                            )
+
+                            testNotificationButton(
+                                title: "Deployment Complete 🚀",
+                                action: { await notificationManager.sendDeploymentCompleteNotification() }
+                            )
+                        }
+                    } else {
+                        Divider()
+                            .background(Color.terminalInputBorder)
+
+                        Button {
+                            Task {
+                                await notificationManager.requestAuthorization()
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "bell.badge")
+                                    .foregroundStyle(Color.terminalCyan)
+                                Text("Request Permission")
+                                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                                    .foregroundColor(.terminalCyan)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Color.terminalInputBackground)
+                            .terminalBorder(cornerRadius: 8)
+                        }
+                    }
+                }
+            }
+
+            Text("Test local notifications for BuilderOS job completion alerts. Tap to trigger test notifications immediately.")
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundStyle(Color.terminalDim)
+                .padding(.horizontal, 4)
+        }
+    }
+
+    private func testNotificationButton(title: String, action: @escaping () async -> Void) -> some View {
+        Button {
+            Task {
+                await action()
+            }
+        } label: {
+            HStack {
+                Text(title)
+                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+                    .foregroundColor(.terminalText)
+                Spacer()
+                Image(systemName: "bell.fill")
+                    .foregroundStyle(Color.terminalCyan)
+                    .font(.system(size: 12))
+            }
+            .padding(.vertical, 10)
+            .padding(.horizontal, 12)
+            .background(Color.terminalInputBackground)
+            .terminalBorder(cornerRadius: 6)
         }
     }
 

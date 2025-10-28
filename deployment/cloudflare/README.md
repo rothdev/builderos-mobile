@@ -146,14 +146,17 @@ Main tunnel configuration:
 tunnel: <your-tunnel-id>
 credentials-file: /Users/Ty/.cloudflared/<tunnel-id>.json
 
+protocol: http2
+
+originRequest:
+  connectTimeout: 10s
+  tcpKeepAlive: 600s
+  keepAliveTimeout: 600s
+  httpHostHeader: builderos.yourdomain.com
+
 ingress:
   - hostname: builderos.yourdomain.com
     service: http://localhost:8080
-    originRequest:
-      noTLSVerify: true
-      connectTimeout: 30s
-      keepAliveConnections: 10
-      keepAliveTimeout: 90s
   - service: http_status:404
 ```
 

@@ -46,10 +46,11 @@
 ### 6. **Tunnel Configuration** ✅
 **File:** `tunnel-config.yml`
 - Routes all traffic to `localhost:8080`
-- Optimized connection settings:
-  - 30-second connect timeout
-  - 10 keep-alive connections
-  - 90-second keep-alive timeout
+- Forces HTTP/2 transport (disables unstable QUIC control stream)
+- Optimized keep-alive settings:
+  - 10-second connect timeout
+  - 600-second TCP keep-alive + origin keep-alive
+  - Custom host header for `api.builderos.app`
 - Catch-all 404 handler
 
 ### 7. **Documentation** ✅

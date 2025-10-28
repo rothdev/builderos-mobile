@@ -1,11 +1,11 @@
 # BuilderOS iOS Companion App
 
-Native iOS companion app for BuilderOS with **embedded Tailscale SDK** for seamless remote access to your Mac.
+Native iOS companion app for BuilderOS with **embedded Cloudflare Tunnel SDK** for seamless remote access to your Mac.
 
 ## Features
 
-✅ **Embedded Tailscale VPN** - No separate Tailscale app required
-✅ **Auto-Discovery** - Automatically finds your Mac on Tailscale network
+✅ **Embedded Cloudflare Tunnel VPN** - No separate Cloudflare Tunnel app required
+✅ **Auto-Discovery** - Automatically finds your Mac on Cloudflare Tunnel network
 ✅ **Secure Access** - End-to-end encrypted connection to BuilderOS API
 ✅ **Real-time Status** - Monitor capsules, system health, and services
 ✅ **Native iOS UI** - SwiftUI with iOS 17+ design language
@@ -16,24 +16,24 @@ Native iOS companion app for BuilderOS with **embedded Tailscale SDK** for seaml
 ### Tech Stack
 - **Swift 5.9+** with SwiftUI
 - **iOS 17.0+** minimum deployment target
-- **Tailscale iOS SDK** via CocoaPods
+- **Cloudflare Tunnel iOS SDK** via CocoaPods
 - **NetworkExtension** framework for VPN management
 - **Keychain** for secure credential storage
 
 ### Key Components
 
 **Services:**
-- `TailscaleConnectionManager` - Manages VPN connection and device discovery
-- `BuilderOSAPIClient` - API client that auto-uses Tailscale IP
+- `Cloudflare TunnelConnectionManager` - Manages VPN connection and device discovery
+- `BuilderOSAPIClient` - API client that auto-uses Cloudflare Tunnel IP
 
 **Views:**
-- `OnboardingView` - First-time setup with Tailscale authentication
+- `OnboardingView` - First-time setup with Cloudflare Tunnel authentication
 - `DashboardView` - Main screen with system status and capsule list
-- `SettingsView` - Tailscale and API configuration
+- `SettingsView` - Cloudflare Tunnel and API configuration
 - `CapsuleDetailView` - Detailed capsule information and metrics
 
 **Models:**
-- `TailscaleDevice` - Represents devices on Tailscale network
+- `Cloudflare TunnelDevice` - Represents devices on Cloudflare Tunnel network
 - `Capsule` - BuilderOS capsule data model
 - `SystemStatus` - BuilderOS system health and metrics
 
@@ -47,7 +47,7 @@ cd /Users/Ty/BuilderOS/capsules/builder-system-mobile
 # Install CocoaPods if not already installed
 sudo gem install cocoapods
 
-# Install Tailscale SDK
+# Install Cloudflare Tunnel SDK
 pod install
 ```
 
@@ -102,9 +102,9 @@ Update the Mac IP address if different from `100.66.202.6`:
    ./server_mode.sh
    ```
 
-2. **Note your Tailscale IP:**
+2. **Note your Cloudflare Tunnel IP:**
    ```bash
-   tailscale ip -4
+   cloudflare ip -4
    # Example output: 100.66.202.6
    ```
 
@@ -117,7 +117,7 @@ Update the Mac IP address if different from `100.66.202.6`:
 
 1. **Launch BuilderOS app**
 2. **Tap "Get Started"**
-3. **Sign in with Tailscale** (GitHub/Google/Microsoft/Email)
+3. **Sign in with Cloudflare Tunnel** (GitHub/Google/Microsoft/Email)
 4. **Wait for Mac discovery** - App automatically finds your Mac
 5. **Enter API key** from server output
 6. **Tap "Connect"** - Dashboard loads with capsule data
@@ -127,7 +127,7 @@ Update the Mac IP address if different from `100.66.202.6`:
 ### Automatic Connection
 
 After first setup:
-1. Open app → Auto-connects to Tailscale
+1. Open app → Auto-connects to Cloudflare Tunnel
 2. Auto-discovers Mac on network
 3. Connects to API → Dashboard loads
 4. **Zero manual configuration needed**
@@ -150,30 +150,30 @@ Dashboard displays:
 ### Settings
 
 Access via gear icon:
-- **Tailscale Status** - View connected devices
+- **Cloudflare Tunnel Status** - View connected devices
 - **API Key** - Update BuilderOS API key
-- **Sign Out** - Disconnect from Tailscale
+- **Sign Out** - Disconnect from Cloudflare Tunnel
 
-## Tailscale Integration
+## Cloudflare Tunnel Integration
 
 ### How It Works
 
-1. **Authentication** - OAuth flow via Tailscale
+1. **Authentication** - OAuth flow via Cloudflare Tunnel
 2. **VPN Connection** - NEVPNManager establishes encrypted tunnel
-3. **Device Discovery** - Lists all devices on Tailscale network
+3. **Device Discovery** - Lists all devices on Cloudflare Tunnel network
 4. **Mac Selection** - Auto-selects Mac based on hostname
-5. **API Access** - Uses Mac's Tailscale IP (`100.66.202.6`) for API calls
+5. **API Access** - Uses Mac's Cloudflare Tunnel IP (`100.66.202.6`) for API calls
 
 ### Network Flow
 
 ```
-iPhone → Tailscale VPN → Mac (100.66.202.6:8080) → BuilderOS API
+iPhone → Cloudflare Tunnel VPN → Mac (100.66.202.6:8080) → BuilderOS API
         (encrypted)           (localhost)
 ```
 
 ### Security
 
-- ✅ End-to-end encryption via Tailscale
+- ✅ End-to-end encryption via Cloudflare Tunnel
 - ✅ OAuth authentication (no passwords)
 - ✅ API key stored in iOS Keychain
 - ✅ Localhost API connection (not exposed to internet)
@@ -188,11 +188,11 @@ builder-system-mobile/
 ├── src/
 │   ├── BuilderOSApp.swift          # Main app entry point
 │   ├── Models/
-│   │   ├── TailscaleDevice.swift   # Device model
+│   │   ├── Cloudflare TunnelDevice.swift   # Device model
 │   │   ├── Capsule.swift            # Capsule model
 │   │   └── SystemStatus.swift       # System status model
 │   ├── Services/
-│   │   ├── TailscaleConnectionManager.swift  # VPN management
+│   │   ├── Cloudflare TunnelConnectionManager.swift  # VPN management
 │   │   └── BuilderOSAPIClient.swift          # API client
 │   ├── Views/
 │   │   ├── OnboardingView.swift     # First-time setup
@@ -227,11 +227,11 @@ xcodebuild test -workspace BuilderOS.xcworkspace -scheme BuilderOS -destination 
 
 ### "Mac not found"
 
-**Cause:** Mac is offline or not connected to Tailscale
+**Cause:** Mac is offline or not connected to Cloudflare Tunnel
 
 **Fix:**
-1. On Mac: `tailscale status` - ensure "Logged in"
-2. On Mac: `tailscale ip -4` - verify IP address
+1. On Mac: `cloudflare status` - ensure "Logged in"
+2. On Mac: `cloudflare ip -4` - verify IP address
 3. On iPhone: Pull to refresh in Settings
 
 ### "Connection failed"
@@ -263,7 +263,7 @@ xcodebuild test -workspace BuilderOS.xcworkspace -scheme BuilderOS -destination 
 
 ## API Endpoints Used
 
-All endpoints relative to `http://{mac-tailscale-ip}:8080`:
+All endpoints relative to `http://{mac-cloudflare-ip}:8080`:
 
 - `GET /api/status` - System status
 - `GET /api/capsules` - List all capsules
@@ -274,7 +274,7 @@ All endpoints relative to `http://{mac-tailscale-ip}:8080`:
 ## Roadmap
 
 ### Phase 1 (Current)
-- ✅ Tailscale VPN integration
+- ✅ Cloudflare Tunnel VPN integration
 - ✅ Auto-discovery of Mac
 - ✅ System status monitoring
 - ✅ Capsule list and details
@@ -298,10 +298,10 @@ Private - BuilderOS System
 ## Support
 
 For issues or questions:
-- Check Tailscale SDK docs: https://tailscale.com/kb/1114/ios-sdk
+- Check Cloudflare Tunnel SDK docs: https://cloudflare.com/kb/1114/ios-sdk
 - BuilderOS API docs: http://100.66.202.6:8080/api/docs
 - Xcode console logs for debugging
 
 ---
 
-**Note:** This app is designed for personal use with BuilderOS. Tailscale account required (free for personal use).
+**Note:** This app is designed for personal use with BuilderOS. Cloudflare Tunnel account required (free for personal use).

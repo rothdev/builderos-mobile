@@ -35,6 +35,7 @@ struct MainContentView: View {
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
                 .tag(3)
         }
+        .animation(.easeInOut(duration: 0.3), value: selectedTab)
         .enableInjection()
     }
 }

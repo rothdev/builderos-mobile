@@ -253,8 +253,7 @@ struct SystemStatus: Codable {
     }
 
     struct NetworkInfo: Codable {
-        let tailscale_status: String
-        let tailscale_ip: String?
+        // Network info structure - extend as needed
     }
 }
 

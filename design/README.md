@@ -32,7 +32,7 @@ design/
 ├── design-system.html             # Color palette, typography, spacing, components
 ├── dashboard-screen.html          # Main dashboard with capsule grid
 ├── chat-screen.html               # Terminal/chat interface with voice input
-├── settings-screen.html           # Settings and Tailscale management
+├── settings-screen.html           # Settings and Cloudflare Tunnel management
 └── onboarding-flow.html           # 5-step first-time setup flow
 ```
 
@@ -43,7 +43,7 @@ design/
 ### 1. Design System (`design-system.html`)
 
 **Interactive color palette:**
-- Brand colors (Primary, Secondary, Tailscale Accent)
+- Brand colors (Primary, Secondary, Accent)
 - Status colors (Success, Warning, Error, Info)
 - Semantic adaptive colors (Light/Dark mode)
 
@@ -68,7 +68,7 @@ design/
 
 **iPhone 15 Pro mockup showing:**
 - Pull-to-refresh interaction
-- Connection status card (Tailscale info)
+- Connection status card (Connection info)
 - 2x2 stats grid (Total Capsules, Active, Testing, API Latency)
 - Capsule grid (2 columns) with status badges
 - Tab bar navigation
@@ -96,7 +96,7 @@ design/
 ### 4. Settings Screen (`settings-screen.html`)
 
 **Grouped settings list showing:**
-- Tailscale connection status
+- Cloudflare Tunnel connection status
 - Device list with IPs
 - API key management
 - Power controls (Sleep/Wake Mac)
@@ -112,7 +112,7 @@ design/
 
 **5-step first-time setup:**
 1. **Welcome Screen** — App intro and value proposition
-2. **Tailscale OAuth** — Authentication provider selection
+2. **API Token Setup** — Authentication provider selection
 3. **Auto-Discovery** — Automatic Mac detection with loading animation
 4. **API Key Entry** — Secure API setup with form validation
 5. **Success** — Confirmation and transition to main app
@@ -242,7 +242,7 @@ Has API Key in Keychain?
     ├─ Yes → Dashboard (Main App)
     └─ No → Onboarding Flow
             ├─ Welcome Screen
-            ├─ Tailscale OAuth
+            ├─ API Token Setup
             ├─ Auto-Discovery
             ├─ API Key Entry
             └─ Success → Dashboard
@@ -260,10 +260,10 @@ Main App (Tab Bar Navigation)
     │   └─ Input Container (Voice + Text)
     │
     ├─ Preview Tab
-    │   └─ WebView (localhost dev servers via Tailscale)
+    │   └─ WebView (localhost dev servers via Cloudflare Tunnel)
     │
     └─ Settings Tab
-        ├─ Tailscale Connection
+        ├─ Server Connection
         ├─ Device List
         ├─ API Configuration
         ├─ Power Controls
@@ -318,7 +318,7 @@ Before submitting to TestFlight:
 - [ ] **Tab bar** switches between all screens
 - [ ] **Onboarding flow** completes successfully (new user)
 - [ ] **API key** stored securely in Keychain
-- [ ] **Tailscale connection** establishes and auto-discovers Mac
+- [ ] **Cloudflare Tunnel connection** establishes and auto-discovers Mac
 - [ ] **Voice input** records and transcribes speech
 - [ ] **Chat messages** send commands and display responses
 - [ ] **Settings toggles** persist between app launches
@@ -338,7 +338,7 @@ Before submitting to TestFlight:
    - Cards (Capsule, Stat, Connection)
    - Message Bubbles (User, System)
 3. **Onboarding Flow** (5 screens)
-   - TailscaleConnectionManager integration
+   - CloudflareConnectionManager integration
    - OAuth web flow
    - Auto-discovery logic
    - Keychain storage
@@ -357,7 +357,7 @@ Before submitting to TestFlight:
 
 ### Key Integration Points:
 
-- **TailscaleConnectionManager:** VPN lifecycle, OAuth, device discovery
+- **CloudflareConnectionManager:** VPN lifecycle, OAuth, device discovery
 - **BuilderOSAPIClient:** REST API with auto-discovered Mac IP
 - **SSHService:** Command execution via SSH for chat/terminal
 - **VoiceManager:** Speech recognition for voice input
