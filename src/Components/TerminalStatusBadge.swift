@@ -27,7 +27,7 @@ struct TerminalStatusBadge: View {
                 .scaleEffect(pulseAnimation ? 1.2 : 1.0)
                 .animation(
                     shouldPulse ?
-                        .easeInOut(duration: 2).repeatForever(autoreverses: true) :
+                        .spring(response: 2.0, dampingFraction: 0.5).repeatForever(autoreverses: true) :
                         .default,
                     value: pulseAnimation
                 )

@@ -197,18 +197,19 @@ struct ClaudeChatView: View {
                     LazyVStack(alignment: .leading, spacing: 12) {
                         ForEach(service.messages) { message in
                             MessageBubbleView(message: message)
+                                .transition(.messageBubble(isUser: message.isUser))
                                 .id(message.id)
                         }
 
                         if service.isLoading {
-                            LoadingIndicatorView(providerName: providerName, accentColor: activeProvider.accentColor)
+                            EnhancedLoadingIndicator(providerName: providerName, accentColor: activeProvider.accentColor)
                         }
                     }
                     .padding()
                 }
                 .onChange(of: service.messages.count) {
                     if let lastMessage = service.messages.last {
-                        withAnimation {
+                        withAnimation(AnimationPresets.tabTransition) {
                             proxy.scrollTo(lastMessage.id, anchor: .bottom)
                         }
                     }
@@ -323,6 +324,7 @@ struct ClaudeChatView: View {
                     .foregroundColor(canSend ? activeProvider.accentColor : .terminalDim)
            }
             .disabled(!canSend)
+            .pressableButton()
         }
         .padding()
         .background(Color.terminalDark.opacity(0.9))
@@ -367,8 +369,17 @@ struct ClaudeChatView: View {
                 self.serviceVersion += 1
             }
 
-        // Auto-connect
+        // Auto-connect (only if not already connected)
+        // Note: The service's connect() method has its own guards for isConnecting/isConnected
         Task {
+            // Check connection state before attempting
+            let alreadyConnected = await MainActor.run { service.isConnected }
+
+            guard !alreadyConnected else {
+                print("⚠️ Skipping connection - service already connected for \(tab.provider.displayName)")
+                return
+            }
+
             do {
                 print("🔵 Starting connection for \(tab.provider.displayName)...")
                 try await service.connect()
@@ -431,25 +442,34 @@ struct ClaudeChatView: View {
         guard canSend, let service = activeService else { return }
 
         let messageText = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
-        let attachmentsToSend = attachmentService.selectedAttachments
-        inputText = ""
-        isInputFocused = false
+        let attachmentsSnapshot = attachmentService.selectedAttachments
 
-        Task {
+        Task { @MainActor in
             do {
-                // Upload attachments if any
-                if !attachmentsToSend.isEmpty {
+                var attachmentsForMessage = attachmentsSnapshot
+
+                if !attachmentsSnapshot.isEmpty {
                     try await attachmentService.uploadAllAttachments()
+                    attachmentsForMessage = attachmentService.selectedAttachments
+
+                    let failedAttachments = attachmentsForMessage.filter { $0.uploadState.isFailed || $0.remoteURL == nil }
+                    guard failedAttachments.isEmpty else {
+                        print("⚠️ Upload failed for attachments: \(failedAttachments.map { $0.filename })")
+                        attachmentService.lastError = attachmentService.lastError ?? "Failed to upload attachments."
+                        inputText = messageText
+                        return
+                    }
                 }
 
-                // Send message with attachments
-                try await service.sendMessage(messageText)
+                inputText = ""
+                isInputFocused = false
 
-                // Clear attachments after successful send
+                let finalizedAttachments = attachmentsForMessage.filter { $0.remoteURL != nil }
+                try await service.sendMessage(messageText, attachments: finalizedAttachments)
                 attachmentService.clearAllAttachments()
             } catch {
                 print("❌ Failed to send message: \(error)")
-                // Keep attachments on error so user can retry
+                inputText = messageText
             }
         }
     }
@@ -457,9 +477,9 @@ struct ClaudeChatView: View {
     private func sendQuickAction(_ message: String) {
         guard let service = activeService else { return }
 
-        Task {
+        Task { @MainActor in
             do {
-                try await service.sendMessage(message)
+                try await service.sendMessage(message, attachments: [])
             } catch {
                 print("❌ Failed to send quick action: \(error)")
             }
@@ -525,6 +545,14 @@ struct MessageBubbleView: View {
                             )
                     )
                     .terminalBorder(cornerRadius: 16, color: message.isUser ? .terminalCyan : .terminalInputBorder)
+
+                if !message.attachments.isEmpty {
+                    VStack(alignment: message.isUser ? .trailing : .leading, spacing: 6) {
+                        ForEach(message.attachments) { attachment in
+                            MessageAttachmentRow(attachment: attachment, isUser: message.isUser)
+                        }
+                    }
+                }
 
                 Text(formatTimestamp(message.timestamp))
                     .font(.system(size: 11, design: .monospaced))
@@ -600,6 +628,7 @@ struct QuickActionChip: View {
             .background(Color.terminalInputBackground)
             .terminalBorder(cornerRadius: 16)
         }
+        .pressableButton()
     }
 }
 

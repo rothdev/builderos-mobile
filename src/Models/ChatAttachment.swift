@@ -200,6 +200,14 @@ struct ChatAttachment: Identifiable, Codable, Equatable {
         (filename as NSString).pathExtension
     }
 
+    /// Remote URL returned by server after successful upload
+    var remoteURL: String? {
+        if case .completed(let url) = uploadState {
+            return url
+        }
+        return nil
+    }
+
     static func == (lhs: ChatAttachment, rhs: ChatAttachment) -> Bool {
         lhs.id == rhs.id
     }

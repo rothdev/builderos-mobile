@@ -1,0 +1,354 @@
+2025-10-28 17:24:01,301 - __main__ - INFO - 🔧 Initializing SessionManager...
+2025-10-28 17:24:01,307 - session_manager - INFO - ✅ Database initialized: api/sessions.db
+2025-10-28 17:24:01,308 - session_manager - INFO - 📚 Loaded 0 sessions from database
+2025-10-28 17:24:01,308 - __main__ - INFO - 🧹 Cleaning up sessions older than 30 days...
+2025-10-28 17:24:01,308 - session_manager - INFO - 🧹 Deleted 0 sessions older than 30 days
+2025-10-28 17:24:01,308 - __main__ - INFO - ✅ Deleted 0 old sessions
+2025-10-28 17:24:01,308 - __main__ - INFO - ============================================================
+2025-10-28 17:24:01,308 - __main__ - INFO - 🚀 BuilderOS Mobile API Server v2.0 (Session-Persistent)
+2025-10-28 17:24:01,308 - __main__ - INFO - ============================================================
+2025-10-28 17:24:01,308 - __main__ - INFO - 📡 Listening on http://localhost:8080
+2025-10-28 17:24:01,308 - __main__ - INFO - 🔌 WebSocket endpoints:
+2025-10-28 17:24:01,308 - __main__ - INFO -    - ws://localhost:8080/api/claude/ws (Jarvis)
+2025-10-28 17:24:01,308 - __main__ - INFO -    - ws://localhost:8080/api/codex/ws (Codex)
+2025-10-28 17:24:01,308 - __main__ - INFO - 💾 Session database: api/sessions.db
+2025-10-28 17:24:01,308 - __main__ - INFO - 📚 Active sessions: 0
+2025-10-28 17:24:01,308 - __main__ - INFO - ============================================================
+2025-10-28 17:24:04,048 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:24:04 -0700] "DELETE /api/claude/session/28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-6AD1A658-F185-46C8-BFFD-F447B20BF108/close HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:24:29,372 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:24:29,698 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:26:43,400 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:26:43,727 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:26:43,906 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:26:45,375 - __main__ - INFO - 🔵 Codex WebSocket connection established
+2025-10-28 17:26:45,425 - __main__ - INFO - 🔵 Codex WebSocket connection established
+2025-10-28 17:26:45,512 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:26:45,633 - __main__ - WARNING - ⚠️ Invalid JSON received
+2025-10-28 17:26:45,719 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:26:45,822 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:26:51,067 - __main__ - WARNING - ❌ First message was not text
+2025-10-28 17:26:51,068 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:26:45 -0700] "GET /api/codex/ws HTTP/1.1" 101 0 "-" "-"
+2025-10-28 17:26:58,225 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:26:58,238 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:26:58,396 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:26:58,429 - __main__ - WARNING - ⚠️ Invalid JSON received
+2025-10-28 17:26:58,606 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:26:58,695 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:27:08,239 - __main__ - WARNING - ❌ Authentication timeout
+2025-10-28 17:27:08,344 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:26:58 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "-"
+2025-10-28 17:27:14,544 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:27:14,544 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:26:58 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "-"
+2025-10-28 17:27:28,924 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:27:28 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:27:29,061 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:27:29 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:27:36,435 - __main__ - INFO - 📬 Claude received: Hello... (session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-E01B72FE-3B8D-42FE-9405-BF18D2B10CC9)
+2025-10-28 17:27:36,436 - performance_trace - INFO - [TRACE 244a37a4] trace_created
+2025-10-28 17:27:36,436 - performance_trace - INFO - [TRACE 244a37a4] server_received_message (+0ms from trace_created)
+2025-10-28 17:27:36,436 - __main__ - INFO - 📬 Processing Claude message (session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-E01B72FE-3B8D-42FE-9405-BF18D2B10CC9, trace: 244a37a4)
+2025-10-28 17:27:36,444 - session_manager - INFO - 📖 Loaded CLAUDE.md context (5114 chars)
+2025-10-28 17:27:36,446 - session_manager - INFO - ✨ Created new session '28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-E01B72FE-3B8D-42FE-9405-BF18D2B10CC9' (claude)
+2025-10-28 17:27:36,447 - performance_trace - INFO - [TRACE 244a37a4] session_loaded (+11ms from server_received_message)
+2025-10-28 17:27:36,447 - __main__ - INFO - 📚 Session has 0 messages in history
+2025-10-28 17:27:36,447 - performance_trace - INFO - [TRACE 244a37a4] history_prepared (+0ms from session_loaded)
+2025-10-28 17:27:36,447 - performance_trace - INFO - [TRACE 244a37a4] bridgehub_call_start (+0ms from history_prepared)
+2025-10-28 17:27:36,447 - bridgehub_client - INFO - 📞 Calling BridgeHub for Jarvis session '28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-E01B72FE-3B8D-42FE-9405-BF18D2B10CC9' → Claude Code
+2025-10-28 17:27:36,453 - bridgehub_client - INFO - ⏱️  BridgeHub process spawned in 6ms
+2025-10-28 17:27:39,094 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:27:39 -0700] "DELETE /api/claude/session/28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-CFC6D618-54CF-40F0-9C2B-A41612741C97/close HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:28:10,562 - bridgehub_client - INFO - ⏱️  First output from BridgeHub in 34115ms
+2025-10-28 17:28:10,562 - bridgehub_client - INFO - ✅ BridgeHub call successful
+2025-10-28 17:28:10,562 - bridgehub_client - INFO - ⏱️  First chunk yielded in 34116ms
+2025-10-28 17:28:10,562 - performance_trace - INFO - [TRACE 244a37a4] first_chunk_received (+34116ms from bridgehub_call_start)
+2025-10-28 17:28:10,920 - performance_trace - INFO - [TRACE 244a37a4] bridgehub_call_complete (+358ms from first_chunk_received)
+2025-10-28 17:28:10,920 - __main__ - INFO - ✅ Streamed 7 chunks to client
+2025-10-28 17:28:10,920 - performance_trace - INFO - [TRACE 244a37a4] response_saved_to_session (+0ms from bridgehub_call_complete)
+2025-10-28 17:28:10,925 - performance_trace - INFO - [TRACE 244a37a4] session_persisted_to_db (+4ms from response_saved_to_session)
+2025-10-28 17:28:10,925 - performance_trace - INFO - [TRACE 244a37a4] completion_sent_to_client (+0ms from session_persisted_to_db)
+2025-10-28 17:28:10,925 - __main__ - INFO - 💾 Session persisted (2 messages total)
+2025-10-28 17:28:10,925 - performance_trace - INFO - ================================================================================
+2025-10-28 17:28:10,925 - performance_trace - INFO - PERFORMANCE TRACE SUMMARY: 244a37a4
+2025-10-28 17:28:10,925 - performance_trace - INFO - ================================================================================
+2025-10-28 17:28:10,925 - performance_trace - INFO - Session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-E01B72FE-3B8D-42FE-9405-BF18D2B10CC9
+2025-10-28 17:28:10,925 - performance_trace - INFO - Agent: claude
+2025-10-28 17:28:10,925 - performance_trace - INFO - Total Duration: 34489ms
+2025-10-28 17:28:10,925 - performance_trace - INFO - 
+2025-10-28 17:28:10,925 - performance_trace - INFO - Timing Breakdown:
+2025-10-28 17:28:10,925 - performance_trace - INFO - --------------------------------------------------------------------------------
+2025-10-28 17:28:10,925 - performance_trace - INFO -   trace_created                  → server_received_message                0ms
+2025-10-28 17:28:10,925 - performance_trace - INFO -   server_received_message        → session_loaded                        10ms
+2025-10-28 17:28:10,925 - performance_trace - INFO -   session_loaded                 → history_prepared                       0ms
+2025-10-28 17:28:10,925 - performance_trace - INFO -   history_prepared               → bridgehub_call_start                   0ms
+2025-10-28 17:28:10,925 - performance_trace - INFO -   bridgehub_call_start           → first_chunk_received               34116ms
+2025-10-28 17:28:10,925 - performance_trace - INFO -   first_chunk_received           → bridgehub_call_complete              358ms
+2025-10-28 17:28:10,925 - performance_trace - INFO -   bridgehub_call_complete        → response_saved_to_session              0ms
+2025-10-28 17:28:10,925 - performance_trace - INFO -   response_saved_to_session      → session_persisted_to_db                4ms
+2025-10-28 17:28:10,925 - performance_trace - INFO -   session_persisted_to_db        → completion_sent_to_client              0ms
+2025-10-28 17:28:10,925 - performance_trace - INFO - ================================================================================
+2025-10-28 17:28:25,797 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:28:25,797 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:26:43 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "-"
+2025-10-28 17:28:25,803 - __main__ - INFO - 👋 Codex WebSocket disconnected
+2025-10-28 17:28:25,803 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:26:45 -0700] "GET /api/codex/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 17:28:32,010 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:28:32,216 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:28:32,313 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:28:47,502 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:28:47,545 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:28:47,767 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:28:47,811 - __main__ - WARNING - ⚠️ Invalid JSON received
+2025-10-28 17:28:47,879 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:28:47,912 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:28:51,561 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:28:51,561 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:47 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 17:28:51,730 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:51 -0700] "DELETE /api/claude/session/28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-1BE4666E-B6C2-44FA-97FF-13A91DB3D469/close HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:28:53,425 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:53 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:28:53,552 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:53 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:28:54,330 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:54 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:28:54,483 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:54 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:28:55,187 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:55 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:28:55,319 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:55 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:28:56,591 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:56 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:28:57,545 - __main__ - WARNING - ❌ Authentication timeout
+2025-10-28 17:28:57,652 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:47 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 17:28:57,881 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:57 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:28:57,986 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:57 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:29:07,513 - __main__ - INFO - 📬 Claude received: Hello... (session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-8ADC69ED-80A4-41C0-B665-D51319E04324)
+2025-10-28 17:29:07,514 - performance_trace - INFO - [TRACE a5e34d50] trace_created
+2025-10-28 17:29:07,514 - performance_trace - INFO - [TRACE a5e34d50] server_received_message (+0ms from trace_created)
+2025-10-28 17:29:07,514 - __main__ - INFO - 📬 Processing Claude message (session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-8ADC69ED-80A4-41C0-B665-D51319E04324, trace: a5e34d50)
+2025-10-28 17:29:07,515 - session_manager - INFO - 📖 Loaded CLAUDE.md context (5114 chars)
+2025-10-28 17:29:07,516 - session_manager - INFO - ✨ Created new session '28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-8ADC69ED-80A4-41C0-B665-D51319E04324' (claude)
+2025-10-28 17:29:07,516 - performance_trace - INFO - [TRACE a5e34d50] session_loaded (+3ms from server_received_message)
+2025-10-28 17:29:07,516 - __main__ - INFO - 📚 Session has 0 messages in history
+2025-10-28 17:29:07,517 - performance_trace - INFO - [TRACE a5e34d50] history_prepared (+0ms from session_loaded)
+2025-10-28 17:29:07,517 - performance_trace - INFO - [TRACE a5e34d50] bridgehub_call_start (+0ms from history_prepared)
+2025-10-28 17:29:07,517 - bridgehub_client - INFO - 📞 Calling BridgeHub for Jarvis session '28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-8ADC69ED-80A4-41C0-B665-D51319E04324' → Claude Code
+2025-10-28 17:29:07,520 - bridgehub_client - INFO - ⏱️  BridgeHub process spawned in 3ms
+2025-10-28 17:29:37,872 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:29:37 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:29:38,011 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:29:38 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:29:39,428 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:29:39 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:29:45,683 - bridgehub_client - INFO - ⏱️  First output from BridgeHub in 38166ms
+2025-10-28 17:29:45,683 - bridgehub_client - INFO - ✅ BridgeHub call successful
+2025-10-28 17:29:45,683 - bridgehub_client - INFO - ⏱️  First chunk yielded in 38166ms
+2025-10-28 17:29:45,683 - performance_trace - INFO - [TRACE a5e34d50] first_chunk_received (+38166ms from bridgehub_call_start)
+2025-10-28 17:29:46,144 - performance_trace - INFO - [TRACE a5e34d50] bridgehub_call_complete (+461ms from first_chunk_received)
+2025-10-28 17:29:46,144 - __main__ - INFO - ✅ Streamed 9 chunks to client
+2025-10-28 17:29:46,144 - performance_trace - INFO - [TRACE a5e34d50] response_saved_to_session (+0ms from bridgehub_call_complete)
+2025-10-28 17:29:46,148 - performance_trace - INFO - [TRACE a5e34d50] session_persisted_to_db (+4ms from response_saved_to_session)
+2025-10-28 17:29:46,148 - performance_trace - INFO - [TRACE a5e34d50] completion_sent_to_client (+0ms from session_persisted_to_db)
+2025-10-28 17:29:46,148 - __main__ - INFO - 💾 Session persisted (2 messages total)
+2025-10-28 17:29:46,148 - performance_trace - INFO - ================================================================================
+2025-10-28 17:29:46,148 - performance_trace - INFO - PERFORMANCE TRACE SUMMARY: a5e34d50
+2025-10-28 17:29:46,148 - performance_trace - INFO - ================================================================================
+2025-10-28 17:29:46,148 - performance_trace - INFO - Session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-8ADC69ED-80A4-41C0-B665-D51319E04324
+2025-10-28 17:29:46,148 - performance_trace - INFO - Agent: claude
+2025-10-28 17:29:46,148 - performance_trace - INFO - Total Duration: 38634ms
+2025-10-28 17:29:46,148 - performance_trace - INFO - 
+2025-10-28 17:29:46,148 - performance_trace - INFO - Timing Breakdown:
+2025-10-28 17:29:46,148 - performance_trace - INFO - --------------------------------------------------------------------------------
+2025-10-28 17:29:46,148 - performance_trace - INFO -   trace_created                  → server_received_message                0ms
+2025-10-28 17:29:46,148 - performance_trace - INFO -   server_received_message        → session_loaded                         3ms
+2025-10-28 17:29:46,148 - performance_trace - INFO -   session_loaded                 → history_prepared                       0ms
+2025-10-28 17:29:46,148 - performance_trace - INFO -   history_prepared               → bridgehub_call_start                   0ms
+2025-10-28 17:29:46,148 - performance_trace - INFO -   bridgehub_call_start           → first_chunk_received               38166ms
+2025-10-28 17:29:46,148 - performance_trace - INFO -   first_chunk_received           → bridgehub_call_complete              461ms
+2025-10-28 17:29:46,148 - performance_trace - INFO -   bridgehub_call_complete        → response_saved_to_session              0ms
+2025-10-28 17:29:46,148 - performance_trace - INFO -   response_saved_to_session      → session_persisted_to_db                4ms
+2025-10-28 17:29:46,148 - performance_trace - INFO -   session_persisted_to_db        → completion_sent_to_client              0ms
+2025-10-28 17:29:46,148 - performance_trace - INFO - ================================================================================
+2025-10-28 17:29:50,075 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:29:50 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:29:50,194 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:29:50 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:30:19,038 - __main__ - INFO - 📬 Claude received: Yes hello Jarvis... (session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-8ADC69ED-80A4-41C0-B665-D51319E04324)
+2025-10-28 17:30:19,041 - performance_trace - INFO - [TRACE 53126159] trace_created
+2025-10-28 17:30:19,042 - performance_trace - INFO - [TRACE 53126159] server_received_message (+0ms from trace_created)
+2025-10-28 17:30:19,042 - __main__ - INFO - 📬 Processing Claude message (session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-8ADC69ED-80A4-41C0-B665-D51319E04324, trace: 53126159)
+2025-10-28 17:30:19,042 - performance_trace - INFO - [TRACE 53126159] session_loaded (+0ms from server_received_message)
+2025-10-28 17:30:19,042 - __main__ - INFO - 📚 Session has 2 messages in history
+2025-10-28 17:30:19,042 - performance_trace - INFO - [TRACE 53126159] history_prepared (+0ms from session_loaded)
+2025-10-28 17:30:19,042 - performance_trace - INFO - [TRACE 53126159] bridgehub_call_start (+0ms from history_prepared)
+2025-10-28 17:30:19,042 - bridgehub_client - INFO - 📞 Calling BridgeHub for Jarvis session '28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-8ADC69ED-80A4-41C0-B665-D51319E04324' → Claude Code
+2025-10-28 17:30:19,049 - bridgehub_client - INFO - ⏱️  BridgeHub process spawned in 7ms
+2025-10-28 17:30:43,316 - bridgehub_client - INFO - ⏱️  First output from BridgeHub in 24274ms
+2025-10-28 17:30:43,317 - bridgehub_client - INFO - ✅ BridgeHub call successful
+2025-10-28 17:30:43,317 - bridgehub_client - INFO - ⏱️  First chunk yielded in 24275ms
+2025-10-28 17:30:43,317 - performance_trace - INFO - [TRACE 53126159] first_chunk_received (+24275ms from bridgehub_call_start)
+2025-10-28 17:30:43,573 - performance_trace - INFO - [TRACE 53126159] bridgehub_call_complete (+256ms from first_chunk_received)
+2025-10-28 17:30:43,573 - __main__ - INFO - ✅ Streamed 5 chunks to client
+2025-10-28 17:30:43,573 - performance_trace - INFO - [TRACE 53126159] response_saved_to_session (+0ms from bridgehub_call_complete)
+2025-10-28 17:30:43,578 - performance_trace - INFO - [TRACE 53126159] session_persisted_to_db (+5ms from response_saved_to_session)
+2025-10-28 17:30:43,579 - performance_trace - INFO - [TRACE 53126159] completion_sent_to_client (+0ms from session_persisted_to_db)
+2025-10-28 17:30:43,579 - __main__ - INFO - 💾 Session persisted (4 messages total)
+2025-10-28 17:30:43,579 - performance_trace - INFO - ================================================================================
+2025-10-28 17:30:43,579 - performance_trace - INFO - PERFORMANCE TRACE SUMMARY: 53126159
+2025-10-28 17:30:43,579 - performance_trace - INFO - ================================================================================
+2025-10-28 17:30:43,579 - performance_trace - INFO - Session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-8ADC69ED-80A4-41C0-B665-D51319E04324
+2025-10-28 17:30:43,579 - performance_trace - INFO - Agent: claude
+2025-10-28 17:30:43,579 - performance_trace - INFO - Total Duration: 24537ms
+2025-10-28 17:30:43,579 - performance_trace - INFO - 
+2025-10-28 17:30:43,579 - performance_trace - INFO - Timing Breakdown:
+2025-10-28 17:30:43,579 - performance_trace - INFO - --------------------------------------------------------------------------------
+2025-10-28 17:30:43,579 - performance_trace - INFO -   trace_created                  → server_received_message                0ms
+2025-10-28 17:30:43,579 - performance_trace - INFO -   server_received_message        → session_loaded                         0ms
+2025-10-28 17:30:43,579 - performance_trace - INFO -   session_loaded                 → history_prepared                       0ms
+2025-10-28 17:30:43,579 - performance_trace - INFO -   history_prepared               → bridgehub_call_start                   0ms
+2025-10-28 17:30:43,579 - performance_trace - INFO -   bridgehub_call_start           → first_chunk_received               24275ms
+2025-10-28 17:30:43,579 - performance_trace - INFO -   first_chunk_received           → bridgehub_call_complete              256ms
+2025-10-28 17:30:43,579 - performance_trace - INFO -   bridgehub_call_complete        → response_saved_to_session              0ms
+2025-10-28 17:30:43,579 - performance_trace - INFO -   response_saved_to_session      → session_persisted_to_db                5ms
+2025-10-28 17:30:43,579 - performance_trace - INFO -   session_persisted_to_db        → completion_sent_to_client              0ms
+2025-10-28 17:30:43,579 - performance_trace - INFO - ================================================================================
+2025-10-28 17:31:03,622 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:31:03,649 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:31:03,804 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:31:03,836 - __main__ - WARNING - ⚠️ Invalid JSON received
+2025-10-28 17:31:03,998 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:31:04,089 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:31:08,779 - __main__ - INFO - 📬 Claude received: Hello.... (session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-DF20D40C-7489-4435-BB76-77177AAC98A7)
+2025-10-28 17:31:08,779 - performance_trace - INFO - [TRACE ad7d35b0] trace_created
+2025-10-28 17:31:08,779 - performance_trace - INFO - [TRACE ad7d35b0] server_received_message (+0ms from trace_created)
+2025-10-28 17:31:08,779 - __main__ - INFO - 📬 Processing Claude message (session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-DF20D40C-7489-4435-BB76-77177AAC98A7, trace: ad7d35b0)
+2025-10-28 17:31:08,781 - session_manager - INFO - 📖 Loaded CLAUDE.md context (5114 chars)
+2025-10-28 17:31:08,782 - session_manager - INFO - ✨ Created new session '28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-DF20D40C-7489-4435-BB76-77177AAC98A7' (claude)
+2025-10-28 17:31:08,782 - performance_trace - INFO - [TRACE ad7d35b0] session_loaded (+2ms from server_received_message)
+2025-10-28 17:31:08,782 - __main__ - INFO - 📚 Session has 0 messages in history
+2025-10-28 17:31:08,782 - performance_trace - INFO - [TRACE ad7d35b0] history_prepared (+0ms from session_loaded)
+2025-10-28 17:31:08,782 - performance_trace - INFO - [TRACE ad7d35b0] bridgehub_call_start (+0ms from history_prepared)
+2025-10-28 17:31:08,782 - bridgehub_client - INFO - 📞 Calling BridgeHub for Jarvis session '28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-DF20D40C-7489-4435-BB76-77177AAC98A7' → Claude Code
+2025-10-28 17:31:08,785 - bridgehub_client - INFO - ⏱️  BridgeHub process spawned in 3ms
+2025-10-28 17:31:13,651 - __main__ - WARNING - ❌ Authentication timeout
+2025-10-28 17:31:13,756 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:31:03 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 17:31:21,706 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:31:21 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:31:21,826 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:31:21 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:31:23,387 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:31:23 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:31:23,503 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:31:23 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:31:26,253 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:31:26 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:31:26,392 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:31:26 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:31:38,399 - bridgehub_client - INFO - ⏱️  First output from BridgeHub in 29617ms
+2025-10-28 17:31:38,400 - bridgehub_client - INFO - ✅ BridgeHub call successful
+2025-10-28 17:31:38,400 - bridgehub_client - INFO - ⏱️  First chunk yielded in 29618ms
+2025-10-28 17:31:38,400 - performance_trace - INFO - [TRACE ad7d35b0] first_chunk_received (+29618ms from bridgehub_call_start)
+2025-10-28 17:31:38,401 - __main__ - ERROR - ❌ Error during BridgeHub call: Cannot write to closing transport
+Traceback (most recent call last):
+  File "/Users/Ty/BuilderOS/capsules/builderos-mobile/api/server_persistent.py", line 152, in handle_claude_session
+    await ws.send_json(chunk_msg)
+  File "/opt/homebrew/lib/python3.14/site-packages/aiohttp/web_ws.py", line 403, in send_json
+    await self.send_str(dumps(data), compress=compress)
+  File "/opt/homebrew/lib/python3.14/site-packages/aiohttp/web_ws.py", line 387, in send_str
+    await self._writer.send(data, binary=False, compress=compress)
+  File "/opt/homebrew/lib/python3.14/site-packages/aiohttp/http_websocket.py", line 752, in send
+    await self._send_frame(message, WSMsgType.TEXT, compress)
+  File "/opt/homebrew/lib/python3.14/site-packages/aiohttp/http_websocket.py", line 686, in _send_frame
+    raise ClientConnectionResetError("Cannot write to closing transport")
+aiohttp.client_exceptions.ClientConnectionResetError: Cannot write to closing transport
+2025-10-28 17:31:38,406 - __main__ - ERROR - ❌ Failed to send error message: Cannot write to closing transport
+2025-10-28 17:31:38,406 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:31:38,406 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:31:03 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 17:31:43,303 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:31:43,303 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:28:32 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 17:31:45,525 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:31:45,723 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:31:45,935 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:31:48,228 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:31:48 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:31:48,335 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:31:48 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:31:52,318 - __main__ - INFO - 📬 Claude received: Hello... (session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-251428F2-C614-41F0-8B57-BC0ECD9624EA)
+2025-10-28 17:31:52,319 - performance_trace - INFO - [TRACE a650cf75] trace_created
+2025-10-28 17:31:52,319 - performance_trace - INFO - [TRACE a650cf75] server_received_message (+0ms from trace_created)
+2025-10-28 17:31:52,319 - __main__ - INFO - 📬 Processing Claude message (session: 28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-251428F2-C614-41F0-8B57-BC0ECD9624EA, trace: a650cf75)
+2025-10-28 17:31:52,323 - session_manager - INFO - 📖 Loaded CLAUDE.md context (5114 chars)
+2025-10-28 17:31:52,324 - session_manager - INFO - ✨ Created new session '28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-251428F2-C614-41F0-8B57-BC0ECD9624EA' (claude)
+2025-10-28 17:31:52,324 - performance_trace - INFO - [TRACE a650cf75] session_loaded (+5ms from server_received_message)
+2025-10-28 17:31:52,324 - __main__ - INFO - 📚 Session has 0 messages in history
+2025-10-28 17:31:52,324 - performance_trace - INFO - [TRACE a650cf75] history_prepared (+0ms from session_loaded)
+2025-10-28 17:31:52,324 - performance_trace - INFO - [TRACE a650cf75] bridgehub_call_start (+0ms from history_prepared)
+2025-10-28 17:31:52,324 - bridgehub_client - INFO - 📞 Calling BridgeHub for Jarvis session '28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-251428F2-C614-41F0-8B57-BC0ECD9624EA' → Claude Code
+2025-10-28 17:31:52,327 - bridgehub_client - INFO - ⏱️  BridgeHub process spawned in 3ms
+2025-10-28 17:32:06,812 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:32:06,812 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:24:29 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 17:32:35,442 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:32:41,141 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:32:45,436 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:32:45,443 - __main__ - WARNING - ❌ Authentication timeout
+2025-10-28 17:32:45,456 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:32:45,491 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:32:35 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "-"
+2025-10-28 17:32:45,602 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:32:45,652 - __main__ - WARNING - ⚠️ Invalid JSON received
+2025-10-28 17:32:45,711 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:32:45,774 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:32:49,413 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:32:49,414 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:32:45 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "-"
+2025-10-28 17:32:49,486 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:32:49 -0700] "DELETE /api/claude/session/28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-143499C2-966C-46AE-9558-67C4B5B9F9C5/close HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:32:51,143 - __main__ - WARNING - ❌ Authentication timeout
+2025-10-28 17:32:51,257 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:32:41 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 17:32:53,667 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:32:53,823 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:32:55,439 - __main__ - WARNING - ❌ Authentication timeout
+2025-10-28 17:32:55,552 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:32:45 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "-"
+2025-10-28 17:32:56,380 - bridgehub_client - INFO - ⏱️  First output from BridgeHub in 64056ms
+2025-10-28 17:32:56,380 - bridgehub_client - INFO - ✅ BridgeHub call successful
+2025-10-28 17:32:56,380 - bridgehub_client - INFO - ⏱️  First chunk yielded in 64056ms
+2025-10-28 17:32:56,380 - performance_trace - INFO - [TRACE a650cf75] first_chunk_received (+64057ms from bridgehub_call_start)
+2025-10-28 17:32:56,380 - __main__ - ERROR - ❌ Error during BridgeHub call: Cannot write to closing transport
+Traceback (most recent call last):
+  File "/Users/Ty/BuilderOS/capsules/builderos-mobile/api/server_persistent.py", line 152, in handle_claude_session
+    await ws.send_json(chunk_msg)
+  File "/opt/homebrew/lib/python3.14/site-packages/aiohttp/web_ws.py", line 403, in send_json
+    await self.send_str(dumps(data), compress=compress)
+  File "/opt/homebrew/lib/python3.14/site-packages/aiohttp/web_ws.py", line 387, in send_str
+    await self._writer.send(data, binary=False, compress=compress)
+  File "/opt/homebrew/lib/python3.14/site-packages/aiohttp/http_websocket.py", line 752, in send
+    await self._send_frame(message, WSMsgType.TEXT, compress)
+  File "/opt/homebrew/lib/python3.14/site-packages/aiohttp/http_websocket.py", line 686, in _send_frame
+    raise ClientConnectionResetError("Cannot write to closing transport")
+aiohttp.client_exceptions.ClientConnectionResetError: Cannot write to closing transport
+2025-10-28 17:32:56,382 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:32:56,382 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:31:45 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 17:33:21,746 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:33:21,747 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:32:53 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 17:33:28,837 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:33:28,995 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:33:29,209 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:33:41,031 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:41 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:41,255 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:41 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:41,725 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:41 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:41,848 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:41 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:42,585 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:42 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:42,787 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:42 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:46,763 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:46 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:46,958 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:46 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:48,008 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:48 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:48,134 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:48 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:50,283 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:50 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:50,405 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:50 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:51,280 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:51 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:51,400 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:51 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:52,691 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:52 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:52,726 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:52 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:52,751 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:52 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:53,686 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:53 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:53,808 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:53 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:55,343 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:55 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:55,460 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:55 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:33:57,635 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:33:57,635 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:28 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "Go-http-client/2.0"
+2025-10-28 17:33:59,361 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:33:59,548 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:33:59,659 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:34:02,470 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:34:02,588 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:34:02,653 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:34:02,697 - __main__ - WARNING - ⚠️ Invalid JSON received
+2025-10-28 17:34:02,757 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:34:02,799 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:34:04,836 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:34:04,836 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:34:02 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "-"
+2025-10-28 17:34:05,218 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:34:05 -0700] "DELETE /api/claude/session/28C390BF-7F9D-43DD-8A70-4AE224E6C841-claude-274E3F7C-6BD5-48CA-AFAD-4FEE2AE9563A/close HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:34:12,589 - __main__ - WARNING - ❌ Authentication timeout
+2025-10-28 17:34:12,709 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:34:02 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "-"
+2025-10-28 17:34:24,948 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:34:24,948 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:33:59 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "-"
+2025-10-28 17:34:47,706 - __main__ - INFO - 🔵 Claude WebSocket connection established
+2025-10-28 17:34:47,855 - __main__ - INFO - ✅ WebSocket authenticated
+2025-10-28 17:34:48,015 - __main__ - WARNING - ⚠️ Empty message received
+2025-10-28 17:35:57,652 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:35:57 -0700] "GET /api/status HTTP/1.1" 200 431 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:35:57,789 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:35:57 -0700] "GET /api/capsules HTTP/1.1" 404 175 "-" "BuilderOS/1 CFNetwork/3860.200.61 Darwin/25.1.0"
+2025-10-28 17:35:58,695 - __main__ - INFO - 👋 Claude WebSocket disconnected
+2025-10-28 17:35:58,695 - aiohttp.access - INFO - 127.0.0.1 [28/Oct/2025:16:34:47 -0700] "GET /api/claude/ws HTTP/1.1" 101 0 "-" "-"
+======== Running on http://0.0.0.0:8080 ========
+(Press CTRL+C to quit)

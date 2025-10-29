@@ -5,7 +5,7 @@ Persistent conversation sessions with SQLite storage
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 from datetime import datetime
 import json
 import sqlite3
@@ -70,10 +70,41 @@ class Session:
     def get_conversation_history(self, max_messages: Optional[int] = None) -> List[Dict]:
         """Get conversation history formatted for Claude API"""
         messages = self.messages[-max_messages:] if max_messages else self.messages
-        return [
-            {"role": msg.role, "content": msg.content}
-            for msg in messages
-        ]
+        formatted: List[Dict[str, Any]] = []
+
+        for msg in messages:
+            content = msg.content
+            attachments = []
+
+            if msg.metadata and isinstance(msg.metadata, dict):
+                raw_attachments = msg.metadata.get("attachments", [])
+                if isinstance(raw_attachments, list):
+                    attachments = [att for att in raw_attachments if isinstance(att, dict)]
+
+            if attachments:
+                attachment_lines = []
+                for att in attachments:
+                    filename = att.get("filename", "file")
+                    attachment_type = att.get("type", "file")
+                    url = att.get("url", "")
+                    size = att.get("size")
+
+                    size_display = ""
+                    if isinstance(size, (int, float)):
+                        size_display = f" ({size} bytes)"
+
+                    attachment_lines.append(
+                        f"- {filename} [{attachment_type}]{size_display} {url}".strip()
+                    )
+
+                content = f"{content}\n\nAttachments:\n" + "\n".join(attachment_lines)
+
+            formatted.append({
+                "role": msg.role,
+                "content": content
+            })
+
+        return formatted
 
     def to_dict(self) -> Dict:
         """Serialize session to dictionary"""

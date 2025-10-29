@@ -8,6 +8,7 @@ import Inject
 
 struct CapsuleDetailView: View {
     let capsule: Capsule
+    var heroNamespace: Namespace.ID?
     @Environment(\.dismiss) private var dismiss
     @ObserveInjection var inject
 
@@ -41,6 +42,9 @@ struct CapsuleDetailView: View {
                                 .foregroundColor(Color.terminalCode)
                                 .lineLimit(1)
                         }
+                    }
+                    .if(heroNamespace != nil) { view in
+                        view.matchedGeometryEffect(id: capsule.id, in: heroNamespace!)
                     }
 
                     // Description
@@ -81,5 +85,17 @@ struct MetricRow: View {
                 .foregroundColor(Color.terminalCyan)
         }
         .enableInjection()
+    }
+}
+
+// Helper extension for conditional modifiers
+extension View {
+    @ViewBuilder
+    func `if`<Transform: View>(_ condition: Bool, transform: (Self) -> Transform) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
     }
 }

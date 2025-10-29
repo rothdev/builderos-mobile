@@ -23,6 +23,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
     private var connectionTask: Task<Void, Error>?  // NEW: Store connection task to prevent cancellation
     private var isUserInitiatedDisconnect = false
     private var isConnecting = false
+    private var firstUserMessageSent = false  // NEW: Track if user has sent their first message
 
     private let heartbeatInterval: TimeInterval = 25
     private let reconnectDelay: TimeInterval = 2.0
@@ -262,7 +263,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
 
     // MARK: - Message Handling
 
-    override func sendMessage(_ text: String) async throws {
+    override func sendMessage(_ text: String, attachments: [ChatAttachment]) async throws {
         guard isConnected else {
             throw CodexAgentError.notConnected
         }
@@ -272,18 +273,50 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
             return
         }
 
-        print("📤 Sending Codex message: \(trimmed.prefix(60))…")
+        // Mark that user has sent their first message (enables error display)
+        if !firstUserMessageSent {
+            firstUserMessageSent = true
+            print("✅ First user message sent - error display now enabled")
+        }
 
-        let userMessage = ClaudeChatMessage(text: trimmed, isUser: true)
+        print("📤 Sending Codex message: \(trimmed.prefix(60))…")
+        if !attachments.isEmpty {
+            print("📎 Sending \(attachments.count) attachment(s) with Codex message")
+        }
+
+        let sanitizedAttachments = attachments.filter { $0.remoteURL != nil }
+        let userMessage = ClaudeChatMessage(
+            text: trimmed,
+            isUser: true,
+            attachments: sanitizedAttachments
+        )
         messages.append(userMessage)
 
         // Send to WebSocket with session persistence fields
-        let payload: [String: Any] = [
+        var payload: [String: Any] = [
             "content": trimmed,
             "session_id": self.sessionId,
             "device_id": self.deviceId,
             "chat_type": "codex"
         ]
+
+        if !sanitizedAttachments.isEmpty {
+            let attachmentsPayload: [[String: Any]] = sanitizedAttachments.compactMap { attachment in
+                guard let remoteURL = attachment.remoteURL else { return nil }
+                return [
+                    "id": attachment.id.uuidString,
+                    "filename": attachment.filename,
+                    "mime_type": attachment.mimeType,
+                    "size": attachment.size,
+                    "type": attachment.type.rawValue,
+                    "url": remoteURL
+                ]
+            }
+
+            if !attachmentsPayload.isEmpty {
+                payload["attachments"] = attachmentsPayload
+            }
+        }
         let data = try JSONSerialization.data(withJSONObject: payload)
         guard let jsonString = String(data: data, encoding: .utf8) else {
             throw CodexAgentError.invalidMessageFormat
@@ -459,6 +492,14 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
     // MARK: - Message Processing
 
     private func handleReceivedText(_ text: String) async {
+        print("🔍 [DEBUG] ========================================")
+        print("🔍 [DEBUG] Codex handleReceivedText called")
+        print("🔍 [DEBUG] Full text length: \(text.count)")
+        print("🔍 [DEBUG] Full text: \(text)")
+        print("🔍 [DEBUG] Current message count: \(messages.count)")
+        print("🔍 [DEBUG] isLoading: \(isLoading), authComplete: \(authenticationComplete), authReceived: \(authenticationReceived)")
+        print("🔍 [DEBUG] ========================================")
+
         if text == "error:invalid_api_key" {
             print("❌ Codex authentication failed: invalid API key")
             connectionStatus = "Error: Invalid API key"
@@ -482,9 +523,38 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
             return
         }
 
+        // Handle session config confirmation (server may echo back the config we sent)
+        if text.contains("working_directory") && !authenticationComplete {
+            print("📋 Received Codex session config confirmation/echo, ignoring")
+            return
+        }
+
         guard let data = text.data(using: .utf8),
               let response = try? JSONDecoder().decode(CodexResponse.self, from: data) else {
-            print("⚠️ Codex failed to decode JSON: \(text)")
+            print("⚠️ Codex failed to decode message as JSON")
+            print("🔍 [DEBUG] Raw text that failed to decode: \(text)")
+            print("🔍 [DEBUG] authenticationComplete: \(authenticationComplete)")
+            print("🔍 [DEBUG] Message will be: \(authenticationComplete ? "ADDED TO UI ❌" : "IGNORED ✅")")
+
+            // DEFENSIVE FIX: Only show errors after user has started chatting
+            // This prevents protocol-level messages (connection handshake, authentication, etc.)
+            // from appearing as error messages in the UI during the connection phase.
+            //
+            // Rationale:
+            // - Connection phase may produce non-JSON messages (e.g., protocol confirmations)
+            // - These should NEVER be visible to users as "Invalid message format" errors
+            // - Real chat errors only happen AFTER user starts interacting
+            // - If there's a genuine error, backend will send proper JSON with type="error"
+            if firstUserMessageSent {
+                print("⚠️ Codex unparseable message received AFTER user interaction - showing error")
+                let errorMsg = ClaudeChatMessage(
+                    text: "Error: Invalid message format",
+                    isUser: false
+                )
+                messages.append(errorMsg)
+            } else {
+                print("🔍 [DEBUG] Ignoring unparseable message during connection phase (no user interaction yet)")
+            }
             return
         }
 

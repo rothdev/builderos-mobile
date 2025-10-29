@@ -125,6 +125,7 @@ struct SettingsView: View {
                             .background(Color.terminalInputBackground)
                             .terminalBorder(cornerRadius: 8)
                         }
+                        .pressableButton()
                     }
 
                     if apiClient.hasAPIKey {
@@ -251,6 +252,7 @@ struct SettingsView: View {
                             .background(Color.terminalInputBackground)
                             .terminalBorder(cornerRadius: 8)
                         }
+                        .pressableButton()
                     }
                 }
             }
@@ -282,6 +284,7 @@ struct SettingsView: View {
             .background(Color.terminalInputBackground)
             .terminalBorder(cornerRadius: 6)
         }
+        .pressableButton()
     }
 
     // MARK: - About Section
@@ -408,6 +411,7 @@ struct SettingsView: View {
             .background(Color.terminalRed.opacity(0.1))
             .terminalBorder(color: .terminalRed)
         }
+        .pressableButton()
     }
 
     private var apiKeyRow: some View {

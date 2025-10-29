@@ -107,8 +107,12 @@ class ChatAgentServiceBase: ObservableObject {
         // Subclasses should override and call super.disconnect()
     }
 
+    func sendMessage(_ text: String, attachments: [ChatAttachment]) async throws {
+        fatalError("Subclasses must override sendMessage(_:attachments:)")
+    }
+
     func sendMessage(_ text: String) async throws {
-        fatalError("Subclasses must override sendMessage(_:)")
+        try await sendMessage(text, attachments: [])
     }
 
     func clearMessages() {

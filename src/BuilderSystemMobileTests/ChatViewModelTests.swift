@@ -1,5 +1,5 @@
 import XCTest
-@testable import BuilderSystemMobile
+@testable import BuilderOS
 
 final class ChatViewModelTests: XCTestCase {
     var chatViewModel: ChatViewModel!

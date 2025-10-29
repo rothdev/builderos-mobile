@@ -35,6 +35,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
     private var connectionTask: Task<Void, Error>?  // NEW: Store connection task to prevent cancellation
     private var isUserInitiatedDisconnect = false
     private var isConnecting = false
+    private var firstUserMessageSent = false  // NEW: Track if user has sent their first message
 
     private let heartbeatInterval: TimeInterval = 25
     private let reconnectDelay: TimeInterval = 2.0
@@ -147,7 +148,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
 
         // Create Starscream WebSocket
         var request = URLRequest(url: wsURL)
-        request.timeoutInterval = 30  // Increased from 10 to 30 seconds for Claude Agent SDK initialization
+        request.timeoutInterval = 120  // Increased to 120 seconds to handle long Claude CLI responses (can take 60+ seconds)
 
         let socket = WebSocket(request: request)
         socket.delegate = self
@@ -309,7 +310,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
     // MARK: - Message Handling
 
     /// Send message to Claude Agent
-    override func sendMessage(_ text: String) async throws {
+    override func sendMessage(_ text: String, attachments: [ChatAttachment]) async throws {
         guard isConnected else {
             throw ClaudeAgentError.notConnected
         }
@@ -318,20 +319,52 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
             return
         }
 
+        // Mark that user has sent their first message (enables error display)
+        if !firstUserMessageSent {
+            firstUserMessageSent = true
+            print("✅ First user message sent - error display now enabled")
+        }
+
         print("📤 Sending message: \(text.prefix(50))...")
+        if !attachments.isEmpty {
+            print("📎 Sending \(attachments.count) attachment(s)")
+        }
 
         // Add user message to UI and persist
-        let userMessage = ClaudeChatMessage(text: text, isUser: true)
+        let sanitizedAttachments = attachments.filter { $0.remoteURL != nil }
+        let userMessage = ClaudeChatMessage(
+            text: text,
+            isUser: true,
+            attachments: sanitizedAttachments
+        )
         messages.append(userMessage)
         persistenceManager.saveMessage(userMessage, sessionId: self.sessionId)
 
         // Send to WebSocket with session persistence fields
-        let messageJSON: [String: Any] = [
+        var messageJSON: [String: Any] = [
             "content": text,
             "session_id": self.sessionId,
             "device_id": self.deviceId,
             "chat_type": "jarvis"
         ]
+
+        if !sanitizedAttachments.isEmpty {
+            let attachmentsPayload: [[String: Any]] = sanitizedAttachments.compactMap { attachment in
+                guard let remoteURL = attachment.remoteURL else { return nil }
+                return [
+                    "id": attachment.id.uuidString,
+                    "filename": attachment.filename,
+                    "mime_type": attachment.mimeType,
+                    "size": attachment.size,
+                    "type": attachment.type.rawValue,
+                    "url": remoteURL
+                ]
+            }
+
+            if !attachmentsPayload.isEmpty {
+                messageJSON["attachments"] = attachmentsPayload
+            }
+        }
         let data = try JSONSerialization.data(withJSONObject: messageJSON)
         let jsonString = String(data: data, encoding: .utf8)!
 
@@ -575,6 +608,24 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
     }
 
     private func handleReceivedText(_ text: String) async {
+        // Device-specific diagnostic logging
+        #if targetEnvironment(simulator)
+        let environment = "SIMULATOR"
+        #else
+        let environment = "PHYSICAL DEVICE"
+        #endif
+
+        print("🔍 [DEBUG] ========================================")
+        print("🔍 [DEBUG] Environment: \(environment)")
+        print("🔍 [DEBUG] handleReceivedText called")
+        print("🔍 [DEBUG] Full text length: \(text.count)")
+        print("🔍 [DEBUG] Full text: \(text)")
+        print("🔍 [DEBUG] Text encoding info: UTF8? \(text.data(using: .utf8) != nil)")
+        print("🔍 [DEBUG] Text bytes (hex): \(text.data(using: .utf8)?.map { String(format: "%02x", $0) }.joined(separator: " ") ?? "nil")")
+        print("🔍 [DEBUG] Current message count: \(messages.count)")
+        print("🔍 [DEBUG] isLoading: \(isLoading), authComplete: \(authenticationComplete), authReceived: \(authenticationReceived)")
+        print("🔍 [DEBUG] ========================================")
+
         // Handle plain-text error responses (e.g., invalid API key) from the backend
         if text == "error:invalid_api_key" {
             print("❌ Authentication failed: invalid API key reported by server")
@@ -600,10 +651,63 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
             return
         }
 
+        // Handle session config confirmation (server may echo back the config we sent)
+        if text.contains("working_directory") && !authenticationComplete {
+            print("📋 Received session config confirmation/echo, ignoring")
+            return
+        }
+
         // Try to decode as JSON response
-        guard let data = text.data(using: .utf8),
-              let response = try? JSONDecoder().decode(ClaudeResponse.self, from: data) else {
-            print("⚠️ Failed to decode message as JSON: \(text)")
+        guard let data = text.data(using: .utf8) else {
+            print("⚠️ Failed to convert text to UTF8 data")
+            print("🔍 [DEBUG] Text that failed UTF8 conversion: \(text)")
+            print("🔍 [DEBUG] Text length: \(text.count)")
+            return
+        }
+
+        // Try JSON decoding with detailed error reporting
+        let decoder = JSONDecoder()
+        guard let response = try? decoder.decode(ClaudeResponse.self, from: data) else {
+            print("⚠️ Failed to decode message as JSON")
+            print("🔍 [DEBUG] Raw text that failed to decode: \(text)")
+            print("🔍 [DEBUG] Data size: \(data.count) bytes")
+            print("🔍 [DEBUG] authenticationComplete: \(authenticationComplete)")
+            print("🔍 [DEBUG] authenticationReceived: \(authenticationReceived)")
+
+            // Try to decode as generic JSON to see what structure we got
+            if let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) {
+                print("🔍 [DEBUG] Message IS valid JSON but not ClaudeResponse structure")
+                print("🔍 [DEBUG] JSON structure: \(jsonObject)")
+            } else {
+                print("🔍 [DEBUG] Message is NOT valid JSON at all")
+                print("🔍 [DEBUG] Checking if it's a protocol message...")
+                if text.contains("working_directory") {
+                    print("🔍 [DEBUG] Contains 'working_directory' - might be config echo")
+                }
+                if text == "ready" || text == "authenticated" || text.hasPrefix("error:") {
+                    print("🔍 [DEBUG] This is a known protocol message: \(text)")
+                }
+            }
+
+            // DEFENSIVE FIX: Only show errors after user has started chatting
+            // This prevents protocol-level messages (connection handshake, authentication, etc.)
+            // from appearing as error messages in the UI during the connection phase.
+            //
+            // Rationale:
+            // - Connection phase may produce non-JSON messages (e.g., protocol confirmations)
+            // - These should NEVER be visible to users as "Invalid message format" errors
+            // - Real chat errors only happen AFTER user starts interacting
+            // - If there's a genuine error, backend will send proper JSON with type="error"
+            if firstUserMessageSent {
+                print("⚠️ Unparseable message received AFTER user interaction - showing error")
+                let errorMsg = ClaudeChatMessage(
+                    text: "Error: Invalid message format",
+                    isUser: false
+                )
+                messages.append(errorMsg)
+            } else {
+                print("🔍 [DEBUG] Ignoring unparseable message during connection phase (no user interaction yet)")
+            }
             return
         }
 

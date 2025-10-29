@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01A62DD1DBCDEECD4ACDBC9C /* AnimationComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13FE5F98678D36AACB4F5272 /* AnimationComponents.swift */; };
 		0217D7FB082740CEAE886279 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159D287C88074D9CAC87F25B /* Typography.swift */; };
 		0434A1D27E84D8DBD3019B59 /* TerminalSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B40C5FB716C664D6120B67B /* TerminalSectionHeader.swift */; };
 		05489E34316004DA700F6A3C /* AttachmentButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EED769F21BCEC8E2AC3AAB /* AttachmentButton.swift */; };
@@ -56,6 +57,7 @@
 		BF68BA2F7A134B10A55916C4 /* QuickActionsBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E7A087B1474EE38839B211 /* QuickActionsBar.swift */; };
 		C2F5518E96E0EA25AAB79EE5 /* ClaudeAgentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FD86B1AEC2803D5F3726C /* ClaudeAgentService.swift */; };
 		C45B07DD68F1478BB1ED6A58 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49479D25C97045E1BD3B5BCA /* SettingsView.swift */; };
+		C46CE5DFF95704381D57E812 /* AnimationComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34EC3B09396EDB4E95EAD399 /* AnimationComponents.swift */; };
 		C70A0501635D67116C548343 /* TerminalCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F87E6F160F367EA52D51580E /* TerminalCard.swift */; };
 		C8461FFC5B5A4254B13A2C7F /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7201CD96FFD44A36A8823C9C /* DashboardView.swift */; };
 		CB12ADA955E65167B4AF059D /* ConversationTabButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00B270BB609AE441B6C506D /* ConversationTabButton.swift */; };
@@ -63,6 +65,7 @@
 		CF3FF1331C944AB5933FF266 /* QuickAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B989BFE64F194033B8F4785B /* QuickAction.swift */; };
 		D1CF08F2A9DF1450E4AA20E3 /* ConversationTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E62DE5E2D1E5DB5CB855EED /* ConversationTabBar.swift */; };
 		D303314BB87ED50EC517C617 /* AttachmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9DD8812E809CC21DFB1C0E /* AttachmentService.swift */; };
+		D3E31F06215B46CD8D6A57C1 /* MessageAttachmentRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E31F07215B46CD8D6A57C1 /* MessageAttachmentRow.swift */; };
 		DEF32941FAAF4AA5AA0CEC35 /* ProfileSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1E01B13A8947B7AC127989 /* ProfileSwitcher.swift */; };
 		E2C8A5F14B0E4F5E9D2A3B77 /* ChatAgentServiceBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E21F3C25D24E7294C8F6B3 /* ChatAgentServiceBase.swift */; };
 		E38AC95F4B9D90857B001CC8 /* ChatTerminalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B6C255050F17D46F1923A31 /* ChatTerminalView.swift */; };
@@ -83,6 +86,7 @@
 		0B1E01B13A8947B7AC127989 /* ProfileSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProfileSwitcher.swift; path = Views/ProfileSwitcher.swift; sourceTree = SOURCE_ROOT; };
 		0C8F74BF3F094646858FBC5B /* BuilderOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BuilderOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E0048A5ED8F2BFA6477A49F /* ChatHeaderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatHeaderView.swift; path = BuilderSystemMobile/Features/Chat/Views/ChatHeaderView.swift; sourceTree = "<group>"; };
+		13FE5F98678D36AACB4F5272 /* AnimationComponents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AnimationComponents.swift; path = Utilities/AnimationComponents.swift; sourceTree = "<group>"; };
 		159D287C88074D9CAC87F25B /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Typography.swift; path = Utilities/Typography.swift; sourceTree = SOURCE_ROOT; };
 		183C31F3545D3B29DBF13C04 /* ClaudeChatView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ClaudeChatView.swift; path = Views/ClaudeChatView.swift; sourceTree = "<group>"; };
 		1A2DA60793824AA694AFCA71 /* TerminalProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TerminalProfile.swift; path = Models/TerminalProfile.swift; sourceTree = SOURCE_ROOT; };
@@ -107,6 +111,7 @@
 		2DF6031381D26429B2526913 /* NotificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationService.swift; path = BuilderSystemMobile/Services/Notifications/NotificationService.swift; sourceTree = "<group>"; };
 		301B7B911C9E96201B3417ED /* CapsuleListView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CapsuleListView.swift; path = ios/BuilderSystemMobile/Views/CapsuleListView.swift; sourceTree = "<group>"; };
 		324241469F13D5735700762C /* BuilderSystemMobileApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BuilderSystemMobileApp.swift; path = BuilderSystemMobile/App/BuilderSystemMobileApp.swift; sourceTree = "<group>"; };
+		34EC3B09396EDB4E95EAD399 /* AnimationComponents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnimationComponents.swift; sourceTree = "<group>"; };
 		3650B0D7C73BE411DA1B298A /* ChatMessagesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatMessagesView.swift; path = BuilderSystemMobile/Features/Chat/Views/ChatMessagesView.swift; sourceTree = "<group>"; };
 		369BB4855BCF1D843EDB3279 /* TerminalButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TerminalButton.swift; path = Components/TerminalButton.swift; sourceTree = "<group>"; };
 		37EED769F21BCEC8E2AC3AAB /* AttachmentButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AttachmentButton.swift; path = Views/Components/AttachmentButton.swift; sourceTree = "<group>"; };
@@ -216,6 +221,7 @@
 		CF9DD8812E809CC21DFB1C0E /* AttachmentService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AttachmentService.swift; path = Services/AttachmentService.swift; sourceTree = "<group>"; };
 		D00B270BB609AE441B6C506D /* ConversationTabButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConversationTabButton.swift; path = Views/ConversationTabButton.swift; sourceTree = "<group>"; };
 		D0AFB5C9B0A04C5B9E5501A1 /* QuickActionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QuickActionsSheet.swift; path = Views/QuickActionsSheet.swift; sourceTree = SOURCE_ROOT; };
+		D3E31F07215B46CD8D6A57C1 /* MessageAttachmentRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MessageAttachmentRow.swift; path = Views/Components/MessageAttachmentRow.swift; sourceTree = "<group>"; };
 		D8CC11AABC1F8C565CC7D3ED /* ContentView_Simple.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContentView_Simple.swift; path = ios/BuilderSystemMobile/ContentView_Simple.swift; sourceTree = "<group>"; };
 		DC829C5EA03F281BEB05519B /* PTYTerminalManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PTYTerminalManager.swift; path = Services/PTYTerminalManager.swift; sourceTree = "<group>"; };
 		DD70BB94243ACD3D6246696C /* ChatMessageView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatMessageView.swift; path = BuilderSystemMobile/Features/Chat/Views/ChatMessageView.swift; sourceTree = "<group>"; };
@@ -475,11 +481,23 @@
 				BD2028D244ED25B191E23FD4 /* NotificationService.swift */,
 				AAFFE58CECEA96945EEB0CC5 /* Package.swift */,
 				8375CE618A82AAD049068D26 /* FilePreviewChip.swift */,
+				D3E31F07215B46CD8D6A57C1 /* MessageAttachmentRow.swift */,
 				37EED769F21BCEC8E2AC3AAB /* AttachmentButton.swift */,
 				8AB12839B54DEAB0BEF96C0C /* ClaudeAgentService_URLSession_BACKUP.swift */,
 				CF9DD8812E809CC21DFB1C0E /* AttachmentService.swift */,
 				288FA79087E2C4B2320EAEC9 /* ClaudeAgentService_Starscream.swift */,
+				13FE5F98678D36AACB4F5272 /* AnimationComponents.swift */,
+				D856FCFCA3B0C1414DC983C1 /* Utilities */,
 			);
+			sourceTree = "<group>";
+		};
+		D856FCFCA3B0C1414DC983C1 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				34EC3B09396EDB4E95EAD399 /* AnimationComponents.swift */,
+			);
+			name = Utilities;
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -614,8 +632,11 @@
 				CB12ADA955E65167B4AF059D /* ConversationTabButton.swift in Sources */,
 				9BB438A1F00B4521701D3403 /* ChatAttachment.swift in Sources */,
 				15C65EC637BBCCFA44EA59AD /* FilePreviewChip.swift in Sources */,
+				D3E31F06215B46CD8D6A57C1 /* MessageAttachmentRow.swift in Sources */,
 				05489E34316004DA700F6A3C /* AttachmentButton.swift in Sources */,
 				D303314BB87ED50EC517C617 /* AttachmentService.swift in Sources */,
+				01A62DD1DBCDEECD4ACDBC9C /* AnimationComponents.swift in Sources */,
+				C46CE5DFF95704381D57E812 /* AnimationComponents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

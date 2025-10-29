@@ -269,8 +269,17 @@ class BuilderOSAPIClient: ObservableObject {
 
         request.httpBody = body
 
-        // Create upload task with progress
-        let (data, response) = try await URLSession.shared.upload(for: request, from: body)
+        progressHandler(0.0)
+
+        // Create upload task with progress delegate
+        let progressDelegate = UploadProgressDelegate(onProgress: progressHandler)
+        let session = URLSession(configuration: .default, delegate: progressDelegate, delegateQueue: nil)
+        defer {
+            session.finishTasksAndInvalidate()
+        }
+
+        let (data, response) = try await session.upload(for: request, from: body)
+        progressHandler(1.0)
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw APIError.invalidResponse
@@ -392,6 +401,30 @@ class BuilderOSAPIClient: ObservableObject {
 struct CapsulesResponse: Codable {
     let count: Int
     let capsules: [Capsule]
+}
+
+// MARK: - Upload Progress Delegate
+
+private final class UploadProgressDelegate: NSObject, URLSessionTaskDelegate {
+    private let onProgress: (Double) -> Void
+
+    init(onProgress: @escaping (Double) -> Void) {
+        self.onProgress = onProgress
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        didSendBodyData bytesSent: Int64,
+        totalBytesSent: Int64,
+        totalBytesExpectedToSend: Int64
+    ) {
+        guard totalBytesExpectedToSend > 0 else { return }
+        let progress = Double(totalBytesSent) / Double(totalBytesExpectedToSend)
+        DispatchQueue.main.async {
+            self.onProgress(min(max(progress, 0.0), 1.0))
+        }
+    }
 }
 
 struct FileUploadResponse: Codable {

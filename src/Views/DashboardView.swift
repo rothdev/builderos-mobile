@@ -16,6 +16,7 @@ struct DashboardView: View {
     @State private var isLoading = false
     @State private var capsules: [Capsule] = []
     @State private var connectionState: Bool = false  // Local copy to force UI updates
+    @Namespace private var heroNamespace  // For hero transitions
 
     var body: some View {
         let _ = print("🟢 DASH: DashboardView body rendering, isLoading=\(isLoading), capsules.count=\(capsules.count), apiClient.isConnected=\(apiClient.isConnected)")
@@ -142,6 +143,7 @@ struct DashboardView: View {
                         .background(Color.terminalInputBackground)
                         .terminalBorder(cornerRadius: 8)
                     }
+                    .pressableButton()
                 }
             }
         }
@@ -215,9 +217,9 @@ struct DashboardView: View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             ForEach(capsules) { capsule in
                 NavigationLink {
-                    CapsuleDetailView(capsule: capsule)
+                    CapsuleDetailView(capsule: capsule, heroNamespace: heroNamespace)
                 } label: {
-                    CapsuleCard(capsule: capsule)
+                    CapsuleCard(capsule: capsule, heroNamespace: heroNamespace)
                 }
                 .buttonStyle(.plain)
             }
@@ -229,6 +231,7 @@ struct DashboardView: View {
             Image(systemName: "cube.transparent")
                 .font(.system(size: 48))
                 .foregroundStyle(Color.terminalCyan.opacity(0.3))
+                .floatingAnimation()
 
             Text("No capsules found")
                 .font(.system(size: 16, weight: .semibold, design: .monospaced))
@@ -278,6 +281,7 @@ struct DashboardView: View {
 // MARK: - Capsule Card Component
 struct CapsuleCard: View {
     let capsule: Capsule
+    var heroNamespace: Namespace.ID?
     @ObserveInjection var inject
 
     var body: some View {
@@ -310,6 +314,9 @@ struct CapsuleCard: View {
         .padding()
         .background(.ultraThinMaterial)
         .terminalBorder()
+        .if(heroNamespace != nil) { view in
+            view.matchedGeometryEffect(id: capsule.id, in: heroNamespace!)
+        }
         .enableInjection()
     }
 }

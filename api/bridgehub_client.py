@@ -168,6 +168,13 @@ class BridgeHubClient:
         Yields:
             Response chunks from BridgeHub
         """
+        import time
+
+        # Track timing
+        start_time = time.time()
+        spawn_time = None
+        first_output_time = None
+        first_chunk_time = None
 
         # Verify BridgeHub exists
         if not Path(BridgeHubClient.BRIDGEHUB_PATH).exists():
@@ -192,13 +199,20 @@ class BridgeHubClient:
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )
-
-            logger.debug("✅ BridgeHub process spawned")
+            spawn_time = time.time()
+            spawn_duration_ms = (spawn_time - start_time) * 1000
+            logger.info(f"⏱️  BridgeHub process spawned in {spawn_duration_ms:.0f}ms")
 
             # Read stdout line by line
             if process.stdout:
                 async for line in process.stdout:
                     line_str = line.decode('utf-8').strip()
+
+                    # Mark first output
+                    if first_output_time is None:
+                        first_output_time = time.time()
+                        first_output_ms = (first_output_time - start_time) * 1000
+                        logger.info(f"⏱️  First output from BridgeHub in {first_output_ms:.0f}ms")
 
                     # Skip empty lines
                     if not line_str:
@@ -229,6 +243,13 @@ class BridgeHubClient:
                                 chunk_size = 100
                                 for i in range(0, len(answer), chunk_size):
                                     chunk = answer[i:i+chunk_size]
+
+                                    # Mark first chunk time
+                                    if first_chunk_time is None:
+                                        first_chunk_time = time.time()
+                                        first_chunk_ms = (first_chunk_time - start_time) * 1000
+                                        logger.info(f"⏱️  First chunk yielded in {first_chunk_ms:.0f}ms")
+
                                     yield chunk
 
                             else:

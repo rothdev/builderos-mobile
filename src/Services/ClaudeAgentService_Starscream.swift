@@ -152,7 +152,7 @@ class ClaudeAgentService: ObservableObject, WebSocketDelegate {
     // MARK: - Message Handling
 
     /// Send message to Claude Agent
-    func sendMessage(_ text: String) async throws {
+    func sendMessage(_ text: String, attachments: [ChatAttachment]) async throws {
         guard isConnected else {
             throw ClaudeAgentError.notConnected
         }
@@ -162,6 +162,9 @@ class ClaudeAgentService: ObservableObject, WebSocketDelegate {
         }
 
         print("📤 Sending message: \(text.prefix(50))...")
+        if !attachments.isEmpty {
+            print("📎 Attachments will be ignored in backup Starscream implementation")
+        }
 
         // Add user message to UI
         let userMessage = ClaudeChatMessage(text: text, isUser: true)

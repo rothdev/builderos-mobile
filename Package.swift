@@ -9,10 +9,7 @@ let package = Package(
         .iOS(.v17)
     ],
     products: [
-        .library(
-            name: "BuilderOS",
-            targets: ["BuilderOS"]
-        )
+        // iOS app - no products needed for SPM (Xcode project builds the app)
     ],
     dependencies: [
         // Tailscale iOS SDK
