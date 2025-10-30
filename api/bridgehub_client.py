@@ -17,6 +17,7 @@ class BridgeHubClient:
     """Client for calling BridgeHub relay"""
 
     BRIDGEHUB_PATH = "/Users/Ty/BuilderOS/tools/bridgehub/dist/bridgehub.js"
+    NODE_PATH = "/opt/homebrew/bin/node"  # Explicit path to Node.js (Homebrew install)
     DEFAULT_TIMEOUT = 120  # 2 minutes
 
     @staticmethod
@@ -190,14 +191,22 @@ class BridgeHubClient:
         logger.debug(f"   Command: node {BridgeHubClient.BRIDGEHUB_PATH} --request '<json>'")
 
         try:
-            # Spawn BridgeHub process
+            # Spawn BridgeHub process (use explicit Node.js path for background processes)
+            # CRITICAL: Pass environment with Homebrew paths so BridgeHub can spawn codex/claude
+            import os
+            env = os.environ.copy()
+            # Prepend Homebrew paths to ensure codex and node are found
+            homebrew_paths = "/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin"
+            env["PATH"] = f"{homebrew_paths}:{env.get('PATH', '')}"
+
             process = await asyncio.create_subprocess_exec(
-                "node",
+                BridgeHubClient.NODE_PATH,
                 BridgeHubClient.BRIDGEHUB_PATH,
                 "--request",
                 request_json,
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
+                env=env
             )
             spawn_time = time.time()
             spawn_duration_ms = (spawn_time - start_time) * 1000
@@ -311,10 +320,10 @@ class BridgeHubClient:
         # Check if BridgeHub file exists
         bridgehub_exists = Path(BridgeHubClient.BRIDGEHUB_PATH).exists()
 
-        # Check if Node.js is available
+        # Check if Node.js is available (use explicit path)
         try:
             process = await asyncio.create_subprocess_exec(
-                "node",
+                BridgeHubClient.NODE_PATH,
                 "--version",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
