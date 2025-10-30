@@ -554,7 +554,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
             print("⚠️ Codex failed to decode message as JSON")
             print("🔍 [DEBUG] Raw text that failed to decode: \(text)")
             print("🔍 [DEBUG] authenticationComplete: \(authenticationComplete)")
-            print("🔍 [DEBUG] Message will be: \(authenticationComplete ? "ADDED TO UI ❌" : "IGNORED ✅")")
+            print("🔍 [DEBUG] firstUserMessageSent: \(firstUserMessageSent)")
 
             // DEFENSIVE FIX: Only show errors after user has started chatting
             // This prevents protocol-level messages (connection handshake, authentication, etc.)
@@ -565,7 +565,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
             // - These should NEVER be visible to users as "Invalid message format" errors
             // - Real chat errors only happen AFTER user starts interacting
             // - If there's a genuine error, backend will send proper JSON with type="error"
-            if firstUserMessageSent {
+            if firstUserMessageSent && authenticationComplete {
                 print("⚠️ Codex unparseable message received AFTER user interaction - showing error")
                 let errorMsg = ClaudeChatMessage(
                     text: "Error: Invalid message format",
@@ -574,7 +574,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
                 messages.append(errorMsg)
                 trimMessagesIfNeeded()  // Prevent unbounded memory growth
             } else {
-                print("🔍 [DEBUG] Ignoring unparseable message during connection phase (no user interaction yet)")
+                print("🔍 [DEBUG] Ignoring unparseable message (connection phase or pre-interaction)")
             }
             return
         }
