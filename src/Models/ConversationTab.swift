@@ -56,24 +56,17 @@ struct ConversationTab: Identifiable {
         self.provider = provider
         self.title = title ?? provider.displayName
 
-        // Generate unique session ID per chat: deviceId-provider-persistentId
+        // Generate unique session ID per chat tab
         if let customSessionId = sessionId {
             self.sessionId = customSessionId
         } else {
             let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
 
-            // Check for saved persistent session ID for this provider
-            let storageKey = "builderos_persistent_session_\(provider.rawValue)"
-            if let savedSessionId = UserDefaults.standard.string(forKey: storageKey) {
-                // Reuse existing persistent session
-                self.sessionId = savedSessionId
-            } else {
-                // Create new persistent session ID and save it
-                let persistentSessionId = "\(deviceId)-\(provider.rawValue)-primary"
-                UserDefaults.standard.set(persistentSessionId, forKey: storageKey)
-                self.sessionId = persistentSessionId
-                print("💾 Created persistent session ID for \(provider.rawValue): \(persistentSessionId)")
-            }
+            // FIXED: Each tab gets its own unique session ID using tabId
+            // This ensures each chat has isolated conversation history
+            let uniqueSessionId = "\(deviceId)-\(provider.rawValue)-\(tabId.uuidString)"
+            self.sessionId = uniqueSessionId
+            print("💾 Created unique session ID for \(provider.rawValue) tab: \(uniqueSessionId)")
         }
     }
 }
