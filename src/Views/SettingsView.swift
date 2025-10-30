@@ -108,9 +108,22 @@ struct SettingsView: View {
                             .background(Color.terminalInputBorder)
 
                         Button {
+                            print("🚨🚨🚨 RECONNECT BUTTON PRESSED (SettingsView) 🚨🚨🚨")
                             Task {
+                                print("📡 Checking backend health...")
+                                // 1. Check backend health first
                                 let success = await apiClient.healthCheck()
                                 connectionState = success
+                                print("📡 Backend health check result: \(success ? "✅ UP" : "❌ DOWN")")
+
+                                // 2. If backend is up, reconnect all chat services
+                                if success {
+                                    print("📡 Backend is up, calling reconnectAll()...")
+                                    await ChatServiceManager.shared.reconnectAll()
+                                    print("📡 reconnectAll() completed")
+                                } else {
+                                    print("⚠️ Backend is down, skipping reconnection")
+                                }
                             }
                         } label: {
                             HStack {
@@ -138,8 +151,8 @@ struct SettingsView: View {
             }
 
             Text("Secure HTTPS tunnel to BuilderOS API via Cloudflare. Works with Proton VPN on both devices.")
-                .font(.system(size: 12, design: .monospaced))
-                .foregroundStyle(Color.terminalDim)
+                .font(.caption)
+                .foregroundStyle(.secondary)
                 .padding(.horizontal, 4)
         }
     }
@@ -154,8 +167,8 @@ struct SettingsView: View {
             }
 
             Text("API key is stored securely in iOS Keychain and never leaves your device.")
-                .font(.system(size: 12, design: .monospaced))
-                .foregroundStyle(Color.terminalDim)
+                .font(.caption)
+                .foregroundStyle(.secondary)
                 .padding(.horizontal, 4)
         }
     }
@@ -172,8 +185,8 @@ struct SettingsView: View {
             }
 
             Text("Sleep puts your Mac to sleep immediately. Wake requires Raspberry Pi intermediary device (see documentation).")
-                .font(.system(size: 12, design: .monospaced))
-                .foregroundStyle(Color.terminalDim)
+                .font(.caption)
+                .foregroundStyle(.secondary)
                 .padding(.horizontal, 4)
         }
     }
@@ -339,8 +352,8 @@ struct SettingsView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Status")
-                    .font(.system(size: 13, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.terminalCode)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
 
                 TerminalStatusBadge(
                     text: connectionState ? "CONNECTED" : "DISCONNECTED",
@@ -361,8 +374,8 @@ struct SettingsView: View {
     private var tunnelURLRow: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Tunnel URL")
-                .font(.system(size: 13, weight: .medium, design: .monospaced))
-                .foregroundStyle(Color.terminalCode)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
 
             TextField("https://your-tunnel-url.trycloudflare.com", text: Binding(
                 get: { apiClient.tunnelURL },
@@ -370,8 +383,9 @@ struct SettingsView: View {
                     APIConfig.updateTunnelURL(newValue)
                 }
             ))
-            .font(.system(size: 12, design: .monospaced))
-            .foregroundStyle(Color.terminalCyan)
+            .font(.caption)
+            .foregroundStyle(.primary)
+            .fontDesign(.monospaced)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
             .keyboardType(.URL)
@@ -418,17 +432,16 @@ struct SettingsView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("API Key")
-                    .font(.system(size: 13, weight: .medium, design: .monospaced))
-                    .foregroundStyle(Color.terminalCode)
+                    .font(.subheadline)
 
                 if apiClient.hasAPIKey {
                     Text("Configured")
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(Color.terminalGreen)
+                        .font(.caption)
+                        .foregroundStyle(.green)
                 } else {
                     Text("Not configured")
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(Color.terminalPink)
+                        .font(.caption)
+                        .foregroundStyle(.orange)
                 }
             }
 
@@ -437,7 +450,8 @@ struct SettingsView: View {
             Button(apiClient.hasAPIKey ? "Update" : "Add") {
                 showAPIKeyInput = true
             }
-            .font(.system(size: 14, weight: .semibold, design: .monospaced))
+            .font(.subheadline)
+            .fontWeight(.semibold)
             .foregroundColor(.terminalCyan)
             .padding(.horizontal, 16)
             .padding(.vertical, 8)

@@ -38,8 +38,8 @@ struct CapsuleDetailView: View {
                             TerminalGradientText(text: capsule.title, fontSize: 20, fontWeight: .bold)
 
                             Text(capsule.name)
-                                .font(.system(size: 12, design: .monospaced))
-                                .foregroundColor(Color.terminalCode)
+                                .font(.bodySmall)
+                                .foregroundColor(.textSecondary)
                                 .lineLimit(1)
                         }
                     }
@@ -53,8 +53,8 @@ struct CapsuleDetailView: View {
 
                         TerminalCard {
                             Text(capsule.purpose)
-                                .font(.system(size: 14, design: .monospaced))
-                                .foregroundColor(Color.terminalText)
+                                .font(.bodyMedium)
+                                .foregroundColor(.textSecondary)
                         }
                     }
 
@@ -77,12 +77,12 @@ struct MetricRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.system(size: 14, weight: .medium, design: .monospaced))
-                .foregroundColor(Color.terminalCode)
+                .font(.bodyMedium)
+                .foregroundColor(.textSecondary)
             Spacer()
             Text(value)
-                .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                .foregroundColor(Color.terminalCyan)
+                .font(.bodyMedium)
+                .fontWeight(.semibold)
         }
         .enableInjection()
     }

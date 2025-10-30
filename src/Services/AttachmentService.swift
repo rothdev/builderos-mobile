@@ -23,6 +23,10 @@ class AttachmentService: ObservableObject {
     // API client for uploads
     private let apiClient = BuilderOSAPIClient()
 
+    // Coordinator references (must be retained until picker dismisses)
+    fileprivate var photoPickerCoordinator: PhotoPickerCoordinator?
+    fileprivate var documentPickerCoordinator: DocumentPickerCoordinator?
+
     // MARK: - Photo/Video Picker
 
     /// Present PHPickerViewController for photo/video selection
@@ -32,7 +36,9 @@ class AttachmentService: ObservableObject {
         config.filter = .any(of: [.images, .videos])
 
         let picker = PHPickerViewController(configuration: config)
-        picker.delegate = PhotoPickerCoordinator(service: self)
+        let coordinator = PhotoPickerCoordinator(service: self)
+        photoPickerCoordinator = coordinator  // Retain coordinator
+        picker.delegate = coordinator
         viewController.present(picker, animated: true)
     }
 
@@ -94,7 +100,9 @@ class AttachmentService: ObservableObject {
 
         let picker = UIDocumentPickerViewController(forOpeningContentTypes: types, asCopy: true)
         picker.allowsMultipleSelection = true
-        picker.delegate = DocumentPickerCoordinator(service: self)
+        let coordinator = DocumentPickerCoordinator(service: self)
+        documentPickerCoordinator = coordinator  // Retain coordinator
+        picker.delegate = coordinator
         viewController.present(picker, animated: true)
     }
 
@@ -330,7 +338,7 @@ class AttachmentService: ObservableObject {
 // MARK: - PHPicker Coordinator
 
 class PhotoPickerCoordinator: NSObject, PHPickerViewControllerDelegate {
-    let service: AttachmentService
+    weak var service: AttachmentService?
 
     init(service: AttachmentService) {
         self.service = service
@@ -340,7 +348,9 @@ class PhotoPickerCoordinator: NSObject, PHPickerViewControllerDelegate {
         picker.dismiss(animated: true)
 
         Task { @MainActor in
-            service.handlePhotoPickerResults(results)
+            service?.handlePhotoPickerResults(results)
+            // Clear the coordinator reference after handling completes
+            service?.photoPickerCoordinator = nil
         }
     }
 }
@@ -348,7 +358,7 @@ class PhotoPickerCoordinator: NSObject, PHPickerViewControllerDelegate {
 // MARK: - Document Picker Coordinator
 
 class DocumentPickerCoordinator: NSObject, UIDocumentPickerDelegate {
-    let service: AttachmentService
+    weak var service: AttachmentService?
 
     init(service: AttachmentService) {
         self.service = service
@@ -356,12 +366,17 @@ class DocumentPickerCoordinator: NSObject, UIDocumentPickerDelegate {
 
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         Task { @MainActor in
-            service.handleDocumentPickerResults(urls)
+            service?.handleDocumentPickerResults(urls)
+            // Clear the coordinator reference after handling completes
+            service?.documentPickerCoordinator = nil
         }
     }
 
     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-        // User cancelled
+        // Clear the coordinator reference on cancel
+        Task { @MainActor in
+            service?.documentPickerCoordinator = nil
+        }
     }
 }
 

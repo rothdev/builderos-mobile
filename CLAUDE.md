@@ -2,7 +2,7 @@
 
 <!--
 AUTO-GENERATED FROM YAML SPECIFICATIONS
-Generated: 2025-10-28T21:17:36.836337
+Generated: 2025-10-29T22:38:21.202343
 Do not edit directly. Update specs/current.yaml instead.
 Regenerate with: python3 tools/generate_claude_md.py <capsule>
 -->
@@ -102,4 +102,4 @@ Builder System operations from iPhone and iPad devices.
 
 ---
 *This file is auto-generated from `specs/current.yaml`*
-*Last generated:* 2025-10-28 21:17:36
+*Last generated:* 2025-10-29 22:38:21

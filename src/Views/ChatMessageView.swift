@@ -11,6 +11,9 @@ struct ChatMessageView: View {
     let message: ChatMessage
     let onToggleThinking: (UUID) -> Void
 
+    // Animation state for message appearance
+    @State private var appeared = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             switch message.type {
@@ -31,6 +34,13 @@ struct ChatMessageView: View {
             }
         }
         .padding(.vertical, 4)
+        .opacity(appeared ? 1.0 : 0.0)
+        .offset(y: appeared ? 0 : 10)
+        .onAppear {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                appeared = true
+            }
+        }
     }
 
     // MARK: - Message Type Views
@@ -38,11 +48,11 @@ struct ChatMessageView: View {
     private var commandView: some View {
         HStack(alignment: .top, spacing: 8) {
             Text(">")
-                .font(.system(.body, design: .monospaced))
+                .font(.system(size: 14, design: .monospaced))
                 .foregroundColor(.green)
 
             Text(message.content)
-                .font(.system(.body, design: .monospaced))
+                .font(.system(size: 14, design: .monospaced))
                 .foregroundColor(.primary)
                 .textSelection(.enabled)
         }
@@ -50,7 +60,7 @@ struct ChatMessageView: View {
 
     private var outputView: some View {
         Text(message.content)
-            .font(.system(.body, design: .monospaced))
+            .font(.system(size: 14, design: .monospaced))
             .foregroundColor(.secondary)
             .textSelection(.enabled)
             .padding(.leading, 16) // Indent output
@@ -63,16 +73,16 @@ struct ChatMessageView: View {
             }) {
                 HStack {
                     Image(systemName: message.isCollapsed ? "chevron.right" : "chevron.down")
-                        .font(.caption)
+                        .font(.system(size: 12, design: .monospaced))
                     Text("Thinking...")
-                        .font(.system(.callout, design: .monospaced))
+                        .font(.system(size: 14, design: .monospaced))
                         .foregroundColor(.blue)
                 }
             }
 
             if !message.isCollapsed {
                 Text(message.content)
-                    .font(.system(.caption, design: .monospaced))
+                    .font(.system(size: 12, design: .monospaced))
                     .foregroundColor(.secondary)
                     .padding(8)
                     .background(Color(.systemGray6))
@@ -91,13 +101,13 @@ struct ChatMessageView: View {
             VStack(alignment: .leading, spacing: 2) {
                 if let tool = message.metadata?["tool"] {
                     Text(tool)
-                        .font(.system(.callout, design: .monospaced, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold, design: .monospaced))
                         .foregroundColor(.orange)
                 }
 
                 if let args = message.metadata?["args"], !args.isEmpty {
                     Text(args)
-                        .font(.system(.caption, design: .monospaced))
+                        .font(.system(size: 12, design: .monospaced))
                         .foregroundColor(.secondary)
                 }
             }
@@ -118,7 +128,7 @@ struct ChatMessageView: View {
             VStack(alignment: .leading, spacing: 2) {
                 if let task = message.metadata?["task"] {
                     Text(task)
-                        .font(.system(.callout, design: .monospaced))
+                        .font(.system(size: 14, design: .monospaced))
                         .foregroundColor(.purple)
                 }
             }
@@ -135,7 +145,7 @@ struct ChatMessageView: View {
                 .foregroundColor(.red)
 
             Text(message.content)
-                .font(.system(.body, design: .monospaced))
+                .font(.system(size: 14, design: .monospaced))
                 .foregroundColor(.red)
         }
         .padding(8)
@@ -150,7 +160,7 @@ struct ChatMessageView: View {
                 .foregroundColor(.blue)
 
             Text(message.content)
-                .font(.system(.body, design: .monospaced))
+                .font(.system(size: 14, design: .monospaced))
                 .foregroundColor(.primary)
         }
         .padding(8)

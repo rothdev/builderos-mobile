@@ -206,23 +206,33 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
 
     override func disconnect() {
         print("🔴 Disconnecting Codex session: \(sessionId)")
+        print("   Setting isUserInitiatedDisconnect = true")
 
         isUserInitiatedDisconnect = true
         super.disconnect()  // Mark shouldMaintainConnection = false
 
         Task { @MainActor in
+            print("   @MainActor: Cancelling reconnection task...")
             reconnectionTask?.cancel()
             reconnectionTask = nil
+            print("   @MainActor: Invalidating heartbeat timer...")
             heartbeatTimer?.invalidate()
             heartbeatTimer = nil
         }
 
         print("   Disconnecting Codex WebSocket...")
+        webSocket?.delegate = nil  // Clear delegate to break retain cycle
         webSocket?.disconnect()
         webSocket = nil
-        isConnected = false
-        authenticationComplete = false
-        connectionStatus = "Disconnected"
+
+        // CRITICAL: Set connection state on MainActor to avoid race conditions
+        Task { @MainActor in
+            print("   @MainActor: Setting isConnected = false")
+            isConnected = false
+            authenticationComplete = false
+            connectionStatus = "Disconnected"
+            print("   @MainActor: Disconnect state changes complete")
+        }
 
         // Send backend API request to close session
         Task {
@@ -291,6 +301,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
             attachments: sanitizedAttachments
         )
         messages.append(userMessage)
+        trimMessagesIfNeeded()  // Prevent unbounded memory growth
 
         // Send to WebSocket with session persistence fields
         var payload: [String: Any] = [
@@ -491,6 +502,15 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
 
     // MARK: - Message Processing
 
+    /// Remove TTS tags only (lightweight, safe for streaming)
+    private func removeTTSTags(_ text: String) -> String {
+        return text.replacingOccurrences(
+            of: "<tts-summary>.*?</tts-summary>",
+            with: "",
+            options: .regularExpression
+        )
+    }
+
     private func handleReceivedText(_ text: String) async {
         print("🔍 [DEBUG] ========================================")
         print("🔍 [DEBUG] Codex handleReceivedText called")
@@ -552,6 +572,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
                     isUser: false
                 )
                 messages.append(errorMsg)
+                trimMessagesIfNeeded()  // Prevent unbounded memory growth
             } else {
                 print("🔍 [DEBUG] Ignoring unparseable message during connection phase (no user interaction yet)")
             }
@@ -559,23 +580,26 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
         }
 
         switch response.type {
-        case "message":
+        case "message", "stream":
+            // Both "message" and "stream" events contain content that should be accumulated
             currentResponseText += response.content
+
+            // During streaming, remove TTS tags for mobile display
+            let displayText = removeTTSTags(currentResponseText)
+
             if let last = messages.last, !last.isUser {
                 messages[messages.count - 1] = ClaudeChatMessage(
                     id: last.id,
-                    text: currentResponseText,
+                    text: displayText,
                     isUser: false
                 )
             } else {
                 messages.append(ClaudeChatMessage(
-                    text: currentResponseText,
+                    text: displayText,
                     isUser: false
                 ))
+                trimMessagesIfNeeded()  // Prevent unbounded memory growth
             }
-
-        case "stream":
-            print("🔄 Codex stream event: \(response.content)")
 
         case "complete":
             print("✅ Codex message complete (usage: \(String(describing: response.usage)))")
@@ -594,6 +618,7 @@ class CodexAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegate
                 text: "Error: \(response.content)",
                 isUser: false
             ))
+            trimMessagesIfNeeded()  // Prevent unbounded memory growth
 
         default:
             print("⚠️ Codex unknown message type: \(response.type)")

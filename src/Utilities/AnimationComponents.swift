@@ -37,40 +37,208 @@ extension View {
     }
 }
 
-// MARK: - 2. Enhanced Loading Indicator
+// MARK: - 2. Retro Cyberpunk Thinking Indicators
 
-/// Improved loading indicator with vertical bounce + fade
+/// Subtle retro cyberpunk thinking indicator with terminal cursor style
+struct RetroCyberpunkThinkingIndicator: View {
+    let providerName: String
+    let accentColor: Color
+    @State private var animating = false
+    @State private var scanlineOffset: CGFloat = 0
+
+    var body: some View {
+        HStack(spacing: 10) {
+            // Blinking terminal cursor (most subtle)
+            BlinkingCursor(color: accentColor, animating: $animating)
+
+            Text("\(providerName) is thinking...")
+                .font(.terminalOutput)
+                .foregroundColor(.terminalText.opacity(0.7))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(
+            // Subtle scanline effect overlay
+            GeometryReader { geometry in
+                Rectangle()
+                    .fill(Color.terminalInputBackground)
+                    .overlay(
+                        // Moving scanline
+                        Rectangle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        accentColor.opacity(0),
+                                        accentColor.opacity(0.05),
+                                        accentColor.opacity(0)
+                                    ],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .frame(height: 2)
+                            .offset(y: scanlineOffset)
+                    )
+            }
+        )
+        .terminalBorder(cornerRadius: 12)
+        .onAppear {
+            animating = true
+
+            // Slow scanline animation
+            withAnimation(
+                .linear(duration: 3.0)
+                    .repeatForever(autoreverses: false)
+            ) {
+                scanlineOffset = 40 // Approximate height of the indicator
+            }
+        }
+    }
+}
+
+/// Blinking cursor component (like a terminal)
+private struct BlinkingCursor: View {
+    let color: Color
+    @Binding var animating: Bool
+    @State private var isVisible = true
+
+    var body: some View {
+        Rectangle()
+            .fill(color)
+            .frame(width: 2, height: 12)
+            .opacity(isVisible ? 1.0 : 0.3)
+            .animation(
+                .easeInOut(duration: 0.6)
+                    .repeatForever(autoreverses: true),
+                value: isVisible
+            )
+            .onAppear {
+                isVisible = false // Start animation
+            }
+    }
+}
+
+/// Alternative: Pulsing glow indicator (more visible but still subtle)
+struct PulsingGlowIndicator: View {
+    let providerName: String
+    let accentColor: Color
+    @State private var pulseScale: CGFloat = 1.0
+    @State private var pulseOpacity: Double = 0.3
+
+    var body: some View {
+        HStack(spacing: 10) {
+            // Pulsing dot with glow
+            Circle()
+                .fill(accentColor)
+                .frame(width: 6, height: 6)
+                .overlay(
+                    // Glow effect
+                    Circle()
+                        .stroke(accentColor, lineWidth: 1)
+                        .scaleEffect(pulseScale)
+                        .opacity(pulseOpacity)
+                )
+
+            Text("\(providerName) is thinking...")
+                .font(.terminalOutput)
+                .foregroundColor(.terminalText.opacity(0.7))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(Color.terminalInputBackground)
+        .terminalBorder(cornerRadius: 12)
+        .onAppear {
+            withAnimation(
+                .easeInOut(duration: 1.5)
+                    .repeatForever(autoreverses: true)
+            ) {
+                pulseScale = 2.0
+                pulseOpacity = 0
+            }
+        }
+    }
+}
+
+/// Alternative: Minimal loading bars (like system activity)
+struct MinimalLoadingBars: View {
+    let providerName: String
+    let accentColor: Color
+    @State private var animating = false
+
+    var body: some View {
+        HStack(spacing: 10) {
+            // Three minimal bars with staggered animation
+            HStack(spacing: 3) {
+                ForEach(0..<3) { index in
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(accentColor)
+                        .frame(width: 2, height: 10)
+                        .scaleEffect(y: animating ? 1.0 : 0.4)
+                        .animation(
+                            .easeInOut(duration: 0.8)
+                                .repeatForever(autoreverses: true)
+                                .delay(Double(index) * 0.15),
+                            value: animating
+                        )
+                }
+            }
+
+            Text("\(providerName) is thinking...")
+                .font(.terminalOutput)
+                .foregroundColor(.terminalText.opacity(0.7))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(Color.terminalInputBackground)
+        .terminalBorder(cornerRadius: 12)
+        .onAppear {
+            animating = true
+        }
+    }
+}
+
+/// Ultra-minimal terminal cursor indicator (most subtle option)
+struct UltraMinimalCursorIndicator: View {
+    let providerName: String
+    let accentColor: Color
+    @State private var isVisible = true
+
+    var body: some View {
+        HStack(spacing: 10) {
+            // Single blinking cursor line
+            Rectangle()
+                .fill(accentColor)
+                .frame(width: 2, height: 14)
+                .opacity(isVisible ? 1.0 : 0.2)
+                .animation(
+                    .easeInOut(duration: 0.8)
+                        .repeatForever(autoreverses: true),
+                    value: isVisible
+                )
+
+            Text("\(providerName) is thinking...")
+                .font(.system(size: 14, design: .monospaced))
+                .foregroundColor(.terminalText.opacity(0.6))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(Color.terminalInputBackground.opacity(0.5))
+        .terminalBorder(cornerRadius: 12)
+        .onAppear {
+            isVisible = false // Start animation
+        }
+    }
+}
+
+/// DEPRECATED: Old bouncy dots animation (too loud for terminal aesthetic)
 struct EnhancedLoadingIndicator: View {
     let providerName: String
     let accentColor: Color
     @State private var animating = false
 
     var body: some View {
-        HStack(spacing: 8) {
-            ForEach(0..<3) { index in
-                Circle()
-                    .fill(accentColor)
-                    .frame(width: 8, height: 8)
-                    .scaleEffect(animating ? 1.0 : 0.5)
-                    .opacity(animating ? 1.0 : 0.5)
-                    .offset(y: animating ? -4 : 0) // Vertical bounce
-                    .animation(
-                        Animation.spring(response: 0.6, dampingFraction: 0.5)
-                            .repeatForever(autoreverses: true)
-                            .delay(Double(index) * 0.15),
-                        value: animating
-                    )
-            }
-            Text("\(providerName) is thinking...")
-                .font(.system(size: 13, design: .monospaced))
-                .foregroundColor(.terminalDim)
-        }
-        .padding(12)
-        .background(Color.terminalInputBackground)
-        .terminalBorder(cornerRadius: 16)
-        .onAppear {
-            animating = true
-        }
+        // Using ultra-minimal cursor indicator (most subtle)
+        UltraMinimalCursorIndicator(providerName: providerName, accentColor: accentColor)
     }
 }
 

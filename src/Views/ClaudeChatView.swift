@@ -197,12 +197,12 @@ struct ClaudeChatView: View {
                     LazyVStack(alignment: .leading, spacing: 12) {
                         ForEach(service.messages) { message in
                             MessageBubbleView(message: message)
-                                .transition(.messageBubble(isUser: message.isUser))
                                 .id(message.id)
                         }
 
                         if service.isLoading {
                             EnhancedLoadingIndicator(providerName: providerName, accentColor: activeProvider.accentColor)
+                                .transition(.opacity.combined(with: .move(edge: .bottom)))
                         }
                     }
                     .padding()
@@ -294,7 +294,7 @@ struct ClaudeChatView: View {
             // Text input
             TextField(activeProvider.inputPlaceholder, text: $inputText, axis: .vertical)
                 .textFieldStyle(.plain)
-                .font(.system(size: 13, design: .monospaced))
+                .font(.system(size: 14, design: .monospaced))
                 .foregroundColor(.terminalText)
                 .padding(12)
                 .background(Color.terminalInputBackground)
@@ -410,6 +410,20 @@ struct ClaudeChatView: View {
 
         print("🗑️ Removing tab: \(tab.provider.displayName) with session: \(tab.sessionId)")
 
+        // MEMORY LEAK FIX: Cancel and nil observer BEFORE removing service
+        if let cancellable = serviceObservers[tabId] {
+            print("   Cancelling observer for tab \(tabId)")
+            cancellable.cancel()
+            serviceObservers.removeValue(forKey: tabId)
+        }
+
+        // Remove service reference BEFORE calling disconnect
+        if let service = serviceInstances.removeValue(forKey: tabId) {
+            print("   Clearing service reference")
+            // Break any potential retain cycles
+            service.disconnect()
+        }
+
         // Remove service from manager (this disconnects and cleans up)
         switch tab.provider {
         case .claude:
@@ -423,19 +437,12 @@ struct ClaudeChatView: View {
             tabs.remove(at: index)
         }
 
-        // Remove service reference
-        serviceInstances.removeValue(forKey: tabId)
-
-        // Cancel observer
-        if let cancellable = serviceObservers[tabId] {
-            cancellable.cancel()
-            serviceObservers.removeValue(forKey: tabId)
-        }
-
         // Select another tab if current was closed
         if selectedTabId == tabId {
             selectedTabId = tabs.first?.id ?? UUID()
         }
+
+        print("✅ Tab removed and cleaned up")
     }
 
     private func sendMessage() {
@@ -519,6 +526,9 @@ struct ClaudeChatView: View {
 struct MessageBubbleView: View {
     let message: ClaudeChatMessage
 
+    // Animation state for smooth appearance
+    @State private var appeared = false
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             if message.isUser {
@@ -527,8 +537,8 @@ struct MessageBubbleView: View {
 
             VStack(alignment: message.isUser ? .trailing : .leading, spacing: 4) {
                 Text(message.text)
-                    .font(.system(size: 13, design: .monospaced))
-                    .foregroundColor(message.isUser ? .terminalText : .terminalText)
+                    .font(.system(size: 14, design: .monospaced))
+                    .foregroundColor(.terminalText) // Consistent terminal text color for both
                     .textSelection(.enabled)
                     .padding(12)
                     .background(
@@ -555,12 +565,20 @@ struct MessageBubbleView: View {
                 }
 
                 Text(formatTimestamp(message.timestamp))
-                    .font(.system(size: 11, design: .monospaced))
+                    .font(.system(size: 12, design: .monospaced))
                     .foregroundColor(.terminalDim)
             }
 
             if !message.isUser {
                 Spacer()
+            }
+        }
+        .opacity(appeared ? 1.0 : 0.0)
+        .offset(y: appeared ? 0 : 15)
+        .scaleEffect(appeared ? 1.0 : 0.95, anchor: message.isUser ? .bottomTrailing : .bottomLeading)
+        .onAppear {
+            withAnimation(.spring(response: 0.45, dampingFraction: 0.82)) {
+                appeared = true
             }
         }
     }
@@ -594,7 +612,7 @@ struct LoadingIndicatorView: View {
                     )
             }
             Text("\(providerName) is thinking...")
-                .font(.system(size: 13, design: .monospaced))
+                .font(.system(size: 14, design: .monospaced))
                 .foregroundColor(.terminalDim)
         }
         .padding(12)
@@ -617,10 +635,10 @@ struct QuickActionChip: View {
         Button(action: action) {
             HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.system(size: 11, design: .monospaced))
+                    .font(.system(size: 12, design: .monospaced))
                     .foregroundColor(.terminalCyan)
                 Text(text)
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .font(.system(size: 12, design: .monospaced))
                     .foregroundColor(.terminalText)
             }
             .padding(.horizontal, 12)

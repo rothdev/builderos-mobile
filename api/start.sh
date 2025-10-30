@@ -6,17 +6,18 @@ cd "$(dirname "$0")"
 echo "🚀 Starting BuilderOS Mobile API Server..."
 
 # Check if virtual environment exists
-if [ ! -d ".venv" ]; then
+if [ ! -d "venv" ]; then
     echo "📦 Creating virtual environment..."
-    python3 -m venv .venv
+    python3 -m venv venv
 fi
 
 # Activate virtual environment
-source .venv/bin/activate
+source venv/bin/activate
 
 # Install dependencies
 echo "📥 Installing dependencies..."
 pip install -q -r requirements.txt
+pip install -q aioapns
 
 # Check for ANTHROPIC_API_KEY
 if [ -z "$ANTHROPIC_API_KEY" ]; then

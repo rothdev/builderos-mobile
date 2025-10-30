@@ -421,8 +421,11 @@ private final class UploadProgressDelegate: NSObject, URLSessionTaskDelegate {
     ) {
         guard totalBytesExpectedToSend > 0 else { return }
         let progress = Double(totalBytesSent) / Double(totalBytesExpectedToSend)
-        DispatchQueue.main.async {
-            self.onProgress(min(max(progress, 0.0), 1.0))
+        let clampedProgress = min(max(progress, 0.0), 1.0)
+
+        // Use weak self to prevent retain cycle with async dispatch
+        DispatchQueue.main.async { [weak self] in
+            self?.onProgress(clampedProgress)
         }
     }
 }

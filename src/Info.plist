@@ -72,6 +72,10 @@
 		</dict>
 	</dict>
 	<!-- Privacy Descriptions -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>BuilderOS needs access to your photo library to select and attach photos or videos to your chat messages.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>BuilderOS needs permission to save photos and videos to your library.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>BuilderOS needs local network access to communicate with your Mac via Tailscale VPN and for hot reload during development.</string>
 	<key>NSBonjourServices</key>
@@ -84,6 +88,13 @@
 	<array>
 		<string>network-authentication</string>
 		<string>processing</string>
+		<string>remote-notification</string>
+		<string>fetch</string>
+	</array>
+	<!-- Background Task Identifiers -->
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.builderos.ios.refresh</string>
 	</array>
 	<!-- Custom Fonts -->
 	<key>UIAppFonts</key>

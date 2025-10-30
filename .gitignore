@@ -43,6 +43,12 @@ deployment/CREDENTIALS.md
 *.p12
 *.mobileprovision
 
+# APNs Certificates (CRITICAL - DO NOT COMMIT)
+api/certs/*.pem
+api/certs/*.cer
+api/certs/*.p12
+api/certs/*.certSigningRequest
+
 # iOS Code Signing
 *.certSigningRequest
 *.p8

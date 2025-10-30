@@ -30,15 +30,25 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
     private var authenticationComplete = false
     private var authenticationReceived = false
     private let persistenceManager = ChatPersistenceManager()
-    private var heartbeatTimer: Timer?
+    private var heartbeatTimer: DispatchSourceTimer?  // Changed to DispatchSourceTimer for background stability
     private var reconnectionTask: Task<Void, Never>?
     private var connectionTask: Task<Void, Error>?  // NEW: Store connection task to prevent cancellation
     private var isUserInitiatedDisconnect = false
     private var isConnecting = false
     private var firstUserMessageSent = false  // NEW: Track if user has sent their first message
 
+    // Background task management
+    private var backgroundTaskID: UIBackgroundTaskIdentifier = .invalid
+
     private let heartbeatInterval: TimeInterval = 25
     private let reconnectDelay: TimeInterval = 2.0
+
+    // Message processing queue (offload from main thread)
+    private let processingQueue = DispatchQueue(label: "com.builderos.message-processing", qos: .userInitiated)
+
+    // Debouncing for UI updates
+    private var uiUpdateWorkItem: DispatchWorkItem?
+    private let uiDebounceInterval: TimeInterval = 0.1  // 100ms debounce
 
     // Session persistence fields
     private let sessionId: String
@@ -76,7 +86,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
     deinit {
         // Cancel tasks synchronously on deinit
         Task { @MainActor in
-            heartbeatTimer?.invalidate()
+            heartbeatTimer?.cancel()
             heartbeatTimer = nil
             reconnectionTask?.cancel()
             reconnectionTask = nil
@@ -252,23 +262,37 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
     /// Disconnect from Claude Agent
     override func disconnect() {
         print("🔴 Disconnecting Claude Agent session: \(sessionId)")
+        print("   Setting isUserInitiatedDisconnect = true")
 
         isUserInitiatedDisconnect = true
         super.disconnect()  // Mark shouldMaintainConnection = false
 
-        Task { @MainActor in
-            reconnectionTask?.cancel()
-            reconnectionTask = nil
-            heartbeatTimer?.invalidate()
-            heartbeatTimer = nil
-        }
-
-        print("   Disconnecting WebSocket...")
+        // MEMORY LEAK FIX: Clear delegate BEFORE any async operations
+        print("   Clearing WebSocket delegate to break retain cycles...")
+        webSocket?.delegate = nil
         webSocket?.disconnect()
         webSocket = nil
-        isConnected = false
-        authenticationComplete = false
-        connectionStatus = "Disconnected"
+
+        Task { @MainActor in
+            print("   @MainActor: Cancelling reconnection task...")
+            reconnectionTask?.cancel()
+            reconnectionTask = nil
+            print("   @MainActor: Cancelling heartbeat timer...")
+            heartbeatTimer?.cancel()
+            heartbeatTimer = nil
+            print("   @MainActor: Cancelling UI update work items...")
+            uiUpdateWorkItem?.cancel()
+            uiUpdateWorkItem = nil
+        }
+
+        // CRITICAL: Set connection state on MainActor to avoid race conditions
+        Task { @MainActor in
+            print("   @MainActor: Setting isConnected = false")
+            isConnected = false
+            authenticationComplete = false
+            connectionStatus = "Disconnected"
+            print("   @MainActor: Disconnect state changes complete")
+        }
 
         // Send backend API request to close session
         Task {
@@ -338,6 +362,7 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
             attachments: sanitizedAttachments
         )
         messages.append(userMessage)
+        trimMessagesIfNeeded()  // Prevent unbounded memory growth
         persistenceManager.saveMessage(userMessage, sessionId: self.sessionId)
 
         // Send to WebSocket with session persistence fields
@@ -386,25 +411,31 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
 
         guard heartbeatInterval > 0 else { return }
 
-        await MainActor.run {
-            heartbeatTimer = Timer.scheduledTimer(withTimeInterval: heartbeatInterval, repeats: true) { [weak self] _ in
-                guard let self else { return }
+        // Use DispatchSourceTimer for better background stability
+        let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global(qos: .utility))
+        timer.schedule(deadline: .now() + heartbeatInterval, repeating: heartbeatInterval, leeway: .seconds(2))
+
+        timer.setEventHandler { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
                 if self.isConnected, let socket = self.webSocket {
                     print("🏓 Sending heartbeat ping to Claude Agent")
                     socket.write(ping: Data())
                 }
             }
-
-            heartbeatTimer?.tolerance = 2
-            if let timer = heartbeatTimer {
-                RunLoop.main.add(timer, forMode: .common)
-            }
         }
+
+        await MainActor.run {
+            self.heartbeatTimer = timer
+        }
+
+        timer.resume()
+        print("✅ Heartbeat started (DispatchSourceTimer for background stability)")
     }
 
     private func stopHeartbeat() async {
         await MainActor.run {
-            heartbeatTimer?.invalidate()
+            heartbeatTimer?.cancel()
             heartbeatTimer = nil
         }
     }
@@ -555,8 +586,19 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
 
     // MARK: - Message Processing
 
+    /// Remove TTS tags only (lightweight, safe for streaming)
+    /// NOTE: nonisolated to allow calling from background threads
+    nonisolated private func removeTTSTags(_ text: String) -> String {
+        return text.replacingOccurrences(
+            of: "<tts-summary>.*?</tts-summary>",
+            with: "",
+            options: .regularExpression
+        )
+    }
+
     /// Clean up message text for display
-    private func cleanMessageText(_ text: String) -> String {
+    /// NOTE: nonisolated to allow calling from background threads
+    nonisolated private func cleanMessageText(_ text: String) -> String {
         var cleaned = text
 
         // Remove <tts-summary> tags and their content
@@ -608,23 +650,8 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
     }
 
     private func handleReceivedText(_ text: String) async {
-        // Device-specific diagnostic logging
-        #if targetEnvironment(simulator)
-        let environment = "SIMULATOR"
-        #else
-        let environment = "PHYSICAL DEVICE"
-        #endif
-
-        print("🔍 [DEBUG] ========================================")
-        print("🔍 [DEBUG] Environment: \(environment)")
-        print("🔍 [DEBUG] handleReceivedText called")
-        print("🔍 [DEBUG] Full text length: \(text.count)")
-        print("🔍 [DEBUG] Full text: \(text)")
-        print("🔍 [DEBUG] Text encoding info: UTF8? \(text.data(using: .utf8) != nil)")
-        print("🔍 [DEBUG] Text bytes (hex): \(text.data(using: .utf8)?.map { String(format: "%02x", $0) }.joined(separator: " ") ?? "nil")")
-        print("🔍 [DEBUG] Current message count: \(messages.count)")
-        print("🔍 [DEBUG] isLoading: \(isLoading), authComplete: \(authenticationComplete), authReceived: \(authenticationReceived)")
-        print("🔍 [DEBUG] ========================================")
+        // Quick protocol message checks (stay on main thread - fast operations)
+        print("📬 Received text (\(text.count) bytes)")
 
         // Handle plain-text error responses (e.g., invalid API key) from the backend
         if text == "error:invalid_api_key" {
@@ -657,111 +684,127 @@ class ClaudeAgentService: ChatAgentServiceBase, @preconcurrency WebSocketDelegat
             return
         }
 
-        // Try to decode as JSON response
-        guard let data = text.data(using: .utf8) else {
-            print("⚠️ Failed to convert text to UTF8 data")
-            print("🔍 [DEBUG] Text that failed UTF8 conversion: \(text)")
-            print("🔍 [DEBUG] Text length: \(text.count)")
-            return
-        }
+        // PERFORMANCE FIX: Process heavy operations on background queue
+        // This prevents UI freezing during message streaming
+        Task.detached(priority: .userInitiated) { [weak self] in
+            guard let self = self else { return }
 
-        // Try JSON decoding with detailed error reporting
-        let decoder = JSONDecoder()
-        guard let response = try? decoder.decode(ClaudeResponse.self, from: data) else {
-            print("⚠️ Failed to decode message as JSON")
-            print("🔍 [DEBUG] Raw text that failed to decode: \(text)")
-            print("🔍 [DEBUG] Data size: \(data.count) bytes")
-            print("🔍 [DEBUG] authenticationComplete: \(authenticationComplete)")
-            print("🔍 [DEBUG] authenticationReceived: \(authenticationReceived)")
+            // Heavy processing on background thread
+            guard let data = text.data(using: .utf8) else {
+                print("⚠️ Failed to convert text to UTF8 data")
+                return
+            }
 
-            // Try to decode as generic JSON to see what structure we got
-            if let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) {
-                print("🔍 [DEBUG] Message IS valid JSON but not ClaudeResponse structure")
-                print("🔍 [DEBUG] JSON structure: \(jsonObject)")
-            } else {
-                print("🔍 [DEBUG] Message is NOT valid JSON at all")
-                print("🔍 [DEBUG] Checking if it's a protocol message...")
-                if text.contains("working_directory") {
-                    print("🔍 [DEBUG] Contains 'working_directory' - might be config echo")
+            // JSON decoding
+            let decoder = JSONDecoder()
+            guard let response = try? decoder.decode(ClaudeResponse.self, from: data) else {
+                print("⚠️ Failed to decode message as JSON")
+
+                // Only show UI errors if user has sent messages
+                let shouldShowError = await MainActor.run { self.firstUserMessageSent }
+                if shouldShowError {
+                    await MainActor.run {
+                        let errorMsg = ClaudeChatMessage(
+                            text: "Error: Invalid message format",
+                            isUser: false
+                        )
+                        self.messages.append(errorMsg)
+                        self.trimMessagesIfNeeded()
+                    }
                 }
-                if text == "ready" || text == "authenticated" || text.hasPrefix("error:") {
-                    print("🔍 [DEBUG] This is a known protocol message: \(text)")
+                return
+            }
+
+            // Process response type
+            switch response.type {
+            case "message":
+                // Text processing on background thread
+                let currentText = await MainActor.run { self.currentResponseText }
+                let newText = currentText + response.content
+                let displayText = self.removeTTSTags(newText)
+
+                // DEBOUNCED UI UPDATE - prevents excessive redraws
+                await self.debouncedUIUpdate {
+                    self.currentResponseText = newText
+
+                    if let lastMessage = self.messages.last, !lastMessage.isUser {
+                        // Update existing message
+                        self.messages[self.messages.count - 1] = ClaudeChatMessage(
+                            text: displayText,
+                            isUser: false
+                        )
+                    } else {
+                        // Create new message
+                        self.messages.append(ClaudeChatMessage(
+                            text: displayText,
+                            isUser: false
+                        ))
+                        self.trimMessagesIfNeeded()
+                    }
                 }
-            }
 
-            // DEFENSIVE FIX: Only show errors after user has started chatting
-            // This prevents protocol-level messages (connection handshake, authentication, etc.)
-            // from appearing as error messages in the UI during the connection phase.
-            //
-            // Rationale:
-            // - Connection phase may produce non-JSON messages (e.g., protocol confirmations)
-            // - These should NEVER be visible to users as "Invalid message format" errors
-            // - Real chat errors only happen AFTER user starts interacting
-            // - If there's a genuine error, backend will send proper JSON with type="error"
-            if firstUserMessageSent {
-                print("⚠️ Unparseable message received AFTER user interaction - showing error")
-                let errorMsg = ClaudeChatMessage(
-                    text: "Error: Invalid message format",
-                    isUser: false
-                )
-                messages.append(errorMsg)
-            } else {
-                print("🔍 [DEBUG] Ignoring unparseable message during connection phase (no user interaction yet)")
+            case "complete":
+                // Heavy text cleaning on background thread
+                let currentText = await MainActor.run { self.currentResponseText }
+                let cleanedText = self.cleanMessageText(currentText)
+
+                // Update UI on main thread
+                await MainActor.run {
+                    if let lastMessage = self.messages.last, !lastMessage.isUser {
+                        self.messages[self.messages.count - 1] = ClaudeChatMessage(
+                            id: lastMessage.id,
+                            text: cleanedText,
+                            isUser: false
+                        )
+                        self.persistenceManager.saveMessage(self.messages.last!, sessionId: self.sessionId)
+                    }
+
+                    self.isLoading = false
+                    self.currentResponseText = ""
+                    print("✅ Message complete")
+                }
+
+            case "ready":
+                await MainActor.run {
+                    self.authenticationComplete = true
+                    print("✅ Claude Agent ready")
+                }
+
+            case "error":
+                await MainActor.run {
+                    self.isLoading = false
+                    self.currentResponseText = ""
+                    self.messages.append(ClaudeChatMessage(
+                        text: "Error: \(response.content)",
+                        isUser: false
+                    ))
+                    self.trimMessagesIfNeeded()
+                    print("❌ Claude Agent error: \(response.content)")
+                }
+
+            default:
+                print("⚠️ Unknown message type: \(response.type)")
             }
-            return
+        }
+    }
+
+    /// Debounce UI updates to prevent excessive redraws during rapid message streaming
+    @MainActor
+    private func debouncedUIUpdate(action: @escaping @MainActor () -> Void) async {
+        // Cancel previous pending update
+        uiUpdateWorkItem?.cancel()
+
+        // Schedule new update
+        let workItem = DispatchWorkItem {
+            Task { @MainActor in
+                action()
+            }
         }
 
-        switch response.type {
-        case "message":
-            // Append to current response (streaming)
-            currentResponseText += response.content
+        uiUpdateWorkItem = workItem
 
-            // Clean the accumulated text for display
-            let cleanedText = cleanMessageText(currentResponseText)
-
-            // Update or create Claude message
-            if let lastMessage = messages.last, !lastMessage.isUser {
-                // Update existing message (streaming)
-                messages[messages.count - 1] = ClaudeChatMessage(
-                    text: cleanedText,
-                    isUser: false
-                )
-            } else {
-                // Create new message
-                messages.append(ClaudeChatMessage(
-                    text: cleanedText,
-                    isUser: false
-                ))
-            }
-            // Keep loading until "complete" message
-
-        case "complete":
-            // Message complete - persist final message and reset loading state
-            print("✅ Message complete")
-            if let lastMessage = messages.last, !lastMessage.isUser {
-                persistenceManager.saveMessage(lastMessage, sessionId: self.sessionId)
-            }
-            isLoading = false
-            currentResponseText = ""
-
-        case "ready":
-            print("✅ Claude Agent ready: \(response.content)")
-            authenticationComplete = true
-
-        case "error":
-            print("❌ Claude Agent error: \(response.content)")
-            isLoading = false
-            currentResponseText = ""
-
-            // Show error message
-            messages.append(ClaudeChatMessage(
-                text: "Error: \(response.content)",
-                isUser: false
-            ))
-
-        default:
-            print("⚠️ Unknown message type: \(response.type)")
-        }
+        // Execute after debounce interval
+        DispatchQueue.main.asyncAfter(deadline: .now() + uiDebounceInterval, execute: workItem)
     }
 
     // MARK: - Utility Methods

@@ -35,6 +35,10 @@ class ChatAgentServiceBase: ObservableObject {
     private var lifecycleObservers: Set<AnyCancellable> = []
     private var shouldMaintainConnection: Bool = false
 
+    // Maximum messages to keep in memory (prevents unbounded growth)
+    // REDUCED from 100 to 50 for better memory stability on physical devices
+    private let maxMessagesInMemory: Int = 50
+
     init() {
         setupLifecycleObservers()
     }
@@ -71,9 +75,10 @@ class ChatAgentServiceBase: ObservableObject {
         // Observe when app enters background
         NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
             .sink { [weak self] _ in
-                print("📱 App entered background - connection will be maintained if possible")
+                print("📱 App entered background - starting background task to maintain connection")
                 // Mark connection state but don't disconnect
                 self?.shouldMaintainConnection = self?.isConnected ?? false
+                self?.beginBackgroundTask()
             }
             .store(in: &lifecycleObservers)
 
@@ -81,7 +86,10 @@ class ChatAgentServiceBase: ObservableObject {
         NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                print("📱 App entering foreground - verifying connection")
+                print("📱 App entering foreground - ending background task")
+
+                // End background task
+                self.endBackgroundTask()
 
                 // Verify connection is still alive, reconnect if needed
                 if self.shouldMaintainConnection && !self.isConnected {
@@ -94,6 +102,34 @@ class ChatAgentServiceBase: ObservableObject {
             .store(in: &lifecycleObservers)
 
         print("✅ App lifecycle observers configured for persistent connections")
+    }
+
+    // MARK: - Background Task Management
+
+    private var backgroundTaskID: UIBackgroundTaskIdentifier = .invalid
+
+    /// Begin background task to keep connection alive (iOS gives ~30 seconds)
+    private func beginBackgroundTask() {
+        guard backgroundTaskID == .invalid else {
+            print("⚠️ Background task already running")
+            return
+        }
+
+        backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "WebSocketConnection") { [weak self] in
+            print("⏰ Background task expiring - cleaning up")
+            self?.endBackgroundTask()
+        }
+
+        print("✅ Background task started (ID: \(backgroundTaskID.rawValue)) - connection will stay alive for ~30s")
+    }
+
+    /// End background task
+    private func endBackgroundTask() {
+        guard backgroundTaskID != .invalid else { return }
+
+        UIApplication.shared.endBackgroundTask(backgroundTaskID)
+        backgroundTaskID = .invalid
+        print("✅ Background task ended")
     }
 
     // MARK: - Lifecycle (override in subclasses)
@@ -118,6 +154,19 @@ class ChatAgentServiceBase: ObservableObject {
     func clearMessages() {
         messages.removeAll()
         isLoading = false
+    }
+
+    // MARK: - Memory Management
+
+    /// Trim old messages if array exceeds maximum size (prevents unbounded memory growth)
+    func trimMessagesIfNeeded() {
+        guard messages.count > maxMessagesInMemory else { return }
+
+        let messagesToRemove = messages.count - maxMessagesInMemory
+        let trimmedMessages = Array(messages.suffix(maxMessagesInMemory))
+
+        print("⚠️ Trimming \(messagesToRemove) old messages (keeping most recent \(maxMessagesInMemory))")
+        messages = trimmedMessages
     }
 }
 
@@ -204,5 +253,97 @@ class ChatServiceManager: ObservableObject {
         }
         claudeServices.removeAll()
         codexServices.removeAll()
+    }
+
+    /// Reconnect all active chat services
+    /// Forces disconnection first to ensure clean reconnection even if services think they're still connected
+    func reconnectAll() async {
+        print("🔄🔄🔄 RECONNECT ALL CALLED 🔄🔄🔄")
+        print("📊 Active Claude services: \(claudeServices.count)")
+        print("📊 Active Codex services: \(codexServices.count)")
+
+        var reconnectCount = 0
+        var successCount = 0
+
+        // Reconnect all Claude services
+        for (sessionId, service) in claudeServices {
+            reconnectCount += 1
+            print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+            print("🔄 RECONNECTING Claude service #\(reconnectCount)")
+            print("   Session ID: \(sessionId)")
+
+            // Check state before disconnect
+            let wasConnected = await MainActor.run { service.isConnected }
+            print("   State before disconnect: isConnected=\(wasConnected)")
+
+            // Force disconnect first to clear any stale connection state
+            print("   ⚡ Calling disconnect()...")
+            service.disconnect()
+
+            // Wait for disconnect to fully complete and propagate
+            print("   ⏱️ Waiting 200ms for disconnect to complete...")
+            try? await Task.sleep(nanoseconds: 200_000_000) // 200ms
+
+            // Verify disconnected state
+            let afterDisconnect = await MainActor.run { service.isConnected }
+            print("   State after disconnect: isConnected=\(afterDisconnect)")
+
+            do {
+                print("   ⚡ Calling connect()...")
+                try await service.connect()
+                successCount += 1
+                let afterConnect = await MainActor.run { service.isConnected }
+                print("   ✅ Claude service reconnected successfully! isConnected=\(afterConnect)")
+            } catch {
+                print("   ❌ Failed to reconnect Claude service: \(error)")
+                print("   ❌ Error details: \(error.localizedDescription)")
+            }
+            print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        }
+
+        // Reconnect all Codex services
+        for (sessionId, service) in codexServices {
+            reconnectCount += 1
+            print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+            print("🔄 RECONNECTING Codex service #\(reconnectCount)")
+            print("   Session ID: \(sessionId)")
+
+            // Check state before disconnect
+            let wasConnected = await MainActor.run { service.isConnected }
+            print("   State before disconnect: isConnected=\(wasConnected)")
+
+            // Force disconnect first to clear any stale connection state
+            print("   ⚡ Calling disconnect()...")
+            service.disconnect()
+
+            // Wait for disconnect to fully complete and propagate
+            print("   ⏱️ Waiting 200ms for disconnect to complete...")
+            try? await Task.sleep(nanoseconds: 200_000_000) // 200ms
+
+            // Verify disconnected state
+            let afterDisconnect = await MainActor.run { service.isConnected }
+            print("   State after disconnect: isConnected=\(afterDisconnect)")
+
+            do {
+                print("   ⚡ Calling connect()...")
+                try await service.connect()
+                successCount += 1
+                let afterConnect = await MainActor.run { service.isConnected }
+                print("   ✅ Codex service reconnected successfully! isConnected=\(afterConnect)")
+            } catch {
+                print("   ❌ Failed to reconnect Codex service: \(error)")
+                print("   ❌ Error details: \(error.localizedDescription)")
+            }
+            print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        }
+
+        if reconnectCount == 0 {
+            print("⚠️⚠️⚠️ NO ACTIVE CHAT SERVICES TO RECONNECT ⚠️⚠️⚠️")
+            print("   Tip: Open a chat screen first to establish connections")
+            print("   Then the reconnect button will work")
+        } else {
+            print("🎉🎉🎉 RECONNECTION COMPLETE 🎉🎉🎉")
+            print("   Success: \(successCount)/\(reconnectCount) services reconnected")
+        }
     }
 }

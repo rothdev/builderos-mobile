@@ -81,13 +81,12 @@ struct DashboardView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(connectionState ? "Connected" : "Disconnected")
-                            .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                            .foregroundColor(connectionState ? .terminalCyan : .terminalRed)
+                            .font(.headline)
 
                         if connectionState {
                             Text("BuilderOS Mobile")
-                                .font(.system(size: 13, design: .monospaced))
-                                .foregroundStyle(Color.terminalCode)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
                         }
                     }
 
@@ -105,16 +104,17 @@ struct DashboardView: View {
 
                     HStack {
                         Label(apiClient.tunnelURL, systemImage: "network")
-                            .font(.system(size: 12, design: .monospaced))
-                            .foregroundStyle(Color.terminalCode)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fontDesign(.monospaced)
                             .lineLimit(1)
                             .truncationMode(.middle)
 
                         Spacer()
 
                         Label("Cloudflare Tunnel", systemImage: "lock.shield.fill")
-                            .font(.system(size: 11, design: .monospaced))
-                            .foregroundStyle(Color.terminalDim)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                 }
 
@@ -124,10 +124,23 @@ struct DashboardView: View {
                         .background(Color.terminalInputBorder)
 
                     Button {
+                        print("🚨🚨🚨 RECONNECT BUTTON PRESSED (DashboardView) 🚨🚨🚨")
                         Task {
                             isRefreshing = true
+                            print("📡 Checking backend health...")
+                            // 1. Check backend health first
                             let success = await apiClient.healthCheck()
                             connectionState = success
+                            print("📡 Backend health check result: \(success ? "✅ UP" : "❌ DOWN")")
+
+                            // 2. If backend is up, reconnect all chat services
+                            if success {
+                                print("📡 Backend is up, calling reconnectAll()...")
+                                await ChatServiceManager.shared.reconnectAll()
+                                print("📡 reconnectAll() completed")
+                            } else {
+                                print("⚠️ Backend is down, skipping reconnection")
+                            }
                             isRefreshing = false
                         }
                     } label: {
@@ -135,7 +148,8 @@ struct DashboardView: View {
                             Image(systemName: "arrow.clockwise")
                                 .foregroundStyle(Color.terminalCyan)
                             Text("Reconnect")
-                                .font(.system(size: 14, weight: .semibold, design: .monospaced))
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
                                 .foregroundColor(.terminalCyan)
                         }
                         .frame(maxWidth: .infinity)
@@ -179,15 +193,15 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 11))
+                    .font(.caption)
                 Text(title)
-                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .font(.caption)
             }
-            .foregroundStyle(Color.terminalCode)
+            .foregroundStyle(.secondary)
 
             Text(value)
-                .font(.system(size: 15, weight: .bold, design: .monospaced))
-                .foregroundColor(.terminalCyan)
+                .font(.title3)
+                .fontWeight(.semibold)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
@@ -230,12 +244,11 @@ struct DashboardView: View {
         VStack(spacing: 12) {
             Image(systemName: "cube.transparent")
                 .font(.system(size: 48))
-                .foregroundStyle(Color.terminalCyan.opacity(0.3))
-                .floatingAnimation()
+                .foregroundStyle(.secondary)
 
             Text("No capsules found")
-                .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                .foregroundStyle(Color.terminalCode)
+                .font(.headline)
+                .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding(40)
@@ -301,14 +314,14 @@ struct CapsuleCard: View {
             }
 
             Text(capsule.title)
-                .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                .foregroundColor(.terminalCyan)
+                .font(.subheadline)
+                .fontWeight(.semibold)
                 .lineLimit(2)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(capsule.purpose)
-                .font(.system(size: 12, design: .monospaced))
-                .foregroundStyle(Color.terminalCode)
+                .font(.caption)
+                .foregroundStyle(.secondary)
                 .lineLimit(2)
         }
         .padding()

@@ -89,7 +89,7 @@ struct ChatTerminalView: View {
                         .id(message.id)
                     }
 
-                    // Loading indicator
+                    // Loading indicator with smooth animation
                     if viewModel.isLoading {
                         HStack {
                             ProgressView()
@@ -99,6 +99,7 @@ struct ChatTerminalView: View {
                                 .foregroundColor(.secondary)
                         }
                         .padding(.leading, 16)
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
                 }
                 .padding()

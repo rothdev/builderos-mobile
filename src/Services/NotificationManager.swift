@@ -79,9 +79,52 @@ class NotificationManager: NSObject, ObservableObject {
         self.deviceToken = token
         print("📱 NOTIFICATION: Device token received: \(token)")
 
-        // TODO: Send token to BuilderOS API
-        // POST /api/notifications/register
-        // Body: { "device_token": token, "api_key": savedAPIKey }
+        // Send token to BuilderOS API
+        Task {
+            await registerDeviceToken(token)
+        }
+    }
+
+    /// Register device token with backend
+    private func registerDeviceToken(_ token: String) async {
+        let tunnelURL = APIConfig.tunnelURL
+        let apiKey = APIConfig.apiToken
+
+        guard !tunnelURL.isEmpty, !apiKey.isEmpty else {
+            print("⚠️ NOTIFICATION: Cannot register device - missing config")
+            return
+        }
+
+        let endpoint = "\(tunnelURL)/api/notifications/register"
+
+        guard let url = URL(string: endpoint) else {
+            print("❌ NOTIFICATION: Invalid URL: \(endpoint)")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+
+        let payload: [String: Any] = [
+            "device_token": token,
+            "platform": "ios",
+            "device_id": UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
+        ]
+
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+            let (_, response) = try await URLSession.shared.data(for: request)
+
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                print("✅ NOTIFICATION: Device token registered with backend")
+            } else {
+                print("⚠️ NOTIFICATION: Failed to register device token - unexpected response")
+            }
+        } catch {
+            print("❌ NOTIFICATION: Failed to register device token: \(error)")
+        }
     }
 
     /// Handle device token registration failure
@@ -157,6 +200,40 @@ class NotificationManager: NSObject, ObservableObject {
             title: "\(agentName) Complete",
             body: taskDescription
         )
+    }
+
+    /// Send notification for new chat message
+    func sendMessageNotification(from sender: String, preview: String) async {
+        guard isAuthorized else {
+            print("⚠️ NOTIFICATION: Cannot send message notification - not authorized")
+            return
+        }
+
+        let content = UNMutableNotificationContent()
+        content.title = "New Message from \(sender)"
+        content.body = preview
+        content.sound = .default
+        content.badge = NSNumber(value: 1)
+
+        // Add custom data for handling notification tap
+        content.userInfo = [
+            "type": "chat_message",
+            "sender": sender,
+            "timestamp": Date().timeIntervalSince1970
+        ]
+
+        let request = UNNotificationRequest(
+            identifier: UUID().uuidString,
+            content: content,
+            trigger: nil  // Deliver immediately
+        )
+
+        do {
+            try await UNUserNotificationCenter.current().add(request)
+            print("📱 NOTIFICATION: Message notification sent")
+        } catch {
+            print("❌ NOTIFICATION: Failed to send message notification: \(error)")
+        }
     }
 
     // MARK: - Badge Management
