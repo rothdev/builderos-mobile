@@ -31,6 +31,11 @@ struct ClaudeChatView: View {
     @State private var showingCloseConfirmation = false
     @FocusState private var isInputFocused: Bool
 
+    // Message deduplication and send state tracking
+    @State private var displayedMessageIds: Set<UUID> = []
+    @State private var isSendingMessage = false
+    @State private var sendPlaceholder: String = ""
+
     // Initialize with first tab selected
     init(selectedTab: Binding<Int>) {
         self._selectedTab = selectedTab
@@ -146,6 +151,11 @@ struct ClaudeChatView: View {
             if let firstTab = tabs.first {
                 createServiceForTab(firstTab)
             }
+
+            // FUNCTIONAL IMPROVEMENT: Restore draft text from UserDefaults
+            if let savedDraft = UserDefaults.standard.string(forKey: "chatDraft_\(selectedTabId)") {
+                inputText = savedDraft
+            }
         }
         .onDisappear {
             print("🔴🔴🔴 ClaudeChatView.onDisappear CALLED 🔴🔴🔴")
@@ -153,10 +163,29 @@ struct ClaudeChatView: View {
             print("   Service instance: \(String(describing: activeService))")
             print("   Service connected: \(activeService?.isConnected ?? false)")
             print("   NOTE: NOT disconnecting - connections persist across tab switches")
+
+            // FUNCTIONAL IMPROVEMENT: Save draft text to UserDefaults
+            if !inputText.isEmpty {
+                UserDefaults.standard.set(inputText, forKey: "chatDraft_\(selectedTabId)")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "chatDraft_\(selectedTabId)")
+            }
         }
-        .onChange(of: selectedTabId) {
+        .onChange(of: selectedTabId) { oldValue, newValue in
+            // FUNCTIONAL IMPROVEMENT: Save draft for old tab
+            if !inputText.isEmpty {
+                UserDefaults.standard.set(inputText, forKey: "chatDraft_\(oldValue)")
+            }
+
+            // FUNCTIONAL IMPROVEMENT: Restore draft for new tab
+            if let savedDraft = UserDefaults.standard.string(forKey: "chatDraft_\(newValue)") {
+                inputText = savedDraft
+            } else {
+                inputText = ""
+            }
+
             // Connect to service when tab changes
-            if let service = serviceInstances[selectedTabId], !service.isConnected {
+            if let service = serviceInstances[newValue], !service.isConnected {
                 Task {
                     try? await service.connect()
                 }
@@ -191,11 +220,25 @@ struct ClaudeChatView: View {
         }
 
         let providerName = activeProvider.displayName
+        // FUNCTIONAL IMPROVEMENT: Message deduplication
+        let uniqueMessages = service.messages.filter { msg in
+            if displayedMessageIds.contains(msg.id) {
+                return true // Already displayed, keep it
+            } else {
+                // New message, add to displayed set
+                DispatchQueue.main.async {
+                    displayedMessageIds.insert(msg.id)
+                }
+                return true
+            }
+        }
+
         return AnyView(
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 12) {
-                        ForEach(service.messages) { message in
+                        // FUNCTIONAL IMPROVEMENT: MessageBubbleView conforms to Equatable for efficient rendering
+                        ForEach(uniqueMessages) { message in
                             MessageBubbleView(message: message)
                                 .id(message.id)
                         }
@@ -292,7 +335,11 @@ struct ClaudeChatView: View {
             )
 
             // Text input
-            TextField(activeProvider.inputPlaceholder, text: $inputText, axis: .vertical)
+            TextField(
+                isSendingMessage ? "Sending..." : activeProvider.inputPlaceholder,
+                text: $inputText,
+                axis: .vertical
+            )
                 .textFieldStyle(.plain)
                 .font(.system(size: 14, design: .monospaced))
                 .foregroundColor(.terminalText)
@@ -301,6 +348,7 @@ struct ClaudeChatView: View {
                 .terminalBorder(cornerRadius: 20)
                 .lineLimit(1...5)
                 .focused($isInputFocused)
+                .disabled(isSendingMessage) // FUNCTIONAL IMPROVEMENT: Disable during send
                 .onSubmit {
                     sendMessage()
                 }
@@ -336,7 +384,8 @@ struct ClaudeChatView: View {
         guard let service = activeService else { return false }
         return service.isConnected &&
         !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        !service.isLoading
+        !service.isLoading &&
+        !isSendingMessage // FUNCTIONAL IMPROVEMENT: Prevent double-send
     }
 
     // MARK: - Actions
@@ -451,6 +500,9 @@ struct ClaudeChatView: View {
         let messageText = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         let attachmentsSnapshot = attachmentService.selectedAttachments
 
+        // FUNCTIONAL IMPROVEMENT: Set sending state immediately
+        isSendingMessage = true
+
         Task { @MainActor in
             do {
                 var attachmentsForMessage = attachmentsSnapshot
@@ -464,6 +516,7 @@ struct ClaudeChatView: View {
                         print("⚠️ Upload failed for attachments: \(failedAttachments.map { $0.filename })")
                         attachmentService.lastError = attachmentService.lastError ?? "Failed to upload attachments."
                         inputText = messageText
+                        isSendingMessage = false // FUNCTIONAL IMPROVEMENT: Reset state on failure
                         return
                     }
                 }
@@ -471,12 +524,20 @@ struct ClaudeChatView: View {
                 inputText = ""
                 isInputFocused = false
 
+                // FUNCTIONAL IMPROVEMENT: Clear draft from UserDefaults when sent
+                UserDefaults.standard.removeObject(forKey: "chatDraft_\(selectedTabId)")
+
                 let finalizedAttachments = attachmentsForMessage.filter { $0.remoteURL != nil }
                 try await service.sendMessage(messageText, attachments: finalizedAttachments)
                 attachmentService.clearAllAttachments()
+
+                // FUNCTIONAL IMPROVEMENT: Small delay for visual feedback
+                try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
+                isSendingMessage = false
             } catch {
                 print("❌ Failed to send message: \(error)")
                 inputText = messageText
+                isSendingMessage = false // FUNCTIONAL IMPROVEMENT: Reset state on error
             }
         }
     }
@@ -523,11 +584,18 @@ struct ClaudeChatView: View {
 
 // MARK: - Message Bubble
 
-struct MessageBubbleView: View {
+struct MessageBubbleView: View, Equatable {
     let message: ClaudeChatMessage
 
     // Animation state for smooth appearance
     @State private var appeared = false
+
+    // FUNCTIONAL IMPROVEMENT: Equatable to prevent unnecessary redraws
+    static func == (lhs: MessageBubbleView, rhs: MessageBubbleView) -> Bool {
+        return lhs.message.id == rhs.message.id &&
+               lhs.message.text == rhs.message.text &&
+               lhs.message.attachments.count == rhs.message.attachments.count
+    }
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {

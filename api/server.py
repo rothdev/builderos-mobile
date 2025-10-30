@@ -65,13 +65,14 @@ codex_connections: Set[web.WebSocketResponse] = set()
 # Format: { "device_id": { "token": "...", "platform": "ios", "registered_at": "..." } }
 device_tokens: Dict[str, Dict] = {}
 
-# Initialize Anthropic client
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-if not ANTHROPIC_API_KEY:
-    logger.error("❌ ANTHROPIC_API_KEY not found in environment")
-    sys.exit(1)
+# Initialize Anthropic client with subscription auth
+# CRITICAL: Remove API key to use Claude subscription instead of API billing
+if 'ANTHROPIC_API_KEY' in os.environ:
+    del os.environ['ANTHROPIC_API_KEY']
+    logger.info("✅ Removed ANTHROPIC_API_KEY to use subscription")
 
-anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+# Initialize without API key - uses subscription authentication
+anthropic_client = anthropic.Anthropic()
 
 
 async def authenticate_websocket(ws: web.WebSocketResponse) -> bool:

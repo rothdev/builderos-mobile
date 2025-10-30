@@ -114,6 +114,7 @@
 		34EC3B09396EDB4E95EAD399 /* AnimationComponents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnimationComponents.swift; sourceTree = "<group>"; };
 		3650B0D7C73BE411DA1B298A /* ChatMessagesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatMessagesView.swift; path = BuilderSystemMobile/Features/Chat/Views/ChatMessagesView.swift; sourceTree = "<group>"; };
 		369BB4855BCF1D843EDB3279 /* TerminalButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TerminalButton.swift; path = Components/TerminalButton.swift; sourceTree = "<group>"; };
+		36CCE792F8FE4D5436301D86 /* ExyteChatComparisonView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExyteChatComparisonView.swift; path = Views/ExyteChatComparisonView.swift; sourceTree = "<group>"; };
 		37EED769F21BCEC8E2AC3AAB /* AttachmentButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AttachmentButton.swift; path = Views/Components/AttachmentButton.swift; sourceTree = "<group>"; };
 		3A157DBDCA662F6161CF7EA9 /* VoiceManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VoiceManager.swift; path = BuilderSystemMobile/Services/Voice/VoiceManager.swift; sourceTree = "<group>"; };
 		3B8B7978B0D0C023A68E8B62 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OnboardingView.swift; path = ios/BuilderSystemMobile/Views/OnboardingView.swift; sourceTree = "<group>"; };
@@ -180,6 +181,7 @@
 		9A8BAFA6EE71F08D01AD3911 /* main.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = main.swift; path = ios/Sources/main.swift; sourceTree = "<group>"; };
 		9B40C5FB716C664D6120B67B /* TerminalSectionHeader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TerminalSectionHeader.swift; path = Components/TerminalSectionHeader.swift; sourceTree = "<group>"; };
 		9B993ED6DD6D72263E64A091 /* ChatMessage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatMessage.swift; path = BuilderSystemMobile/Features/Chat/Models/ChatMessage.swift; sourceTree = "<group>"; };
+		9BD90917A670F4FC657E17CA /* MessageKitComparisonView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MessageKitComparisonView.swift; path = Views/MessageKitComparisonView.swift; sourceTree = "<group>"; };
 		9C41CA25B6989289B78346F2 /* TTSManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TTSManager.swift; path = BuilderSystemMobile/Services/Voice/TTSManager.swift; sourceTree = "<group>"; };
 		9F139848BF5E18A385CE61D5 /* ChatMessageView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatMessageView.swift; path = BuilderSystemMobile/Features/Chat/Views/ChatMessageView.swift; sourceTree = "<group>"; };
 		9F5168B3AABAE9310764881D /* FileUploadService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FileUploadService.swift; path = BuilderSystemMobile/Services/FileUploadService.swift; sourceTree = "<group>"; };
@@ -488,6 +490,8 @@
 				288FA79087E2C4B2320EAEC9 /* ClaudeAgentService_Starscream.swift */,
 				13FE5F98678D36AACB4F5272 /* AnimationComponents.swift */,
 				D856FCFCA3B0C1414DC983C1 /* Utilities */,
+				36CCE792F8FE4D5436301D86 /* ExyteChatComparisonView.swift */,
+				9BD90917A670F4FC657E17CA /* MessageKitComparisonView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -519,6 +523,8 @@
 			packageProductDependencies = (
 				7A7D86B96AA7875BDF7E8303 /* SwiftTerm */,
 				5F947D6AFB22B2F36790514C /* Starscream */,
+				10D27DAB703E1690FCA5430A /* ExyteChat */,
+				6C50E3A2AD5FB7EC420E3B50 /* MessageKit */,
 			);
 			productName = BuilderOS;
 			productReference = 0C8F74BF3F094646858FBC5B /* BuilderOS.app */;
@@ -546,6 +552,8 @@
 				1023C18D2EAB0BD3007B0725 /* XCRemoteSwiftPackageReference "Inject" */,
 				BDF7E693B73576419C714F24 /* XCRemoteSwiftPackageReference "SwiftTerm" */,
 				184DC2907F0EBF9C4EA21AE0 /* XCRemoteSwiftPackageReference "Starscream" */,
+				59DAA86DFA3938E33D789A0C /* XCRemoteSwiftPackageReference "Chat" */,
+				D678390E38D31F437C79A537 /* XCRemoteSwiftPackageReference "MessageKit" */,
 			);
 			productRefGroup = 2495A36E4C3447C096EB90F9 /* Products */;
 			projectDirPath = "";
@@ -816,12 +824,28 @@
 				minimumVersion = 4.0.8;
 			};
 		};
+		59DAA86DFA3938E33D789A0C /* XCRemoteSwiftPackageReference "Chat" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/Chat";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		BDF7E693B73576419C714F24 /* XCRemoteSwiftPackageReference "SwiftTerm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/migueldeicaza/SwiftTerm";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.2.6;
+			};
+		};
+		D678390E38D31F437C79A537 /* XCRemoteSwiftPackageReference "MessageKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MessageKit/MessageKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.2.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -832,10 +856,20 @@
 			package = 1023C18D2EAB0BD3007B0725 /* XCRemoteSwiftPackageReference "Inject" */;
 			productName = Inject;
 		};
+		10D27DAB703E1690FCA5430A /* ExyteChat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 59DAA86DFA3938E33D789A0C /* XCRemoteSwiftPackageReference "Chat" */;
+			productName = ExyteChat;
+		};
 		5F947D6AFB22B2F36790514C /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 184DC2907F0EBF9C4EA21AE0 /* XCRemoteSwiftPackageReference "Starscream" */;
 			productName = Starscream;
+		};
+		6C50E3A2AD5FB7EC420E3B50 /* MessageKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D678390E38D31F437C79A537 /* XCRemoteSwiftPackageReference "MessageKit" */;
+			productName = MessageKit;
 		};
 		7A7D86B96AA7875BDF7E8303 /* SwiftTerm */ = {
 			isa = XCSwiftPackageProductDependency;
