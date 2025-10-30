@@ -17,6 +17,9 @@ import anthropic
 from aiohttp import web
 from aiohttp import WSMsgType
 
+# BridgeHub integration
+from bridgehub_client import BridgeHubClient
+
 # APNs imports
 try:
     from aioapns import APNs, NotificationRequest
@@ -65,14 +68,9 @@ codex_connections: Set[web.WebSocketResponse] = set()
 # Format: { "device_id": { "token": "...", "platform": "ios", "registered_at": "..." } }
 device_tokens: Dict[str, Dict] = {}
 
-# Initialize Anthropic client with subscription auth
-# CRITICAL: Remove API key to use Claude subscription instead of API billing
-if 'ANTHROPIC_API_KEY' in os.environ:
-    del os.environ['ANTHROPIC_API_KEY']
-    logger.info("✅ Removed ANTHROPIC_API_KEY to use subscription")
-
-# Initialize without API key - uses subscription authentication
-anthropic_client = anthropic.Anthropic()
+# Initialize Anthropic client
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
 
 async def authenticate_websocket(ws: web.WebSocketResponse) -> bool:
@@ -134,12 +132,19 @@ async def handle_claude_message(content: str) -> str:
         raise
 
 
-async def handle_codex_message(content: str) -> str:
+async def handle_codex_message(content: str, session_id: str, conversation_history: list):
     """
-    Send message to Codex (placeholder - needs BridgeHub integration).
+    Send message to Codex via BridgeHub.
+    Yields response chunks as they arrive from Codex CLI.
     """
-    # TODO: Integrate with BridgeHub CLI for Codex communication
-    return f"Codex response placeholder for: {content}"
+    logger.info(f"📬 Sending to Codex via BridgeHub: {content[:60]}...")
+
+    async for chunk in BridgeHubClient.call_codex(
+        message=content,
+        session_id=session_id,
+        conversation_history=conversation_history
+    ):
+        yield chunk
 
 
 async def claude_websocket_handler(request):
@@ -248,7 +253,7 @@ async def claude_websocket_handler(request):
 
 async def codex_websocket_handler(request):
     """
-    WebSocket endpoint for Codex Agent chat.
+    WebSocket endpoint for Codex Agent chat via BridgeHub.
     """
     ws = web.WebSocketResponse()
     await ws.prepare(request)
@@ -263,10 +268,15 @@ async def codex_websocket_handler(request):
     # Add to active connections
     codex_connections.add(ws)
 
+    # Generate session ID for this connection
+    import uuid
+    session_id = str(uuid.uuid4())
+    conversation_history = []
+
     # Send ready message
     ready_msg = {
         "type": "ready",
-        "content": "Codex Agent connected",
+        "content": "Codex Agent connected via BridgeHub",
         "timestamp": datetime.now().isoformat()
     }
     await ws.send_json(ready_msg)
@@ -284,32 +294,41 @@ async def codex_websocket_handler(request):
 
                     logger.info(f"📬 Codex received: {user_message[:60]}...")
 
-                    # Get Codex response
-                    response_text = await handle_codex_message(user_message)
+                    # Add to conversation history
+                    conversation_history.append({
+                        "role": "user",
+                        "content": user_message
+                    })
 
-                    # Send response
-                    response_msg = {
-                        "type": "message",
-                        "content": response_text,
-                        "timestamp": datetime.now().isoformat()
-                    }
-                    await ws.send_json(response_msg)
+                    # Stream Codex response from BridgeHub
+                    full_response = ""
+                    async for chunk in handle_codex_message(user_message, session_id, conversation_history):
+                        full_response += chunk
+
+                        # Send chunk
+                        chunk_msg = {
+                            "type": "message",
+                            "content": chunk,
+                            "timestamp": datetime.now().isoformat()
+                        }
+                        await ws.send_json(chunk_msg)
+
+                    # Add response to history
+                    conversation_history.append({
+                        "role": "assistant",
+                        "content": full_response
+                    })
 
                     # Send completion
                     complete_msg = {
                         "type": "complete",
                         "content": "Response complete",
-                        "timestamp": datetime.now().isoformat(),
-                        "usage": {
-                            "input_tokens": None,
-                            "cached_input_tokens": None,
-                            "output_tokens": None
-                        }
+                        "timestamp": datetime.now().isoformat()
                     }
                     await ws.send_json(complete_msg)
 
                     # Send push notifications to all registered devices
-                    preview = response_text[:100] + "..." if len(response_text) > 100 else response_text
+                    preview = full_response[:100] + "..." if len(full_response) > 100 else full_response
                     for device_id in device_tokens.keys():
                         await send_push_notification(
                             device_id=device_id,
@@ -332,7 +351,7 @@ async def codex_websocket_handler(request):
                     await ws.send_json(error_msg)
 
                 except Exception as e:
-                    logger.error(f"❌ Error processing message: {e}")
+                    logger.error(f"❌ Error processing Codex message: {e}")
                     error_msg = {
                         "type": "error",
                         "content": str(e),
