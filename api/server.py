@@ -104,9 +104,9 @@ async def authenticate_websocket(ws: web.WebSocketResponse) -> bool:
         return False
 
 
-async def handle_claude_message(content: str) -> str:
+async def handle_claude_message(content: str):
     """
-    Send message to Claude API and return streaming response.
+    Send message to Claude API and yield streaming response chunks.
     """
     try:
         # Create message with streaming
@@ -119,13 +119,10 @@ async def handle_claude_message(content: str) -> str:
             stream=True
         )
 
-        # Collect full response
-        full_response = ""
+        # Stream response chunks as they arrive
         for chunk in response:
             if hasattr(chunk, 'delta') and hasattr(chunk.delta, 'text'):
-                full_response += chunk.delta.text
-
-        return full_response
+                yield chunk.delta.text
 
     except Exception as e:
         logger.error(f"❌ Claude API error: {e}")
@@ -185,20 +182,16 @@ async def claude_websocket_handler(request):
 
                     logger.info(f"📬 Claude received: {user_message[:60]}...")
 
-                    # Get Claude response (streaming)
-                    response_text = await handle_claude_message(user_message)
-
-                    # Send response in chunks
-                    chunk_size = 100
-                    for i in range(0, len(response_text), chunk_size):
-                        chunk = response_text[i:i+chunk_size]
+                    # Stream Claude response chunks as they arrive
+                    full_response = ""
+                    async for chunk in handle_claude_message(user_message):
+                        full_response += chunk
                         chunk_msg = {
                             "type": "message",
                             "content": chunk,
                             "timestamp": datetime.now().isoformat()
                         }
                         await ws.send_json(chunk_msg)
-                        await asyncio.sleep(0.05)  # Simulate streaming
 
                     # Send completion message
                     complete_msg = {
@@ -210,7 +203,7 @@ async def claude_websocket_handler(request):
 
                     # Send push notifications to all registered devices
                     # (they can filter if WebSocket is already active)
-                    preview = response_text[:100] + "..." if len(response_text) > 100 else response_text
+                    preview = full_response[:100] + "..." if len(full_response) > 100 else full_response
                     for device_id in device_tokens.keys():
                         await send_push_notification(
                             device_id=device_id,
