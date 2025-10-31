@@ -73,6 +73,54 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
 
+def build_system_prompt(working_directory: str = "/Users/Ty/BuilderOS") -> str:
+    """
+    Build system prompt with Jarvis identity and BuilderOS context.
+    This gives Claude proper identity and environmental awareness.
+    """
+    return f"""# Builder System – Jarvis Activation
+
+## STARTUP PROTOCOL
+Builder OS session activation confirmed.
+
+## Jarvis Identity
+You are **Jarvis**, Ty's Number-2, second-in-command and chief of staff for the Builder System. You are his intelligent top agent - persistent, learning, and evolving over years. You serve as the intelligent layer between Ty and all other specialist agents.
+
+## Current Environment
+- **Working Directory:** {working_directory}
+- **Platform:** macOS (Darwin)
+- **System:** BuilderOS - The one thing that builds all other things
+- **Interface:** Mobile app (iOS)
+
+## Response Formation: Autonomous Execution Principle
+
+**CRITICAL: Don't ask Ty to do what Jarvis or agents can do.**
+
+### The Core Problem
+Jarvis exists to reduce Ty's execution burden. Asking Ty to perform mechanical tasks defeats this purpose.
+
+**DO ask Ty for decisions and approvals:**
+- ✅ "Want me to implement X?" - Checking strategic direction
+- ✅ "Should we use approach A or B?" - Genuine decision needed
+- ✅ "This costs $X/month, proceed?" - Spend approval required
+- ✅ "This is a breaking change, confirm?" - Risk gate
+
+**DO NOT ask Ty to perform mechanical work:**
+- ❌ "Once you test this, let me know if it works"
+- ❌ "Can you check what's on the screen?"
+- ❌ "Run this command and tell me the output"
+
+**The goal:** Ty decides WHAT to build. Jarvis and agents figure out HOW and verify it works.
+
+## System Purpose
+The Builder System is **the one thing that builds all other things** for Ty - whether workflow automations, apps, or business systems. It moves ideas from *ideation → design → build → deploy* efficiently.
+
+**Core Goal:** Build everything Ty needs, when he needs it.
+
+## Mobile Context
+You are responding via BuilderOS mobile app. Keep responses concise but informative. You have full BuilderOS capabilities available through the backend APIs."""
+
+
 async def authenticate_websocket(ws: web.WebSocketResponse) -> bool:
     """
     Authenticate WebSocket connection by expecting API key as first message.
@@ -104,15 +152,20 @@ async def authenticate_websocket(ws: web.WebSocketResponse) -> bool:
         return False
 
 
-async def handle_claude_message(content: str):
+async def handle_claude_message(content: str, working_directory: str = "/Users/Ty/BuilderOS"):
     """
-    Send message to Claude API and yield streaming response chunks.
+    Send message to Claude API with full Jarvis identity and BuilderOS context.
+    Yields streaming response chunks as they arrive.
     """
     try:
+        # Build system prompt with Jarvis identity and context
+        system_prompt = build_system_prompt(working_directory)
+
         # Create message with streaming
         response = anthropic_client.messages.create(
             model="claude-sonnet-4-5-20250929",
             max_tokens=4096,
+            system=system_prompt,  # ← ADD SYSTEM PROMPT
             messages=[
                 {"role": "user", "content": content}
             ],
@@ -146,7 +199,14 @@ async def handle_codex_message(content: str, session_id: str, conversation_histo
 
 async def claude_websocket_handler(request):
     """
-    WebSocket endpoint for Claude Agent chat.
+    WebSocket endpoint for Claude Agent chat with BuilderOS context.
+
+    Protocol:
+    1. Client sends API key as first message
+    2. Server responds "authenticated" on success
+    3. Client optionally sends session config: {"working_directory": "/path/to/dir"}
+    4. Client sends messages as JSON: {"content": "user message text"}
+    5. Server streams responses with full Jarvis identity and BuilderOS context
     """
     ws = web.WebSocketResponse()
     await ws.prepare(request)
@@ -161,11 +221,24 @@ async def claude_websocket_handler(request):
     # Add to active connections
     claude_connections.add(ws)
 
-    # Send ready message
+    # Default working directory (can be overridden by session config)
+    working_directory = "/Users/Ty/BuilderOS"
+
+    # Session config is optional - mobile app can send working_directory
+    # For now, we just use the default. In the future, the mobile app can send:
+    # {"working_directory": "/Users/Ty/BuilderOS/capsules/some-capsule"}
+    # as the first message after authentication
+
+    logger.info(f"📁 Working directory: {working_directory}")
+
+    # Send ready message with Jarvis identity
     ready_msg = {
         "type": "ready",
-        "content": "Claude Agent connected",
-        "timestamp": datetime.now().isoformat()
+        "content": "Jarvis activated. BuilderOS mobile interface ready.",
+        "timestamp": datetime.now().isoformat(),
+        "identity": "Jarvis",
+        "working_directory": working_directory,
+        "system": "BuilderOS"
     }
     await ws.send_json(ready_msg)
 
@@ -182,9 +255,9 @@ async def claude_websocket_handler(request):
 
                     logger.info(f"📬 Claude received: {user_message[:60]}...")
 
-                    # Stream Claude response chunks as they arrive
+                    # Stream Claude response chunks with Jarvis identity and BuilderOS context
                     full_response = ""
-                    async for chunk in handle_claude_message(user_message):
+                    async for chunk in handle_claude_message(user_message, working_directory):
                         full_response += chunk
                         chunk_msg = {
                             "type": "message",
